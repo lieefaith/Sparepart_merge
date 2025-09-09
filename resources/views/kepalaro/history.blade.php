@@ -1,38 +1,61 @@
 @extends('layouts.kepalaro')
 
-@section('title', 'Dashboard Kepala RO')
+@section('title', 'Histori Permintaan')
 
 @section('content')
 <div x-data="{
     showDetailModal: false,
-    showApproveModal: false,
-    showRejectModal: false,
     detailData: {},
-    approveId: null,
-    rejectId: null,
 
     openDetail(data) {
         this.detailData = data;
         this.showDetailModal = true;
-    },
-    confirmApprove(id) {
-        this.approveId = id;
-        this.showApproveModal = true;
-    },
-    confirmReject(id) {
-        this.rejectId = id;
-        this.showRejectModal = true;
     }
 }">
+<div class="py-8 px-6">
+    <h2 class="text-2xl font-semibold mb-6 text-gray-800">Histori Permintaan</h2>
+
+    <!-- Filter Form -->
+    <form method="GET" action="{{ route('kepalaro.history') }}" class="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4 bg-gray-50 p-4 rounded-lg">
+        <!-- Status -->
+        <div>
+            <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <select name="status" id="status" class="w-full border-gray-300 rounded-lg">
+                <option value="all" {{ ($filters['status'] ?? '') == 'all' ? 'selected' : '' }}>Semua</option>
+                <option value="pending" {{ ($filters['status'] ?? '') == 'pending' ? 'selected' : '' }}>Pending</option>
+                <option value="diterima" {{ ($filters['status'] ?? '') == 'diterima' ? 'selected' : '' }}>Diterima</option>
+                <option value="ditolak" {{ ($filters['status'] ?? '') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+            </select>
+        </div>
+
+        <!-- Dari tanggal -->
+        <div>
+            <label for="date_from" class="block text-sm font-medium text-gray-700 mb-1">Dari Tanggal</label>
+            <input type="date" name="date_from" id="date_from"
+                   value="{{ $filters['date_from'] ?? '' }}"
+                   class="w-full border-gray-300 rounded-lg">
+        </div>
+
+        <!-- Sampai tanggal -->
+        <div>
+            <label for="date_to" class="block text-sm font-medium text-gray-700 mb-1">Sampai Tanggal</label>
+            <input type="date" name="date_to" id="date_to"
+                   value="{{ $filters['date_to'] ?? '' }}"
+                   class="w-full border-gray-300 rounded-lg">
+        </div>
+
+        <!-- Tombol -->
+        <div class="flex items-end gap-2">
+            <button type="submit"
+                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Filter</button>
+            <a href="{{ route('kepalaro.history') }}"
+                class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400">Reset</a>
+        </div>
+    </form>
+
 
     <div class="py-8 px-6">
-        @if (session('success'))
-            <div class="mb-6 p-4 bg-green-100 text-green-800 rounded-lg text-sm">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        <h2 class="text-2xl font-semibold mb-6 text-gray-800">Permintaan Menunggu Approval</h2>
+        <h2 class="text-2xl font-semibold mb-6 text-gray-800">Histori Permintaan</h2>
 
         <div class="bg-white shadow rounded-lg overflow-hidden">
             <table class="min-w-full divide-y divide-gray-200">
@@ -41,6 +64,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pemohon</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
@@ -50,30 +74,32 @@
                             <td class="px-6 py-4 text-sm font-medium text-gray-900">#{{ $req->id }}</td>
                             <td class="px-6 py-4 text-sm">{{ $req->user?->name ?? 'Tidak Diketahui' }}</td>
                             <td class="px-6 py-4 text-sm">{{ \Carbon\Carbon::parse($req->tanggal_permintaan)->format('d M Y') }}</td>
-                            <td class="px-6 py-4 text-sm space-x-3">
+                            <td class="px-6 py-4 text-sm">
+                                <span class="px-2 py-1 text-xs rounded-full
+                                    @if($req->status == 'diterima') bg-green-100 text-green-800
+                                    @elseif($req->status == 'ditolak') bg-red-100 text-red-800
+                                    @else bg-gray-100 text-gray-800 @endif">
+                                    {{ ucfirst($req->status) }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-sm">
                                 <button @click="openDetail({{ json_encode([
                                     'tiket' => $req->tiket,
                                     'user' => $req->user?->name,
                                     'email' => $req->user?->email,
                                     'tanggal' => \Carbon\Carbon::parse($req->tanggal_permintaan)->format('d M Y'),
+                                    'status' => $req->status,
+                                    'catatan' => $req->catatan ?? null,
                                     'details' => $req->details
                                 ]) }})"
                                         class="text-blue-600 hover:text-blue-800 hover:underline text-sm font-medium">
                                     Detail
                                 </button>
-                                <button @click="confirmApprove({{ $req->id }})"
-                                        class="text-green-600 hover:text-green-800 hover:underline text-sm font-medium">
-                                    Approve
-                                </button>
-                                <button @click="confirmReject({{ $req->id }})"
-                                        class="text-red-600 hover:text-red-800 hover:underline text-sm font-medium">
-                                    Reject
-                                </button>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">Tidak ada permintaan menunggu approval.</td>
+                            <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">Belum ada riwayat permintaan.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -110,10 +136,23 @@
                         <p class="font-medium" x-text="detailData.tanggal"></p>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-600">Jumlah Item:</p>
-                        <p class="font-medium" x-text="detailData.details?.length || 0"></p>
+                        <p class="text-sm text-gray-600">Status:</p>
+                        <span class="px-2 py-1 text-xs rounded-full ml-1"
+                              :class="{
+                                  'bg-green-100 text-green-800': detailData.status === 'diterima',
+                                  'bg-red-100 text-red-800': detailData.status === 'ditolak',
+                                  'bg-gray-100 text-gray-800': detailData.status !== 'diterima' && detailData.status !== 'ditolak'
+                              }"
+                              x-text="detailData.status ? detailData.status.charAt(0).toUpperCase() + detailData.status.slice(1) : '-'">
+                        </span>
                     </div>
                 </div>
+                <template x-if="detailData.status === 'ditolak' && detailData.catatan">
+                    <div class="mt-3 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-800">
+                        <strong>Catatan Penolakan:</strong>
+                        <span x-text="detailData.catatan"></span>
+                    </div>
+                </template>
                 <div class="overflow-x-auto">
                     <table class="min-w-full border border-gray-200 text-sm">
                         <thead class="bg-blue-50 text-blue-700">
@@ -150,56 +189,6 @@
                     Tutup
                 </button>
             </div>
-        </div>
-    </div>
-
-    <!-- Modal Approve -->
-    <div x-show="showApproveModal"
-         x-transition
-         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-         x-cloak>
-        <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-            <h3 class="text-lg font-bold">Setujui Permintaan?</h3>
-            <p class="text-gray-600 text-sm">Apakah Anda yakin ingin menyetujui permintaan ini?</p>
-            <form :action="`/kepalaro/approve/${approveId}`" method="POST">
-                @csrf
-                <div class="mt-6 text-right space-x-2">
-                    <button type="button" @click="showApproveModal = false"
-                            class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-sm font-medium">
-                        Batal
-                    </button>
-                    <button type="submit"
-                            class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm font-medium">
-                        Ya, Setujui
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal Reject -->
-    <div x-show="showRejectModal"
-         x-transition
-         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-         x-cloak>
-        <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-            <h3 class="text-lg font-bold">Tolak Permintaan</h3>
-            <form :action="`/kepalaro/reject/${rejectId}`" method="POST">
-                @csrf
-                <label class="block mt-3 text-sm font-medium text-gray-700">Catatan Penolakan</label>
-                <textarea name="catatan" class="w-full border border-gray-300 rounded-lg p-2 mt-1 text-sm" 
-                          placeholder="Jelaskan alasan penolakan..." rows="3" required></textarea>
-                <div class="mt-6 text-right space-x-2">
-                    <button type="button" @click="showRejectModal = false"
-                            class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-sm font-medium">
-                        Batal
-                    </button>
-                    <button type="submit"
-                            class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm font-medium">
-                        Tolak
-                    </button>
-                </div>
-            </form>
         </div>
     </div>
 </div>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\JenisBarang;
 
 class HomeController extends Controller
 {
@@ -10,4 +11,10 @@ class HomeController extends Controller
     {
         return view('user.home');
     }
+
+  public function jenisBarang()
+{
+    $jenisBarang = JenisBarang::with('listBarang')->get();
+    return view('user.jenisbarang', compact('jenisBarang'));
+}
 }

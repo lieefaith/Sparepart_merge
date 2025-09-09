@@ -9,46 +9,73 @@ use Illuminate\Support\Facades\Auth;
 class PermintaanController extends Controller
 {
     /**
-     * Tampilkan list permintaan
+     * Tampilkan list permintaan user yang sedang login
      */
-    public function index()
-    {
-        $permintaans = Permintaan::with(['user', 'details'])->orderBy('id', 'desc')->get();
-        return view('user.requestbarang', compact('permintaans'));
+   public function index(Request $request)
+{
+    $query = Permintaan::with(['user', 'details'])
+        ->where('user_id', Auth::id());
+
+    // Filter berdasarkan status
+    if ($request->filled('status') && $request->status !== 'all') {
+        $query->where('status', $request->status);
     }
+
+    // Filter berdasarkan tanggal
+    if ($request->filled('start_date') && $request->filled('end_date')) {
+        $query->whereBetween('tanggal_permintaan', [
+            $request->start_date,
+            $request->end_date
+        ]);
+    }
+
+    $permintaans = $query->orderBy('tanggal_permintaan', 'desc')->get();
+
+    return view('user.requestbarang', compact('permintaans'));
+}
 
     /**
      * Simpan permintaan baru
      */
     public function store(Request $request)
     {
+        // Validasi input
         $request->validate([
+            'items' => 'required|array|min:1',
             'items.*.nama' => 'required|string|max:50',
             'items.*.deskripsi' => 'required|string|max:255',
             'items.*.jumlah' => 'required|integer|min:1',
             'items.*.keterangan' => 'nullable|string|max:255',
         ]);
 
+        // Ambil user login
+        $user = Auth::user();
+
+        // Buat permintaan baru (tiket akan auto-generate di model)
         $permintaan = Permintaan::create([
-            'user_id' => Auth::id(),
+            'user_id'            => $user->id,
             'tanggal_permintaan' => now(),
-            
+            'status'             => 'pending',
         ]);
+
+        // Simpan detail item permintaan
         foreach ($request->items as $item) {
             $permintaan->details()->create([
-                'tiket' => $permintaan->tiket,
-                'nama_item' => $item['nama'],
-                'deskripsi' => $item['deskripsi'],
-                'jumlah' => $item['jumlah'],
+                'tiket'      => $permintaan->tiket, // pakai tiket dari model
+                'nama_item'  => $item['nama'],
+                'deskripsi'  => $item['deskripsi'],
+                'jumlah'     => $item['jumlah'],
                 'keterangan' => $item['keterangan'] ?? null,
             ]);
         }
 
-        return redirect()->route('request.store')->with('success', 'Permintaan berhasil dikirim!');
+        // Redirect ke halaman daftar permintaan
+        return redirect()->route('request.barang.index')->with('success', 'Permintaan berhasil dikirim!');
     }
 
-
-
+    /**
+     * Ambil detail permintaan berdasarkan tiket (API)
+     */
     public function getDetail($tiket)
     {
         $permintaan = Permintaan::with(['details', 'user'])
@@ -56,14 +83,14 @@ class PermintaanController extends Controller
             ->firstOrFail();
 
         return response()->json([
-            'tiket' => $permintaan->tiket,
+            'tiket'              => $permintaan->tiket,
             'tanggal_permintaan' => $permintaan->tanggal_permintaan,
-            'name' => $permintaan->user->name,
-            'details' => $permintaan->details->map(function ($detail) {
+            'name'               => $permintaan->user->name,
+            'details'            => $permintaan->details->map(function ($detail) {
                 return [
-                    'nama' => $detail->nama_item,
-                    'deskripsi' => $detail->deskripsi ?? '-',
-                    'jumlah' => $detail->jumlah,
+                    'nama'       => $detail->nama_item,
+                    'deskripsi'  => $detail->deskripsi ?? '-',
+                    'jumlah'     => $detail->jumlah,
                     'keterangan' => $detail->keterangan ?? '-',
                 ];
             }),

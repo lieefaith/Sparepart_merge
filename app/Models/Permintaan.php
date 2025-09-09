@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class Permintaan extends Model
 {
@@ -15,7 +14,6 @@ class Permintaan extends Model
         'status',
     ];
 
-
     public $timestamps = false;
 
     protected static function boot()
@@ -23,14 +21,21 @@ class Permintaan extends Model
         parent::boot();
 
         static::creating(function ($permintaan) {
+            $user   = auth()->user();
+            $region = strtoupper($user->region);
+            $year   = now()->year;
 
-            $lastTiketNumber = DB::table('permintaan')
-                ->select(DB::raw('MAX(CAST(SUBSTRING(tiket, 7) AS UNSIGNED)) as max_number'))
-                ->value('max_number');
+            // Cari tiket terakhir untuk region & tahun ini
+            $lastPermintaan = self::where('tiket', 'like', "REQ-{$region}-{$year}-%")
+                ->orderBy('id', 'desc')
+                ->first();
 
-            $nextNumber = $lastTiketNumber ? $lastTiketNumber + 1 : 1;
+            $number = 1;
+            if ($lastPermintaan && preg_match('/(\d+)$/', $lastPermintaan->tiket, $matches)) {
+                $number = (int)$matches[1] + 1;
+            }
 
-            $permintaan->tiket = 'REQ-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+            $permintaan->tiket = "REQ-{$region}-{$year}-" . str_pad($number, 3, '0', STR_PAD_LEFT);
         });
     }
 
@@ -42,5 +47,10 @@ class Permintaan extends Model
     public function details()
     {
         return $this->hasMany(PermintaanDetail::class, 'tiket', 'tiket');
+    }
+
+    public function histori()
+    {
+        return $this->hasOne(HistoriPermintaan::class, 'tiket', 'tiket');
     }
 }

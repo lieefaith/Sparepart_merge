@@ -26,7 +26,7 @@ class AuthController extends Controller
             case 1:
                 return redirect()->route('superadmin.dashboard');
             case 2:
-                return redirect()->route('kepalaro.dashboard');
+                return redirect()->route('kepalaro.home');
             case 3:
                 return redirect()->route('kepalagudang.dashboard');
             default: // user biasa

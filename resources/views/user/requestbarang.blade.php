@@ -1,373 +1,410 @@
-<!DOCTYPE html>
-<html lang="id">
+@extends('layouts.user')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Request Barang</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+@section('title', 'Request Barang')
 
-        .card {
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border: none;
-        }
+@section('content')
+<div class="container py-5 px-6">
 
-        .table th {
-            background-color: #4e73df;
-            color: white;
-            vertical-align: middle;
-        }
+    <!-- Notifikasi -->
+    @if (session('success'))
+        <div class="mb-6 p-4 bg-green-100 text-green-800 rounded-lg text-sm flex items-center">
+            <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+            <button type="button" class="ms-auto" onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    @endif
 
-        .btn-primary {
-            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
-            border: none;
-        }
+    <!-- Filter -->
+<form method="GET" action="{{ route('request.barang.index') }}" class="mb-4 flex flex-wrap gap-3 items-end">
+    <!-- Status -->
+    <div>
+        <label class="block text-sm font-medium text-gray-700">Status</label>
+        <select name="status" class="border-gray-300 rounded-md shadow-sm text-sm">
+            <option value="all" {{ request('status') == 'all' ? 'selected' : '' }}>Semua</option>
+            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+            <option value="diterima" {{ request('status') == 'diterima' ? 'selected' : '' }}>Diterima</option>
+            <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+        </select>
+    </div>
 
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #224abe 0%, #4e73df 100%);
-        }
+    <!-- Range Tanggal -->
+    <div>
+        <label class="block text-sm font-medium text-gray-700">Dari</label>
+        <input type="date" name="start_date" value="{{ request('start_date') }}" 
+               class="border-gray-300 rounded-md shadow-sm text-sm">
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700">Sampai</label>
+        <input type="date" name="end_date" value="{{ request('end_date') }}" 
+               class="border-gray-300 rounded-md shadow-sm text-sm">
+    </div>
 
-        .btn-back {
-            background-color: #858796;
-            border: none;
-            color: white;
-        }
+    <!-- Tombol Filter -->
+    <div>
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700">
+            <i class="fas fa-filter me-1"></i> Filter
+        </button>
+    </div>
+</form>
 
-        .btn-back:hover {
-            background-color: #717384;
-        }
+    <!-- Default: Tampilkan History -->
+    <div id="history-section" class="bg-white shadow rounded-lg p-6 max-w-5xl mx-auto">
+        <h4 class="text-xl font-bold mb-4 flex items-center text-gray-800">
+            <i class="fas fa-history me-2 text-blue-600"></i> History Request
+        </h4>
 
-        .ticket-row:hover {
-            background-color: #f1f3f9;
-            cursor: pointer;
-        }
-
-        .modal-header {
-            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
-            color: white;
-        }
-
-        .badge-status {
-            font-size: 0.85rem;
-            padding: 0.35rem 0.65rem;
-            border-radius: 0.5rem;
-        }
-
-        .page-title {
-            color: #2c3e50;
-            border-bottom: 2px solid #e9ecef;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        .loading-spinner {
-            display: none;
-            width: 3rem;
-            height: 3rem;
-            margin: 20px auto;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="container py-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold page-title">Request Sparepart</h2>
-            <a href="{{ route('home') }}" class="btn btn-back">
-                <i class="fas fa-arrow-left me-2"></i>Kembali ke Home
-            </a>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">No</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Tiket</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($permintaans as $index => $p)
+                        <tr class="ticket-row hover:bg-gray-50 cursor-pointer transition-colors">
+                            <td class="px-4 py-3 text-sm">{{ $index + 1 }}</td>
+                            <td class="px-4 py-3 text-sm font-medium text-blue-600">{{ $p->tiket }}</td>
+                            <td class="px-4 py-3 text-sm">{{ \Carbon\Carbon::parse($p->tanggal_permintaan)->translatedFormat('l, d F Y') }}</td>
+                            <td class="px-4 py-3 text-sm">
+                                @if ($p->status === 'diterima')
+                                    <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Diterima</span>
+                                @elseif ($p->status === 'ditolak')
+                                    <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">Ditolak</span>
+                                @else
+                                    <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">Pending</span>
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm">
+                                <button onclick="showDetail('{{ $p->tiket }}')" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                    <i class="fas fa-eye me-1"></i> Detail
+                                </button>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-4 py-8 text-center text-sm text-gray-500">
+                                <i class="fas fa-inbox fa-3x text-gray-400 block mb-3"></i>
+                                <p>Belum ada history request</p>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
 
-        <!-- Notifikasi -->
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <!-- Tombol Buat Request Baru -->
+        <div class="flex justify-end mt-6">
+            <button onclick="showForm()" class="btn btn-primary bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center transition-all duration-200">
+                <i class="fas fa-plus-circle me-2"></i> Buat Request Baru
+            </button>
+        </div>
+    </div>
+
+    <!-- Form Request - Sembunyi awalnya -->
+<div id="form-section" class="bg-white shadow rounded-lg p-6 max-w-5xl mx-auto hidden">
+    <h4 class="text-xl font-bold mb-4 flex items-center text-gray-800">
+        <i class="fas fa-file-alt me-2 text-blue-600"></i> Form Request Barang
+    </h4>
+
+    <form id="request-form" action="{{ route('request.barang.store') }}" method="POST">
+        @csrf
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-blue-700">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-white uppercase">No</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-white uppercase">Nama Item</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-white uppercase">Deskripsi</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-white uppercase">Jumlah</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-white uppercase">Keterangan</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-white uppercase">Aksi</th>
+                    </tr>
+                </thead>
+               <tbody id="request-table-body">
+    <tr class="hover:bg-gray-50 transition-colors">
+        <!-- Kolom No -->
+        <td class="px-4 py-3 text-sm text-center border border-gray-300 bg-gray-50 font-mono">1</td>
+
+        <!-- Kolom Nama Item -->
+        <td class="border border-gray-300">
+            <input type="text" class="w-full border-0 outline-none px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" name="items[0][nama]" required>
+        </td>
+
+        <!-- Kolom Deskripsi -->
+        <td class="border border-gray-300">
+            <input type="text" class="w-full border-0 outline-none px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" name="items[0][deskripsi]" required>
+        </td>
+
+        <!-- Kolom Jumlah -->
+        <td class="border border-gray-300">
+            <input type="number" class="w-full border-0 outline-none px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" name="items[0][jumlah]" min="1" value="1" required>
+        </td>
+
+        <!-- Kolom Keterangan -->
+        <td class="border border-gray-300">
+            <input type="text" class="w-full border-0 outline-none px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" name="items[0][keterangan]" required>
+        </td>
+
+        <!-- Kolom Aksi -->
+        <td class="px-4 py-3 text-center border border-gray-300">
+            <button type="button" class="btn btn-sm btn-danger item-center opacity-50 cursor-not-allowed" disabled>
+                <i class="fas fa-trash"></i>
+            </button>
+        </td>
+    </tr>
+</tbody>
+            </table>
+        </div>
+
+        <!-- Tombol: Tambah Baris di kiri, Batal & Kirim di kanan -->
+        <div class="flex justify-between items-center mt-6">
+            <!-- Kiri: Tombol Tambah Baris -->
+            <button type="button" onclick="tambahRow()" class="btn btn-outline-primary bg-blue-600 hover:bg-blue-700 text-white border border-blue-600 px-4 py-2 rounded-md text-sm flex items-center transition-all duration-200">
+                <i class="fas fa-plus me-2"></i> Tambah Baris
+            </button>
+
+            <!-- Kanan: Batal & Kirim -->
+            <div class="flex gap-2">
+                <button type="button" onclick="cancelForm()" class="btn btn-secondary bg-red-400 hover:bg-red-500 text-white px-4 py-2 rounded-md text-sm transition-all duration-200">
+                    <i class="fas fa-times me-2"></i> Batal
+                </button>
+                <button type="submit" class="btn btn-success bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm flex items-center transition-all duration-200">
+                    <i class="fas fa-paper-plane me-2"></i> Kirim Request
+                </button>
             </div>
-        @endif
+        </div>
+    </form>
+</div>
 
-        <!-- History Request -->
-        <div id="history-section">
-            <div class="card p-4 mb-4">
-                <h4 class="fw-bold mb-3"><i class="fas fa-history me-2"></i>History Request</h4>
-
-                <div class="table-responsive">
-                    <table class="table table-bordered align-middle" id="history-table">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Nama Tiket</th>
-                                <th>Tanggal</th>
-                                <th>Status</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($permintaans as $index => $p)
-                                <tr class="ticket-row">
-                                    <td>{{ $index + 1 }}</td>
-                                    <td class="fw-bold text-primary">{{ $p->tiket }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($p->tanggal_permintaan)->translatedFormat('l, d F Y') }}
-                                    </td>
-                                    <td>{{ $p->status ?? '-' }}</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-info" onclick="showDetail('{{ $p->tiket }}')">
-                                            <i class="fas fa-eye me-1"></i>Detail
-                                        </button>
-                                    </td>
-                                </tr>
-                            @empty
+<!-- Modal Detail -->
+<div x-data="{ showDetail: false }" x-show="showDetail" x-cloak class="fixed inset-0 z-50 overflow-y-auto" style="display: none;"> <div class="flex items-center justify-center min-h-screen">
+        <div class="bg-black bg-opacity-50 absolute inset-0" @click="showDetail = false"></div>
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 z-10">
+            <div class="modal-header bg-blue-600 text-white p-4 rounded-t-lg flex justify-between items-center">
+                <h5 class="text-lg font-semibold">Detail Request</h5>
+                <button @click="showDetail = false" class="text-white hover:text-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div id="modal-spinner" class="flex justify-center">
+                    <div class="spinner-border text-blue-600" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div id="modal-content" style="display: none;">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 text-sm">
+                        <div>
+                            <strong>Nama Tiket:</strong> <span id="modal-ticket-name"></span>
+                        </div>
+                        <div>
+                            <strong>Tanggal:</strong> <span id="modal-ticket-date"></span>
+                        </div>
+                        <div>
+                            <strong>User:</strong> <span id="modal-ticket-user"></span>
+                        </div>
+                        <div>
+                            <strong>Jumlah Item:</strong> <span id="modal-ticket-count"></span>
+                        </div>
+                    </div>
+                    <h6 class="mt-4 mb-3 font-semibold">Daftar Barang:</h6>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full border border-gray-200 text-sm">
+                            <thead class="bg-gray-50">
                                 <tr>
-                                    <td colspan="6" class="text-center py-4">
-                                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                        <p class="text-muted">Belum ada history request</p>
-                                    </td>
+                                    <th class="px-4 py-2 border-b text-left">No</th>
+                                    <th class="px-4 py-2 border-b text-left">Nama Item</th>
+                                    <th class="px-4 py-2 border-b text-left">Deskripsi</th>
+                                    <th class="px-4 py-2 border-b text-left">Jumlah</th>
+                                    <th class="px-4 py-2 border-b text-left">Keterangan</th>
                                 </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-                <div class="d-flex justify-content-end mt-3">
-                    <button class="btn btn-primary" onclick="showForm()">
-                        <i class="fas fa-plus-circle me-2"></i>Buat Request Baru
-                    </button>
+                            </thead>
+                            <tbody id="modal-items-list"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Form Request -->
-        <div id="form-section" class="card p-4 d-none">
-            <h4 class="fw-bold mb-3"><i class="fas fa-file-alt me-2"></i>Form Request Barang</h4>
-            <form id="request-form" action="{{ route('request.store') }}" method="POST">
-                @csrf
-                <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead class="table-success">
-                            <tr>
-                                <th>No</th>
-                                <th>Nama Item</th>
-                                <th>Deskripsi</th>
-                                <th>Jumlah</th>
-                                <th>Keterangan</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="request-table-body">
-                            <tr>
-                                <td>1</td>
-                                <td><input type="text" class="form-control" name="items[0][nama]" required></td>
-                                <td><input type="text" class="form-control" name="items[0][deskripsi]" required></td>
-                                <td><input type="number" class="form-control" name="items[0][jumlah]" min="1"
-                                        value="1" required></td>
-                                <td><input type="text" class="form-control" name="items[0][keterangan]" required>
-                                </td>
-                                <td><button type="button" class="btn btn-sm btn-danger" disabled><i
-                                            class="fas fa-trash"></i></button></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="d-flex justify-content-between mt-4">
-                    <button type="button" class="btn btn-outline-primary" onclick="tambahRow()">
-                        <i class="fas fa-plus me-2"></i>Tambah Baris
-                    </button>
-                    <div>
-                        <button type="button" class="btn btn-secondary me-2" onclick="cancelForm()">
-                            <i class="fas fa-times me-2"></i>Batal
-                        </button>
-                        <button type="submit" class="btn btn-success">
-                            <i class="fas fa-paper-plane me-2"></i>Kirim Request
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal Detail -->
-    <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="detailModalLabel">Detail Request</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="d-flex justify-content-center">
-                        <div class="spinner-border text-primary" id="modal-spinner" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
-                    <div id="modal-content" style="display: none;">
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <strong>Nama Tiket:</strong> <span id="modal-ticket-name"></span>
-                            </div>
-                            <div class="col-md-6">
-                                <strong>Tanggal:</strong> <span id="modal-ticket-date"></span>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <strong>User:</strong> <span id="modal-ticket-user"></span>
-                            </div>
-                            <div class="col-md-6">
-                                <strong>Jumlah Item:</strong> <span id="modal-ticket-count"></span>
-                            </div>
-                        </div>
-                        <h6 class="mt-4 mb-3">Daftar Barang:</h6>
-                        <div class="table-responsive">
-                            <table class="table table-bordered">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Nama Item</th>
-                                        <th>Deskripsi</th>
-                                        <th>Jumlah</th>
-                                        <th>Keterangan</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="modal-items-list">
-                                    <!-- Items will be inserted here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                </div>
+            <div class="bg-gray-50 px-6 py-4 rounded-b-lg flex justify-end">
+              <button onclick="closeDetailModal()" class="btn btn-secondary bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-md text-sm">
+    Tutup
+</button>
             </div>
         </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        let noRow = 1;
-        let detailModal = null;
+<script>
+    let noRow = 1;
 
-        const allTickets = {!! json_encode(
-            $permintaans->map(function ($p) {
-                    return [
-                        'id' => $p->id,
-                        'name' => $p->tiket,
-                        'date' => $p->tanggal_permintaan,
-                        'status' => $p->status,
-                        'author' => $p->user ? $p->user->name : '-',
-                        'items' => $p->details->map(function ($d) {
-                                return [
-                                    'nama' => $d->nama_item,
-                                    'desc' => $d->deskripsi ?? '-',
-                                    'qty' => $d->jumlah,
-                                    'note' => $d->keterangan ?? '-',
-                                ];
-                            })->toArray(),
-                    ];
-                })->toArray(),
-        ) !!};
+    function showForm() {
+        document.getElementById('history-section').classList.add('hidden');
+        document.getElementById('form-section').classList.remove('hidden');
+    }
+    function closeDetailModal() {
+    const modal = document.getElementById('detail-modal') || document.querySelector('[x-show="showDetail"]');
+    if (modal) {
+        modal.style.display = 'none';
+    }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
+    // Opsional: reset Alpine state jika ada
+    const alpineEl = document.querySelector('[x-data]');
+    if (alpineEl && alpineEl.__x) {
+        alpineEl.__x.$data.showDetail = false;
+    }
+}
+
+    function cancelForm() {
+        document.getElementById('form-section').classList.add('hidden');
+        document.getElementById('history-section').classList.remove('hidden');
+        document.getElementById('request-form').reset();
+
+        const tbody = document.getElementById('request-table-body');
+        tbody.innerHTML = `
+            <tr class="hover:bg-gray-50 transition-colors">
+                <!-- Kolom No -->
+                <td class="px-4 py-3 text-sm text-center border border-gray-300 bg-gray-50 font-mono">1</td>
+
+                <!-- Kolom Nama Item -->
+                <td class="border border-gray-300">
+                    <input type="text" class="w-full border-0 outline-none px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" name="items[0][nama]" required>
+                </td>
+
+                <!-- Kolom Deskripsi -->
+                <td class="border border-gray-300">
+                    <input type="text" class="w-full border-0 outline-none px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" name="items[0][deskripsi]" required>
+                </td>
+
+                <!-- Kolom Jumlah -->
+                <td class="border border-gray-300">
+                    <input type="number" class="w-full border-0 outline-none px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" name="items[0][jumlah]" min="1" value="1" required>
+                </td>
+
+                <!-- Kolom Keterangan -->
+                <td class="border border-gray-300">
+                    <input type="text" class="w-full border-0 outline-none px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" name="items[0][keterangan]" required>
+                </td>
+
+                <!-- Kolom Aksi -->
+                <td class="px-4 py-3 text-center border border-gray-300">
+                    <button type="button" class="btn btn-sm btn-danger opacity-50 cursor-not-allowed" disabled>
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+        noRow = 1;
+    }
+
+    function tambahRow() {
+        noRow++;
+        const tbody = document.getElementById('request-table-body');
+        const row = document.createElement('tr');
+        row.classList.add('hover:bg-gray-50', 'transition-colors');
+        
+        row.innerHTML = `
+            <td class="px-4 py-3 text-sm text-center border border-gray-300 bg-gray-50 font-mono">${noRow}</td>
+            <td class="border border-gray-300">
+                <input type="text" class="w-full border-0 outline-none px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" name="items[${noRow - 1}][nama]" required>
+            </td>
+            <td class="border border-gray-300">
+                <input type="text" class="w-full border-0 outline-none px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" name="items[${noRow - 1}][deskripsi]" required>
+            </td>
+            <td class="border border-gray-300">
+                <input type="number" class="w-full border-0 outline-none px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" name="items[${noRow - 1}][jumlah]" min="1" value="1" required>
+            </td>
+            <td class="border border-gray-300">
+                <input type="text" class="w-full border-0 outline-none px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" name="items[${noRow - 1}][keterangan]" required>
+            </td>
+            <td class="px-4 py-3 text-center border border-gray-300">
+                <button type="button" onclick="removeRow(this)" class="btn btn-sm btn-danger bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    }
+
+    function removeRow(btn) {
+        const row = btn.closest('tr');
+        row.remove();
+        const rows = document.querySelectorAll('#request-table-body tr');
+        rows.forEach((row, index) => {
+            const noCell = row.cells[0];
+            if (noCell) {
+                noCell.textContent = index + 1;
+            }
         });
+        noRow = rows.length;
+    }
 
-        function showForm() {
-            document.getElementById('history-section').classList.add('d-none');
-            document.getElementById('form-section').classList.remove('d-none');
-        }
+    function showDetail(tiket) {
+    const modalSpinner = document.getElementById('modal-spinner');
+    const modalContent = document.getElementById('modal-content');
+    modalSpinner.style.display = 'block';
+    modalContent.style.display = 'none';
 
-        function cancelForm() {
-            document.getElementById('form-section').classList.add('d-none');
-            document.getElementById('history-section').classList.remove('d-none');
-            document.getElementById('request-form').reset();
-            document.getElementById('request-table-body').innerHTML = `
-        <tr>
-          <td>1</td>
-          <td><input type="text" class="form-control" name="items[0][nama]" required></td>
-          <td><input type="text" class="form-control" name="items[0][deskripsi]" required></td>
-          <td><input type="number" class="form-control" name="items[0][jumlah]" min="1" value="1" required></td>
-          <td><input type="text" class="form-control" name="items[0][keterangan]" required></td>
-          <td><button type="button" class="btn btn-sm btn-danger" disabled><i class="fas fa-trash"></i></button></td>
-        </tr>`;
-            noRow = 1;
-        }
+    // Tampilkan modal dulu (tanpa Alpine)
+    const modal = document.querySelector('[x-show="showDetail"]');
+    if (modal && modal.style.display === 'none') {
+        modal.style.display = 'block';
+        // Beri sedikit delay agar animasi jalan
+        setTimeout(() => {
+            modal.classList.add('opacity-100');
+        }, 10);
+    }
 
-        function tambahRow() {
-            noRow++;
-            const tbody = document.getElementById('request-table-body');
-            const row = document.createElement('tr');
-            row.innerHTML =
-                `
-        <td>${noRow}</td>
-        <td><input type="text" class="form-control" name="items[${noRow-1}][nama]" required></td>
-        <td><input type="text" class="form-control" name="items[${noRow-1}][deskripsi]" required></td>
-        <td><input type="number" class="form-control" name="items[${noRow-1}][jumlah]" min="1" value="1" required></td>
-        <td><input type="text" class="form-control" name="items[${noRow-1}][keterangan]" required></td>
-        <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)"><i class="fas fa-trash"></i></button></td>`;
-            tbody.appendChild(row);
-        }
-
-        function removeRow(btn) {
-            const row = btn.closest('tr');
-            row.remove();
-            const rows = document.querySelectorAll('#request-table-body tr');
-            rows.forEach((row, index) => {
-                row.cells[0].textContent = index + 1;
-            });
-            noRow = rows.length;
-        }
-
-        function showDetail(tiket) {
-            document.getElementById('modal-spinner').style.display = 'block';
-            document.getElementById('modal-content').style.display = 'none';
-
-            fetch(`/requestbarang/${tiket}`)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('modal-ticket-name').textContent = data.tiket;
-                    document.getElementById('modal-ticket-date').textContent = new Date(data.tanggal_permintaan)
-                        .toLocaleDateString('id-ID', {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                        });
-                    document.getElementById('modal-ticket-user').textContent = data ? data.name : '-';
-                    document.getElementById('modal-ticket-count').textContent = data.details.length;
-
-                    // Isi daftar barang
-                    const itemsList = document.getElementById('modal-items-list');
-                    itemsList.innerHTML = '';
-
-                    data.details.forEach((item, index) => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-              <td>${index + 1}</td>
-              <td>${item.nama}</td>
-              <td>${item.deskripsi || '-'}</td>
-              <td>${item.jumlah}</td>
-              <td>${item.keterangan || '-'}</td>
-            `;
-                        itemsList.appendChild(row);
-                    });
-
-                    document.getElementById('modal-spinner').style.display = 'none';
-                    document.getElementById('modal-content').style.display = 'block';
-
-                    detailModal.show();
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Gagal memuat detail permintaan');
+    fetch(`/requestbarang/${tiket}`)
+        .then(response => {
+            if (!response.ok) throw new Error('Not Found');
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById('modal-ticket-name').textContent = data.tiket;
+            document.getElementById('modal-ticket-date').textContent = new Date(data.tanggal_permintaan)
+                .toLocaleDateString('id-ID', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
                 });
-        }
-    </script>
-</body>
+            document.getElementById('modal-ticket-user').textContent = data.name || '-';
+            document.getElementById('modal-ticket-count').textContent = data.details.length;
 
-</html>
+            const itemsList = document.getElementById('modal-items-list');
+            itemsList.innerHTML = '';
+
+            data.details.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-4 py-2 border-b text-center">${index + 1}</td>
+                    <td class="px-4 py-2 border-b">${item.nama}</td>
+                    <td class="px-4 py-2 border-b">${item.deskripsi || '-'}</td>
+                    <td class="px-4 py-2 border-b text-center">${item.jumlah}</td>
+                    <td class="px-4 py-2 border-b">${item.keterangan || '-'}</td>
+                `;
+                itemsList.appendChild(row);
+            });
+
+            modalSpinner.style.display = 'none';
+            modalContent.style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            modalSpinner.style.display = 'none';
+            modalContent.innerHTML = `
+                <div class="text-center text-red-600 p-4">
+                    <i class="fas fa-exclamation-triangle text-2xl mb-2"></i>
+                    <p>Detail tidak ditemukan atau terjadi kesalahan.</p>
+                </div>
+            `;
+            modalContent.style.display = 'block';
+        });
+}
+</script>
+@endsection

@@ -3,123 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - Aplikasi Sparepart</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <title>Aplikasi Sparepart PGN.COM</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+
+    <!-- Scripts -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Figtree', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
             min-height: 100vh;
-            display: flex;
+            margin: 0;
+            color: #333;
+        }
+
+        /* .hero {
+            background: url('https://images.unsplash.com/photo-1620714223084-8fcacc6dfd8d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80') no-repeat center center fixed;
+            background-size: cover;
+            backdrop-filter: blur(8px);
+            padding: 6rem 0;
+        } */
+
+        .card-hover {
+            transition: all 0.3s ease;
+            border: 1px solid #e0e6ed;
+            border-top-width: 4px;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-color: #4e73df;
+        }
+
+        .btn-custom {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
             align-items: center;
+            gap: 8px;
         }
-        
-        .container {
-            max-width: 800px;
-        }
-        
-        .welcome-text {
-            color: #2c3e50;
-        }
-        
-        .subtitle {
-            color: #6c757d;
-        }
-        
-        .card {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
-        }
-        
-        .card-jenis {
-            border-top: 4px solid #4e73df;
-        }
-        
-        .card-request {
-            border-top: 4px solid #1cc88a;
-        }
-        
-        .card-icon {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-        }
-        
-        .icon-jenis {
-            color: #4e73df;
-        }
-        
-        .icon-request {
-            color: #1cc88a;
-        }
-        
+
         .btn-jenis {
             background-color: #4e73df;
             border-color: #4e73df;
             color: white;
         }
-        
+
         .btn-jenis:hover {
             background-color: #3a56c4;
-            border-color: #3a56c4;
-            color: white;
+            transform: translateY(-2px);
         }
-        
+
         .btn-request {
             background-color: #1cc88a;
             border-color: #1cc88a;
             color: white;
         }
-        
+
         .btn-request:hover {
             background-color: #17a673;
-            border-color: #17a673;
-            color: white;
+            transform: translateY(-2px);
+        }
+
+        .logo {
+            height: 60px;
+        }
+
+        .footer {
+            color: #6c757d;
+            font-size: 0.9rem;
         }
     </style>
 </head>
-<body>
-    <div class="container py-5">
-        <div class="text-center mb-5">
-            <h1 class="fw-bold welcome-text">Selamat Datang di Aplikasi Sparepart</h1>
-            <p class="subtitle">Lihat daftar sparepart & ajukan request barang dengan mudah.</p>
-        </div>
+<body class="antialiased">
+    <div class="hero flex items-center">
+        <div class="max-w-5xl mx-auto w-full px-6 py-12 text-center">
+            
 
-        <div class="row justify-content-center">
-            <div class="col-md-5 mb-4">
-                <div class="card p-4 text-center h-100 card-jenis">
-                    <div class="card-icon icon-jenis">
-                        <i class="fas fa-cogs"></i>
+            <!-- Judul -->
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+                Sistem Manajemen Sparepart             </h1>
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4"><span class="text-blue-700">Field Technician</span> </h1>
+            <p class="text-lg text-gray-600 mb-12 max-w-3xl mx-auto">
+               Akses Data, Request, dan Monitoring Sparepart </p>
+            <!-- Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-4xl mx-auto">
+                <!-- Jenis Barang -->
+                <a href="{{ route('jenis.barang') }}"
+                   class="bg-white rounded-xl shadow-lg p-8 text-left border-l-4 border-transparent 
+            hover:border-blue-500 hover:shadow-2xl transform hover:-translate-y-1 
+            transition-all duration-300 ease-in-out cursor-pointer">
+                    <div class="flex items-center mb-5">
+                        <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mr-4 group-hover:bg-blue-600 transition">
+                            <i class="fas fa-cogs text-xl text-blue-600 group-hover:text-white"></i>
+                        </div>
+                        <h3 class="text-2xl font-semibold text-gray-800">Jenis Barang</h3>
                     </div>
-                    <h4 class="fw-bold">Jenis Barang</h4>
-                    <p class="text-muted">Lihat daftar sparepart yang tersedia</p>
-                    <a href="{{ route('jenis.barang') }}" class="btn btn-jenis mt-2">Lihat</a>
-                </div>
-            </div>
-            <div class="col-md-5 mb-4">
-                <div class="card p-4 text-center h-100 card-request">
-                    <div class="card-icon icon-request">
-                        <i class="fas fa-clipboard-list"></i>
+                    <p class="text-gray-600 mb-6">Lihat daftar semua jenis sparepart yang tersedia di sistem.</p>
+                    <span class="btn-custom btn-jenis">Lihat Daftar <i class="fas fa-arrow-right"></i></span>
+                </a>
+
+                <!-- Request Barang -->
+                <a href="{{ route('request.barang.index') }}"
+                  class="bg-white rounded-xl shadow-lg p-8 text-left border-l-4
+            hover:border-green-500 hover:shadow-4xl transform hover:-translate-y-1 
+            transition-all duration-300 ease-in-out cursor-pointer">
+                    <div class="flex items-center mb-5">
+                        <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mr-4 group-hover:bg-green-600 transition">
+                            <i class="fas fa-clipboard-list text-xl text-green-600 group-hover:text-white"></i>
+                        </div>
+                        <h3 class="text-2xl font-semibold text-gray-800">Request Barang</h3>
                     </div>
-                    <h4 class="fw-bold">Request Barang</h4>
-                    <p class="text-muted">Ajukan permintaan sparepart baru</p>
-                    <a href="{{ route('request.barang') }}" class="btn btn-request mt-2">Request</a>
-                </div>
+                    <p class="text-gray-600 mb-6">Ajukan permintaan sparepart dengan cepat dan tercatat.</p>
+                    <span class="btn-custom btn-request">Buat Request <i class="fas fa-plus"></i></span>
+                </a>
             </div>
-        </div>
-        
-        <div class="text-center mt-5">
-            <p class="text-muted">© 2023 Aplikasi Sparepart</p>
+
+            <!-- Footer -->
+            <div class="mt-16 footer">
+                <p>&copy; {{ date('Y') }} Aplikasi Sparepart - PT PGN.COM. Solusi Digital untuk Operasional Unggul.</p>
+            </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

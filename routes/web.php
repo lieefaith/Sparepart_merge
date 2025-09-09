@@ -9,6 +9,7 @@ use App\Http\Controllers\SuperadminController;
 use App\Http\Controllers\KepalaGudangController;
 use App\Http\Controllers\SparepartController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\KepalaROController;
 
 require __DIR__ . '/auth.php';
 
@@ -64,10 +65,21 @@ Route::middleware(['auth', 'role:1'])
 Route::middleware(['auth', 'role:2'])
     ->prefix('kepalaro')
     ->name('kepalaro.')
+    ->controller(KepalaROController::class)
     ->group(function () {
-        Route::get('/dashboard', fn() => view('kepalaro.dashboard'))->name('dashboard');
-    });
+        // Halaman Home (ini yang ditampilkan pertama kali setelah login Kepala RO)
+        Route::get('/home', fn() => view('kepalaro.home'))->name('home');
 
+        // Dashboard & fitur lainnya
+        Route::get('/dashboard', 'index')->name('dashboard');
+        Route::get('/history', 'history')->name('history');
+        Route::post('/approve/{id}', 'approve')->name('approve');
+        Route::post('/reject/{id}', 'reject')->name('reject');
+
+        // API: cek jumlah pending (filter region kepala RO)
+        Route::get('/api/pending-count', [KepalaROController::class, 'pendingCount'])
+            ->name('api.pending.count');
+    });
 
 // =====================
 // KEPALA GUDANG (role:3)
@@ -102,6 +114,7 @@ Route::middleware(['auth', 'role:4'])
     ->prefix('user')
     ->group(function () {
         Route::get('/home', [HomeController::class, 'index'])->name('home');
+        Route::get('/jenisbarang', [HomeController::class, 'jenisBarang'])->name('jenis.barang');
     });
 
 
@@ -109,11 +122,13 @@ Route::middleware(['auth', 'role:4'])
 // AUTHENTICATED AREA (all roles)
 // =====================
 // Menu lain
-Route::get('/jenisbarang', fn() => view('user.jenisbarang'))->name('jenis.barang');
 
 // Request Barang
-Route::prefix('requestbarang')->name('request.')->controller(PermintaanController::class)->group(function () {
-    Route::get('/', 'index')->name('barang');
-    Route::get('/{tiket}', 'getDetail');
-    Route::post('/', 'store')->name('store');
-});
+Route::prefix('requestbarang')
+    ->name('request.barang.')
+    ->controller(PermintaanController::class)
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/{tiket}', 'getDetail')->name('detail');
+        Route::post('/', 'store')->name('store');
+    });
