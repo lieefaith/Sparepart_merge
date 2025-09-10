@@ -68,7 +68,7 @@
                 </svg>
                 <h1 class="text-2xl font-bold">Request Sparepart</h1>
             </div>
-            <p class="text-sm text-[#00A0E3] mt-1">PT PERTAMINA GAS NEGARA</p>
+            <p class="text-sm text-[#00A0E3] mt-1">PT PGN COM</p>
         </div>
 
         <!-- Form Login -->
@@ -139,7 +139,7 @@
         <!-- Footer -->
         <div class="bg-gray-50 px-8 py-4 text-center border-t border-gray-100">
             <p class="text-xs text-gray-500">
-                &copy; {{ date('Y') }} PT Pertamina Gas Negara. Hak Cipta Dilindungi.
+                &copy; {{ date('Y') }} PT PGN COM. Hak Cipta Dilindungi.
             </p>
         </div>
     </div>

@@ -76,22 +76,22 @@
                     </div>
                 </div>
 
-                <!-- Dropdown Menu -->
-                <div x-show="showDropdown" x-transition
-                     class="absolute bottom-16 left-4 bg-white text-gray-800 rounded-lg shadow-lg w-48 z-50"
-                     x-cloak>
-                    <!-- Trigger Modal -->
-                    <button @click="profileOpen = true"
-                       class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
-                        Profil Saya
-                    </button>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
-                            Logout
-                        </button>
-                    </form>
-                </div>
+<!-- Dropdown Menu -->
+<div x-show="showDropdown" x-transition
+     class="absolute bottom-16 left-4 bg-white text-gray-800 rounded-lg shadow-lg w-48 z-50"
+     x-cloak>
+    <a href="{{ route('profile.show') }}" 
+       class="block px-4 py-2 text-sm hover:bg-gray-100">
+        Profil Saya
+    </a>
+    <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+            Logout
+        </button>
+    </form>
+</div>
+
             </div>
         </aside>
 
@@ -117,34 +117,6 @@
                 @yield('content')
             </div>
         </main>
-
-        <!-- Modal Profil User -->
-        <div x-show="profileOpen" x-transition
-             class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-             x-cloak
-             @click.self="profileOpen = false">
-            <div class="bg-white rounded-xl shadow-lg w-96 p-6 relative">
-                <!-- Tombol Close -->
-                <button @click="profileOpen = false"
-                        class="absolute top-3 right-3 text-gray-500 hover:text-gray-700">
-                    ✕
-                </button>
-
-                <h2 class="text-xl font-bold mb-4 text-gray-800">Profil User</h2>
-                <div class="space-y-2 text-sm text-gray-700">
-                    <p><span class="font-semibold">Nama:</span> {{ Auth::user()->name }}</p>
-                    <p><span class="font-semibold">Email:</span> {{ Auth::user()->email }}</p>
-                    <p><span class="font-semibold">Role:</span>
-                        @php
-                            $roles = ['1' => 'Admin', '2' => 'Kepala RO', '3' => 'Kepala Gudang', '4' => 'Field Technician'];
-                        @endphp
-                        {{ $roles[Auth::user()->role] ?? Auth::user()->role }}
-                    </p>
-                    <p><span class="font-semibold">Regional Office:</span> {{ Auth::user()->region }}</p>
-                    <p><span class="font-semibold">Atasan:</span> {{ Auth::user()->atasan }}</p>
-                </div>
-            </div>
-        </div>
     </div>
 </body>
 </html>

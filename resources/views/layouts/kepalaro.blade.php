@@ -115,7 +115,9 @@
                 <div x-show="showDropdown" x-transition
                      class="absolute bottom-16 left-4 bg-white text-gray-800 rounded-lg shadow-lg w-48 z-50"
                      x-cloak>
-                    <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100">Profil Saya</a>
+                   <a href="{{ route('profile.show') }}" class="block px-4 py-2 text-sm hover:bg-gray-100">
+    Profil Saya
+</a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Logout</button>

@@ -457,7 +457,7 @@
                     <div class="card-icon bg-primary bg-opacity-10 text-primary">
                         <i class="bi bi-tools"></i>
                     </div>
-                    <h4 class="stats-number">156</h4>
+                    <h4 class="stats-number">{{ $totalQty }}</h4>
                     <p class="stats-title">Total Sparepart</p>
                 </div>
             </div>
@@ -466,7 +466,7 @@
                     <div class="card-icon bg-success bg-opacity-10 text-success">
                         <i class="bi bi-check-circle"></i>
                     </div>
-                    <h4 class="stats-number">120</h4>
+                    <h4 class="stats-number">{{ $totalTersedia }}</h4>
                     <p class="stats-title">Tersedia</p>
                 </div>
             </div>
@@ -475,8 +475,8 @@
                     <div class="card-icon bg-warning bg-opacity-10 text-warning">
                         <i class="bi bi-clock-history"></i>
                     </div>
-                    <h4 class="stats-number">25</h4>
-                    <p class="stats-title">Dipesan</p>
+                    <h4 class="stats-number">{{ $totalDipesan }}</h4>
+                    <p class="stats-title">Dikirim</p>
                 </div>
             </div>
             <div class="col-xl-3 col-md-6">
@@ -484,7 +484,7 @@
                     <div class="card-icon bg-danger bg-opacity-10 text-danger">
                         <i class="bi bi-exclamation-circle"></i>
                     </div>
-                    <h4 class="stats-number">11</h4>
+                    <h4 class="stats-number">{{ $totalHabis }}</h4>
                     <p class="stats-title">Habis</p>
                 </div>
             </div>
@@ -493,44 +493,49 @@
         <!-- Filter Section -->
         <div class="filter-card">
             <h5 class="mb-3"><i class="bi bi-funnel me-2"></i>Filter Data</h5>
-            <form>
+            <form method="GET" action="{{ route('kepalagudang.sparepart.index') }}">
                 <div class="row g-3">
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <label for="jenisFilter" class="form-label">Jenis Sparepart</label>
-                        <select class="form-select" id="jenisFilter">
-                            <option selected>Semua Jenis</option>
-                            <option>SFP 1G-850nm-300m</option>
-                            <option>SFP 1G-1310nm-10km</option>
-                            <option>Filter Oli</option>
-                            <option>Kampas Rem</option>
+                        <select class="form-select" name="jenis" id="jenisFilter" onchange="this.form.submit()">
+                            <option value="">Semua Jenis</option>
+                            @foreach ($jenis as $j)
+                                <option value="{{ $j->id }}"
+                                    {{ (string) request('jenis') === (string) $j->id ? 'selected' : '' }}>
+                                    {{ $j->jenis }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
-                    <div class="col-md-3">
-                        <label for="statusFilter" class="form-label">Status</label>
-                        <select class="form-select" id="statusFilter">
-                            <option selected>Semua Status</option>
-                            <option>Tersedia</option>
-                            <option>Dipesan</option>
-                            <option>Habis</option>
+                    <div class="col-md-4">
+                        <label for="statusFilter" class="form-label">Status Sparepart</label>
+                        <select class="form-select" name="status" id="statusFilter">
+                            <option value="">Semua Status</option>
+                            <option value="tersedia" {{ request('status') == 'tersedia' ? 'selected' : '' }}>
+                                Tersedia</option>
+                            <option value="habis" {{ request('status') == 'habis' ? 'selected' : '' }}>Habis
+                            </option>
+                            <option value="dipesan" {{ request('status') == 'dipesan' ? 'selected' : '' }}>
+                                Dipesan</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
-                        <label for="picFilter" class="form-label">PIC</label>
-                        <select class="form-select" id="picFilter">
-                            <option selected>Semua PIC</option>
-                            <option>Andi</option>
-                            <option>Budi</option>
-                            <option>Citra</option>
-                            <option>Dewi</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="tanggalFilter" class="form-label">Tanggal</label>
-                        <input type="date" class="form-control" id="tanggalFilter">
+                    <div class="col-md-4">
+                        <label for="searchFilter" class="form-label">Cari Sparepart</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Cari ID atau nama sparepart..."
+                                name="search" value="{{ request('search') }}">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="col-12 text-end">
-                        <button type="reset" class="btn btn-outline-secondary me-2">Reset</button>
-                        <button type="submit" class="btn btn-primary">Terapkan Filter</button>
+                        <a href="{{ route('kepalagudang.sparepart.index') }}" class="btn btn-light me-2">
+                            <i class="bi bi-arrow-clockwise me-1"></i> Reset
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-filter me-1"></i> Terapkan Filter
+                        </button>
                     </div>
                 </div>
             </form>
@@ -538,202 +543,454 @@
 
         <!-- Table -->
         <div class="table-container">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0"><i class="bi bi-list-check me-2"></i>Daftar Sparepart</h5>
-                <div class="d-flex">
-                    <input type="text" class="form-control form-control-sm me-2" placeholder="Cari sparepart..."
-                        style="width: 200px;">
-                    <button class="btn btn-sm btn-outline-primary">
-                        <i class="bi bi-download me-1"></i> Export
-                    </button>
-                </div>
-            </div>
-
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
                         <tr>
                             <th>ID Sparepart</th>
                             <th>Jenis & Type</th>
-                            <th>Status</th>
                             <th>Quantity</th>
-                            <th>PIC</th>
-                            <th>Tanggal</th>
-                            <th>Aksi</th>
+                            @if ($filterStatus === 'habis')
+                                <th>Habis</th>
+                            @elseif ($filterStatus === 'dipesan')
+                                <th>Dipesan</th>
+                            @else
+                                <th>Tersedia</th>
+                            @endif
+                            <th>Detail</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td><span class="fw-bold text-primary">SP001</span></td>
-                            <td>SFP 1G-850nm-300m</td>
-                            <td><span class="badge bg-success status-badge">Tersedia</span></td>
-                            <td>25</td>
-                            <td>Andi</td>
-                            <td>2025-08-28</td>
-                            <td>
-                                <button class="btn btn-primary btn-action" data-bs-toggle="tooltip" title="Edit"><i
-                                        class="bi bi-pencil"></i></button>
-                                <button class="btn btn-danger btn-action" data-bs-toggle="tooltip" title="Hapus"><i
-                                        class="bi bi-trash"></i></button>
-                                <button class="btn btn-info btn-action" data-bs-toggle="tooltip" title="Detail"><i
-                                        class="bi bi-eye"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><span class="fw-bold text-primary">SP002</span></td>
-                            <td>SFP 1G-1310nm-10km</td>
-                            <td><span class="badge bg-warning status-badge">Dipesan</span></td>
-                            <td>10</td>
-                            <td>Budi</td>
-                            <td>2025-08-27</td>
-                            <td>
-                                <button class="btn btn-primary btn-action" data-bs-toggle="tooltip" title="Edit"><i
-                                        class="bi bi-pencil"></i></button>
-                                <button class="btn btn-danger btn-action" data-bs-toggle="tooltip" title="Hapus"><i
-                                        class="bi bi-trash"></i></button>
-                                <button class="btn btn-info btn-action" data-bs-toggle="tooltip" title="Detail"><i
-                                        class="bi bi-eye"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><span class="fw-bold text-primary">SP003</span></td>
-                            <td>Filter Oli</td>
-                            <td><span class="badge bg-success status-badge">Tersedia</span></td>
-                            <td>42</td>
-                            <td>Citra</td>
-                            <td>2025-08-29</td>
-                            <td>
-                                <button class="btn btn-primary btn-action" data-bs-toggle="tooltip" title="Edit"><i
-                                        class="bi bi-pencil"></i></button>
-                                <button class="btn btn-danger btn-action" data-bs-toggle="tooltip" title="Hapus"><i
-                                        class="bi bi-trash"></i></button>
-                                <button class="btn btn-info btn-action" data-bs-toggle="tooltip" title="Detail"><i
-                                        class="bi bi-eye"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><span class="fw-bold text-primary">SP004</span></td>
-                            <td>Kampas Rem</td>
-                            <td><span class="badge bg-danger status-badge">Habis</span></td>
-                            <td>0</td>
-                            <td>Dewi</td>
-                            <td>2025-08-25</td>
-                            <td>
-                                <button class="btn btn-primary btn-action" data-bs-toggle="tooltip" title="Edit"><i
-                                        class="bi bi-pencil"></i></button>
-                                <button class="btn btn-danger btn-action" data-bs-toggle="tooltip" title="Hapus"><i
-                                        class="bi bi-trash"></i></button>
-                                <button class="btn btn-info btn-action" data-bs-toggle="tooltip" title="Detail"><i
-                                        class="bi bi-eye"></i></button>
-                            </td>
-                        </tr>
+                        @forelse($listBarang as $barang)
+                            <tr>
+                                <td><span class="fw-bold">{{ $barang->tiket_sparepart }}</span></td>
+                                <td>{{ $barang->jenisBarang->jenis }} {{ $barang->tipeBarang->tipe }}</td>
+                                <td>{{ $barang->quantity }}</td>
+                                @if ($filterStatus === 'habis')
+                                    <td>{{ $totalsPerTiket[$barang->tiket_sparepart]['habis'] ?? 0 }}</td>
+                                @elseif ($filterStatus === 'dipesan')
+                                    <td>{{ $totalsPerTiket[$barang->tiket_sparepart]['dipesan'] ?? 0 }}</td>
+                                @else
+                                    <td>{{ $totalsPerTiket[$barang->tiket_sparepart]['tersedia'] ?? 0 }}</td>
+                                @endif
+                                <td>
+                                    <button class="btn btn-info btn-sm btn-detail"
+                                        onclick="showDetail('{{ $barang->tiket_sparepart }}')" title="Detail">
+                                        <i class="bi bi-eye"></i> Detail
+                                    </button>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    Tidak ada data
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- Pagination -->
-        <div class="pagination-container d-flex justify-content-between align-items-center">
+        <div class="d-flex justify-content-between align-items-center mt-3">
             <div class="text-muted">
-                Menampilkan 1 hingga 4 dari 156 entri
+                Menampilkan {{ $listBarang->firstItem() }} hingga {{ $listBarang->lastItem() }} dari
+                {{ $listBarang->total() }} entri
             </div>
             <nav aria-label="Page navigation">
-                <ul class="pagination mb-0">
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Sebelumnya</a>
-                    </li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">Selanjutnya</a>
-                    </li>
-                </ul>
+                {{ $listBarang->links('pagination::bootstrap-5') }}
             </nav>
         </div>
     </div>
 
     <!-- Modal Tambah Sparepart -->
-    <div class="modal fade" id="tambahSparepartModal" tabindex="-1" aria-labelledby="tambahSparepartModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+    <div class="modal fade" id="tambahSparepartModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="tambahSparepartModalLabel"><i class="bi bi-plus-circle me-2"></i>Tambah
+                    <h5 class="modal-title" id="tambahSparepartModalLabel"><i
+                            class="bi bi-plus-circle me-2"></i>Tambah
                         Sparepart Baru</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form method="POST" action="{{ route('kepalagudang.sparepart.store') }}" id="sparepartForm">
                         <div class="row g-3">
+                            @csrf
+                            @if ($errors->any())
+                                <div class="alert alert-danger">
+                                    <ul>
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
                             <div class="col-md-6">
-                                <label for="jenisSparepart" class="form-label">Jenis</label>
-                                <input type="text" class="form-control" id="jenisSparepart"
-                                    placeholder="Masukkan jenis sparepart">
+                                <label for="jenisSparepart" class="form-label">Jenis Sparepart</label>
+                                <select class="form-select @error('jenisSparepart') is-invalid @enderror"
+                                    id="jenisSparepart" name="jenisSparepart" required>
+                                    <option value="" selected>Pilih jenis sparepart</option>
+                                    @foreach ($jenis as $j)
+                                        <option value="{{ $j->id }}"
+                                            {{ old('jenisSparepart') == $j->id ? 'selected' : '' }}>
+                                            {{ $j->jenis }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('jenisSparepart')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-6">
-                                <label for="typeSparepart" class="form-label">Type</label>
-                                <input type="text" class="form-control" id="typeSparepart"
-                                    placeholder="Masukkan type sparepart">
+                                <label for="typeSparepart" class="form-label">Type Sparepart</label>
+                                <select class="form-select @error('typeSparepart') is-invalid @enderror"
+                                    id="typeSparepart" name="typeSparepart" required>
+                                    <option value="" selected>Pilih tipe sparepart</option>
+                                    @foreach ($tipe as $t)
+                                        <option value="{{ $t->id }}"
+                                            {{ old('typeSparepart') == $t->id ? 'selected' : '' }}>{{ $t->tipe }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('typeSparepart')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-6">
                                 <label for="serialNumber" class="form-label">Serial Number</label>
-                                <input type="text" class="form-control" id="serialNumber"
-                                    placeholder="Masukkan serial number">
+                                <input type="text"
+                                    class="form-control @error('serial_number') is-invalid @enderror"
+                                    id="serialNumber" name="serial_number" placeholder="Masukkan serial number"
+                                    value="{{ old('serial_number') }}">
+                                @error('serial_number')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-6">
                                 <label for="quantity" class="form-label">Quantity</label>
-                                <input type="number" class="form-control" id="quantity" min="0" placeholder="0">
+                                <input type="number" class="form-control @error('quantity') is-invalid @enderror"
+                                    id="quantity" name="quantity" placeholder="Masukkan jumlah" required
+                                    min="1" value="{{ old('quantity', 1) }}">
+                                @error('quantity')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label for="tanggal" class="form-label">Tanggal</label>
+                                <input type="date" class="form-control @error('tanggal') is-invalid @enderror"
+                                    id="tanggal" name="tanggal" value="{{ old('tanggal') }}" required>
+                                @error('tanggal')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label for="spk" class="form-label">SPK</label>
+                                <input type="text" class="form-control @error('spk') is-invalid @enderror"
+                                    id="spk" name="spk" placeholder="Masukkan SPK"
+                                    value="{{ old('spk') }}">
+                                @error('spk')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-6">
                                 <label for="harga" class="form-label">Harga</label>
-                                <input type="number" class="form-control" id="harga" min="0" placeholder="Rp">
+                                <input type="number" class="form-control @error('harga') is-invalid @enderror"
+                                    id="harga" name="harga" placeholder="Masukkan harga" required
+                                    value="{{ old('harga') }}">
+                                @error('harga')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-6">
                                 <label for="vendor" class="form-label">Vendor</label>
-                                <input type="text" class="form-control" id="vendor" placeholder="Nama vendor">
+                                <input type="text" class="form-control @error('vendor') is-invalid @enderror"
+                                    id="vendor" name="vendor" placeholder="Masukkan vendor"
+                                    value="{{ old('vendor') }}">
+                                @error('vendor')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label for="pic" class="form-label">PIC</label>
+                                <input type="text" class="form-control @error('pic') is-invalid @enderror"
+                                    id="pic" name="pic" placeholder="Masukkan PIC" required
+                                    value="{{ old('pic') }}">
+                                @error('pic')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label for="department" class="form-label">Department</label>
+                                <input type="text" class="form-control @error('department') is-invalid @enderror"
+                                    id="department" name="department" placeholder="Masukkan department"
+                                    value="{{ old('department') }}">
+                                @error('department')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-12">
                                 <label for="keterangan" class="form-label">Keterangan</label>
-                                <textarea class="form-control" id="keterangan" rows="3"
-                                    placeholder="Tambahkan keterangan tambahan..."></textarea>
+                                <textarea class="form-control" id="keterangan" rows="3" placeholder="Tambahkan keterangan tambahan..."></textarea>
                             </div>
                         </div>
-                    </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-primary">Simpan Sparepart</button>
+                    <button type="submit" class="btn btn-primary">Simpan Sparepart</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {{-- <div class="modal fade" id="editSparepartModal{{ $sparepart->id }}" tabindex="-1" aria-labelledby="editSparepartModalLabel{{ $sparepart->id }}" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="editSparepartModalLabel"><i class="bi bi-pencil-square me-2"></i>Edit Sparepart</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" id="editSparepartForm">
+    @csrf
+    @method('PUT')
+                    <div class="row g-3">
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+                        <!-- ID Sparepart -->
+                        <div class="col-12">
+                            <label for="tiketSparepart" class="form-label">ID Sparepart</label>
+                            <input type="text" class="form-control" id="tiketSparepart" name="tiket_sparepart" value="{{ $sparepart->tiket_sparepart }}" disabled>
+                        </div>
+                        <!-- Serial Number -->
+                        <div class="col-md-6">
+                            <label for="serialNumber" class="form-label">Serial Number</label>
+                            <input type="text" class="form-control @error('serial_number') is-invalid @enderror" id="serialNumber" name="serial_number" placeholder="Masukkan serial number" value="{{ old('serial_number', $sparepart->serial_number) }}">
+                            @error('serial_number')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <!-- Type Sparepart -->
+                        <div class="col-md-6">
+                            <label for="typeSparepart" class="form-label">Type Sparepart</label>
+                            <select class="form-select @error('typeSparepart') is-invalid @enderror" id="typeSparepart" name="typeSparepart" required>
+                                <option value="" selected>Pilih tipe sparepart</option>
+                                @foreach ($tipe as $t)
+                                    <option value="{{ $t->id }}" {{ old('typeSparepart', $sparepart->tipe_id) == $t->id ? 'selected' : '' }}>
+                                        {{ $t->tipe }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('typeSparepart')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <!-- Quantity -->
+                        <div class="col-md-6">
+                            <label for="quantity" class="form-label">Quantity</label>
+                            <input type="number" class="form-control @error('quantity') is-invalid @enderror" id="quantity" name="quantity" placeholder="Masukkan jumlah" required min="1" value="{{ old('quantity', $sparepart->quantity) }}">
+                            @error('quantity')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <!-- Tanggal -->
+                        <div class="col-md-6">
+                            <label for="tanggal" class="form-label">Tanggal</label>
+                            <input type="date" class="form-control @error('tanggal') is-invalid @enderror" id="tanggal" name="tanggal" value="{{ old('tanggal', $sparepart->tanggal) }}" required>
+                            @error('tanggal')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <!-- Harga -->
+                        <div class="col-md-6">
+                            <label for="harga" class="form-label">Harga</label>
+                            <input type="number" class="form-control @error('harga') is-invalid @enderror" id="harga" name="harga" placeholder="Masukkan harga" required value="{{ old('harga', $sparepart->harga) }}">
+                            @error('harga')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <!-- Vendor -->
+                        <div class="col-md-6">
+                            <label for="vendor" class="form-label">Vendor</label>
+                            <input type="text" class="form-control @error('vendor') is-invalid @enderror" id="vendor" name="vendor" placeholder="Masukkan vendor" value="{{ old('vendor', $sparepart->vendor) }}">
+                            @error('vendor')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <!-- PIC -->
+                        <div class="col-md-6">
+                            <label for="pic" class="form-label">PIC</label>
+                            <input type="text" class="form-control @error('pic') is-invalid @enderror" id="pic" name="pic" placeholder="Masukkan PIC" required value="{{ old('pic', $sparepart->pic) }}">
+                            @error('pic')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <!-- Keterangan -->
+                        <div class="col-md-6">
+                            <label for="department" class="form-label">Department</label>
+                            <input type="text" class="form-control @error('department') is-invalid @enderror" id="department" name="department" placeholder="Masukkan department" value="{{ old('department', $sparepart->department) }}">
+                            @error('department')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="col-12">
+                            <label for="keterangan" class="form-label">Keterangan</label>
+                            <textarea class="form-control" id="keterangan" name="keterangan" rows="3" placeholder="Tambahkan keterangan tambahan...">{{ old('keterangan', $sparepart->keterangan) }}</textarea>
+                        </div>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="submit" class="btn btn-primary">Update Sparepart</button>
+            </div>
+            </form>
+            @endforeach
+        </div>
+    </div> --}}
+    </div>
+
+
+    <div class="modal fade" id="sparepartDetailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-receipt me-2"></i>Detail Sparepart</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-center">
+                        <div class="spinner-border text-primary" id="sparepart-spinner" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+
+                    <div id="sparepart-content" style="display:none;">
+                        <div class="row mb-3">
+                            <div class="col-md-6"><strong>ID Sparepart:</strong> <span id="trx-id"></span></div>
+                        </div>
+                        <h6 class="mt-3 mb-2">Daftar Sparepart:</h6>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Serial Number</th>
+                                        <th>Type</th>
+                                        <th>Jenis</th>
+                                        <th>Status</th>
+                                        <th>Harga</th>
+                                        <th>Vendor (Supplier)</th>
+                                        <th>SPK</th>
+                                        <th>PIC</th>
+                                        <th>Keterangan</th>
+                                        <th>Tanggal</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="trx-items-list">
+                                </tbody>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
     </div>
-    
+
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Initialize tooltips
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
+        let sparepartDetailModal;
+
+        document.addEventListener("DOMContentLoaded", function() {
+            sparepartDetailModal = new bootstrap.Modal(document.getElementById('sparepartDetailModal'));
+
+            @if ($errors->any())
+                const modal = new bootstrap.Modal(document.getElementById('tambahSparepartModal'));
+                modal.show();
+            @endif
         });
 
-        // Function to update date
-        function updateDate() {
-            const now = new Date();
-            const options = { day: 'numeric', month: 'long', year: 'numeric' };
-            const formattedDate = now.toLocaleDateString('id-ID', options);
-            document.getElementById('current-date').textContent = formattedDate;
+        function formatRupiah(val) {
+            const num = Number(String(val).replace(/\D/g, '')) || 0;
+            return 'Rp ' + new Intl.NumberFormat('id-ID').format(num);
         }
 
-        // Set current date in filter
-        document.getElementById('tanggalFilter').valueAsDate = new Date();
+        function showTransaksiDetail(data) {
+            // spinner dan konten sesuai dengan id modal detail kamu
+            document.getElementById('sparepart-spinner').style.display = 'block';
+            document.getElementById('sparepart-content').style.display = 'none';
 
-        // Toggle sidebar on mobile (if needed)
-        document.querySelector('.navbar-toggler').addEventListener('click', function () {
-            document.querySelector('.sidebar').classList.toggle('show');
-        });
+            document.getElementById('trx-id').textContent = data.id || '-';
+
+            const tbody = document.getElementById('trx-items-list');
+            tbody.innerHTML = "";
+
+            data.items.forEach((item, i) => {
+                let statusClass = 'bg-secondary';
+                if (item.status === 'tersedia') {
+                    statusClass = 'bg-success';
+                } else if (item.status === 'habis') {
+                    statusClass = 'bg-danger';
+                } else if (item.status === 'dipesan') {
+                    statusClass = 'bg-warning';
+                }
+
+                const row = `
+            <tr>
+                <td>${i + 1}</td>
+                <td>${item.serial || '-'}</td>
+                <td>${data.type || '-'}</td>
+                <td>${data.jenis || '-'}</td>
+                <td><span class="badge ${statusClass}">${item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1) : '-'}</span></td>
+                <td>${item.harga ? formatRupiah(item.harga) : '-'}</td>
+                <td>${item.vendor || '-'}</td>
+                <td>${item.spk || '-'}</td>
+                <td>${item.pic || '-'}</td>
+                <td>${item.keterangan || '-'}</td>
+                <td>${item.tanggal || '-'}</td>
+                <td>
+                    <button class="btn btn-primary btn-action" data-bs-toggle="tooltip" title="Edit">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-danger btn-action" data-bs-toggle="tooltip" title="Hapus">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+                tbody.insertAdjacentHTML("beforeend", row);
+            });
+
+            document.getElementById('sparepart-spinner').style.display = 'none';
+            document.getElementById('sparepart-content').style.display = 'block';
+
+            sparepartDetailModal.show();
+        }
+
+        function showDetail(tiket_sparepart) {
+            fetch(`/kepalagudang/sparepart/${tiket_sparepart}/detail`)
+                .then(res => res.json())
+                .then(data => {
+                    showTransaksiDetail(data);
+                    console.log(data);
+                })
+                .catch(err => {
+                    console.error('Fetch error:', err);
+                    alert('Gagal mengambil detail!');
+                });
+        }
     </script>
 </body>
 

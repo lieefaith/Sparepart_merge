@@ -471,7 +471,7 @@
                 <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
             </a>
             <a href="{{ route('superadmin.request.index') }}" class="list-group-item list-group-item-action">
-                <i class="bi bi-cart-check"></i> <span>Request Barang</span>
+                <i class="bi bi-cart-check"></i> <span>List Request</span>
             </a>
             <a href="{{ route('superadmin.sparepart.index') }}" class="list-group-item list-group-item-action">
                 <i class="bi bi-tools"></i> <span>Daftar Sparepart</span>

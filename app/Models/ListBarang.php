@@ -15,10 +15,6 @@ class ListBarang extends Model
         'tiket_sparepart',
         'jenis_id',
         'tipe_id',
-        'kode_region',
-        'tanggal',
-        'pic',
-        'department'
     ];
 
     protected $casts = [
@@ -38,11 +34,6 @@ class ListBarang extends Model
             $nextNumber = $lastTiketNumber ? $lastTiketNumber + 1 : 1;
             $listBarang->tiket_sparepart = 'SP-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
         });
-    }
-
-    public function region()
-    {
-        return $this->belongsTo(Region::class, 'kode_region', 'kode_region');
     }
 
     public function jenisBarang()

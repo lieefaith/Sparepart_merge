@@ -23,6 +23,7 @@ class KepalaROController extends Controller
         return view('kepalaro.dashboard', compact('requests'));
     }
 
+
     // History: Semua permintaan (disetujui/ditolak)
   public function history(Request $request)
 {

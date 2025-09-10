@@ -21,6 +21,9 @@ class DetailBarang extends Model
         'vendor',
         'keterangan',
         'kode_region',
+        'tanggal',
+        'pic',
+        'department'
     ];
 
     public function listBarang()

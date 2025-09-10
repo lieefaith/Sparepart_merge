@@ -40,7 +40,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/profile/show', [ProfileController::class, 'show'])->name('profile.show');
+
 });
+
+
 
 
 // =====================
@@ -53,8 +57,8 @@ Route::middleware(['auth', 'role:1'])
     ->group(function () {
         Route::get('/dashboard', 'dashboard')->name('dashboard');
         Route::get('/request', 'requestIndex')->name('request.index');
-        Route::get('/sparepart', [SuperadminController::class, 'sparepartIndex'])->name('sparepart.index');
-        Route::get('/sparepart/{tiket_sparepart}/detail', [SuperadminController::class, 'showDetail'])->name('sparepart.detail');
+        Route::get('/sparepart', [SparepartController::class, 'indexAdmin'])->name('sparepart.index');
+        Route::get('/sparepart/{tiket_sparepart}/detail', [SparepartController::class, 'showDetail'])->name('sparepart.detail');
         Route::get('/history', 'historyIndex')->name('history.index');
     });
 

@@ -127,59 +127,51 @@
     <!-- Table -->
     <div class="table-container">
         <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>ID Sparepart</th>
-                        <th>Jenis & Type</th>
-                        <th>Status</th>
-                        <th>Quantity</th>
-                        <th>PIC</th>
-                        <th>Tanggal</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($listBarang as $barang)
+                <table class="table table-hover">
+                    <thead>
                         <tr>
-                            <td><span class="fw-bold">{{ $barang->tiket_sparepart }}</span></td>
-                            <td>{{ $barang->jenisBarang->jenis }} {{ $barang->tipeBarang->tipe }}</td>
-                            <td>
-                                <span class="badge
-                                    @if ($barang->status == 'tersedia') bg-success
-                                    @elseif($barang->status == 'habis') bg-danger
-                                    @elseif($barang->status == 'dipesan') bg-warning
-                                    @else bg-secondary @endif">
-                                    {{ ucfirst($barang->status) }}
-                                </span>
-                            </td>
-                            <td>{{ $barang->quantity }}</td>
-                            <td>{{ $barang->pic }}</td>
-                            <td>{{ \Carbon\Carbon::parse($barang->tanggal)->format('d-m-Y') }}</td>
-                            <td>
-                                <button class="btn btn-primary btn-action" data-bs-toggle="tooltip" title="Edit">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-danger btn-action" data-bs-toggle="tooltip" title="Hapus">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                                <button class="btn btn-info btn-action" 
-                                    onclick="showDetail('{{ $barang->tiket_sparepart }}')"
-                                    data-bs-toggle="tooltip" title="Detail">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                            </td>
+                            <th>ID Sparepart</th>
+                            <th>Jenis & Type</th>
+                            <th>Quantity</th>
+                            @if ($filterStatus === 'habis')
+                                <th>Habis</th>
+                            @elseif ($filterStatus === 'dipesan')
+                                <th>Dipesan</th>
+                            @else
+                                <th>Tersedia</th>
+                            @endif
+                            <th>Detail</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="text-center text-muted py-4">
-                                <i class="bi bi-inbox display-4 d-block mb-2"></i>
-                                Tidak ada data sparepart
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @forelse($listBarang as $barang)
+                            <tr>
+                                <td><span class="fw-bold">{{ $barang->tiket_sparepart }}</span></td>
+                                <td>{{ $barang->jenisBarang->jenis }} {{ $barang->tipeBarang->tipe }}</td>
+                                <td>{{ $barang->quantity }}</td>
+                                @if ($filterStatus === 'habis')
+                                    <td>{{ $totalsPerTiket[$barang->tiket_sparepart]['habis'] ?? 0 }}</td>
+                                @elseif ($filterStatus === 'dipesan')
+                                    <td>{{ $totalsPerTiket[$barang->tiket_sparepart]['dipesan'] ?? 0 }}</td>
+                                @else
+                                    <td>{{ $totalsPerTiket[$barang->tiket_sparepart]['tersedia'] ?? 0 }}</td>
+                                @endif
+                                <td>
+                                    <button class="btn btn-info btn-sm btn-detail"
+                                        onclick="showDetail('{{ $barang->tiket_sparepart }}')" title="Detail">
+                                        <i class="bi bi-eye"></i> Detail
+                                    </button>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    Tidak ada data
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
         </div>
     </div>
 
@@ -217,16 +209,20 @@
                         <h6 class="mt-3 mb-2">Daftar Sparepart:</h6>
                         <div class="table-responsive">
                             <table class="table table-bordered">
-                                <thead class="table-light">
+                                 <thead class="table-light">
                                     <tr>
                                         <th>No</th>
                                         <th>Serial Number</th>
                                         <th>Type</th>
                                         <th>Jenis</th>
+                                        <th>Status</th>
                                         <th>Harga</th>
                                         <th>Vendor (Supplier)</th>
                                         <th>SPK</th>
+                                        <th>PIC</th>
                                         <th>Keterangan</th>
+                                        <th>Tanggal</th>
+                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody id="trx-items-list"></tbody>
