@@ -260,6 +260,14 @@
         .edit-mode {
             display: none;
         }
+        
+        .badge-aset {
+            background-color: var(--success);
+        }
+        
+        .badge-non-aset {
+            background-color: var(--info);
+        }
     </style>
 </head>
 <body>
@@ -346,6 +354,14 @@
                                     <label for="namaJenis" class="form-label required-field">Nama Jenis Sparepart</label>
                                     <input type="text" class="form-control form-control-lg" id="namaJenis" placeholder="Masukkan nama jenis sparepart" required>
                                 </div>
+                                <div class="mb-4">
+                                    <label for="kategoriJenis" class="form-label required-field">Kategori</label>
+                                    <select class="form-select form-select-lg" id="kategoriJenis" required>
+                                        <option value="">Pilih Kategori</option>
+                                        <option value="Aset">Aset</option>
+                                        <option value="Non Aset">Non Aset</option>
+                                    </select>
+                                </div>
                                 <div class="text-center">
                                     <button type="submit" class="btn btn-primary btn-lg">
                                         <i class="bi bi-save me-1"></i> <span class="add-mode">Simpan</span><span class="edit-mode">Update</span> Jenis Sparepart
@@ -364,6 +380,7 @@
                                     <tr>
                                         <th>No</th>
                                         <th>Nama Jenis</th>
+                                        <th>Kategori</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -371,8 +388,9 @@
                                     <tr>
                                         <td>1</td>
                                         <td>Engine Parts</td>
+                                        <td><span class="badge bg-success">Aset</span></td>
                                         <td>
-                                            <button class="btn btn-sm btn-outline-primary me-1" onclick="editJenis(1, 'Engine Parts')">
+                                            <button class="btn btn-sm btn-outline-primary me-1" onclick="editJenis(1, 'Engine Parts', 'Aset')">
                                                 <i class="bi bi-pencil"></i>
                                             </button>
                                             <button class="btn btn-sm btn-outline-danger" onclick="hapusJenis(1)">
@@ -383,8 +401,9 @@
                                     <tr>
                                         <td>2</td>
                                         <td>Electrical Parts</td>
+                                        <td><span class="badge bg-info">Non Aset</span></td>
                                         <td>
-                                            <button class="btn btn-sm btn-outline-primary me-1" onclick="editJenis(2, 'Electrical Parts')">
+                                            <button class="btn btn-sm btn-outline-primary me-1" onclick="editJenis(2, 'Electrical Parts', 'Non Aset')">
                                                 <i class="bi bi-pencil"></i>
                                             </button>
                                             <button class="btn btn-sm btn-outline-danger" onclick="hapusJenis(2)">
@@ -395,8 +414,9 @@
                                     <tr>
                                         <td>3</td>
                                         <td>Suspension Parts</td>
+                                        <td><span class="badge bg-success">Aset</span></td>
                                         <td>
-                                            <button class="btn btn-sm btn-outline-primary me-1" onclick="editJenis(3, 'Suspension Parts')">
+                                            <button class="btn btn-sm btn-outline-primary me-1" onclick="editJenis(3, 'Suspension Parts', 'Aset')">
                                                 <i class="bi bi-pencil"></i>
                                             </button>
                                             <button class="btn btn-sm btn-outline-danger" onclick="hapusJenis(3)">
@@ -588,9 +608,9 @@
     <script>
         // Data storage (simulasi database)
         let jenisData = [
-            { id: 1, nama: 'Engine Parts' },
-            { id: 2, nama: 'Electrical Parts' },
-            { id: 3, nama: 'Suspension Parts' }
+            { id: 1, nama: 'Engine Parts', kategori: 'Aset' },
+            { id: 2, nama: 'Electrical Parts', kategori: 'Non Aset' },
+            { id: 3, nama: 'Suspension Parts', kategori: 'Aset' }
         ];
         
         let tipeData = [
@@ -631,6 +651,12 @@
         function resetForm(type) {
             document.getElementById(`${type}Id`).value = '';
             document.getElementById(`nama${type.charAt(0).toUpperCase() + type.slice(1)}`).value = '';
+            
+            // Reset kategori hanya untuk jenis
+            if (type === 'jenis') {
+                document.getElementById('kategoriJenis').value = '';
+            }
+            
             toggleEditMode(type, false);
         }
         
@@ -640,9 +666,15 @@
             e.preventDefault();
             const id = document.getElementById('jenisId').value;
             const namaJenis = document.getElementById('namaJenis').value;
+            const kategoriJenis = document.getElementById('kategoriJenis').value;
             
             if (namaJenis.trim() === '') {
                 alert('Nama jenis sparepart tidak boleh kosong!');
+                return;
+            }
+            
+            if (kategoriJenis === '') {
+                alert('Kategori harus dipilih!');
                 return;
             }
             
@@ -651,12 +683,13 @@
                 const index = jenisData.findIndex(item => item.id == id);
                 if (index !== -1) {
                     jenisData[index].nama = namaJenis;
+                    jenisData[index].kategori = kategoriJenis;
                     alert('Data jenis sparepart berhasil diupdate!');
                 }
             } else {
                 // Add new
                 const newId = jenisData.length > 0 ? Math.max(...jenisData.map(item => item.id)) + 1 : 1;
-                jenisData.push({ id: newId, nama: namaJenis });
+                jenisData.push({ id: newId, nama: namaJenis, kategori: kategoriJenis });
                 alert('Data jenis sparepart "' + namaJenis + '" berhasil disimpan!');
             }
             
@@ -666,9 +699,10 @@
         });
         
         // Edit jenis
-        function editJenis(id, nama) {
+        function editJenis(id, nama, kategori) {
             document.getElementById('jenisId').value = id;
             document.getElementById('namaJenis').value = nama;
+            document.getElementById('kategoriJenis').value = kategori;
             document.getElementById('namaJenis').focus();
             toggleEditMode('jenis', true);
         }
@@ -694,12 +728,14 @@
             tableBody.innerHTML = '';
             
             jenisData.forEach((item, index) => {
+                const badgeClass = item.kategori === 'Aset' ? 'badge-aset' : 'badge-non-aset';
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${index + 1}</td>
                     <td>${item.nama}</td>
+                    <td><span class="badge ${badgeClass}">${item.kategori}</span></td>
                     <td>
-                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editJenis(${item.id}, '${item.nama}')">
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editJenis(${item.id}, '${item.nama}', '${item.kategori}')">
                             <i class="bi bi-pencil"></i>
                         </button>
                         <button class="btn btn-sm btn-outline-danger" onclick="hapusJenis(${item.id})">
