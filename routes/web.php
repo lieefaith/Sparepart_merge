@@ -107,6 +107,8 @@ Route::middleware(['auth', 'role:3'])
         Route::get('/history/{id}', 'historyDetail')->name('history.detail');
 
         Route::get('/profile', fn() => view('kepalagudang.profile'))->name('profile');
+        Route::get('/data', fn() => view('kepalagudang.data'))->name('data');
+
     });
 
 

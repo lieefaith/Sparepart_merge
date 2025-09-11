@@ -413,22 +413,24 @@
 
     <!-- Sidebar -->
     <div class="sidebar">
-        <div class="list-group list-group-flush">
-            <a href="{{ route('kepalagudang.dashboard') }}" class="list-group-item list-group-item-action py-3">
-                <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
-            </a>
-            <a href="{{ route('kepalagudang.request.index') }}" class="list-group-item list-group-item-action py-3">
-                <i class="bi bi-send"></i> <span>Request / Send</span>
-            </a>
-            <a href="{{ route('kepalagudang.sparepart.index') }}"
-                class="list-group-item list-group-item-action py-3 active">
-                <i class="bi bi-tools"></i> <span>Daftar Sparepart</span>
-            </a>
-            <a href="{{ route('kepalagudang.history.index') }}" class="list-group-item list-group-item-action py-3">
-                <i class="bi bi-clock-history"></i> <span>Histori Barang</span>
-            </a>
-        </div>
+    <div class="list-group list-group-flush">
+        <a href="{{ route('kepalagudang.dashboard') }}" class="list-group-item list-group-item-action py-3">
+            <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
+        </a>
+        <a href="{{ route('kepalagudang.request.index') }}" class="list-group-item list-group-item-action py-3">
+            <i class="bi bi-send"></i> <span>Request / Send</span>
+        </a>
+        <a href="{{ route('kepalagudang.sparepart.index') }}" class="list-group-item list-group-item-action py-3">
+            <i class="bi bi-tools"></i> <span>Daftar Sparepart</span>
+        </a>
+        <a href="{{ route('kepalagudang.data') }}" class="list-group-item list-group-item-action py-3">
+            <i class="bi bi-folder2-open"></i> <span>Data</span>
+        </a>
+        <a href="{{ route('kepalagudang.history.index') }}" class="list-group-item list-group-item-action py-3">
+            <i class="bi bi-clock-history"></i> <span>Histori Barang</span>
+        </a>
     </div>
+</div>
 
     <!-- Main Content -->
     <div class="main-content">
