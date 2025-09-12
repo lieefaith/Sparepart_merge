@@ -9,6 +9,8 @@ use App\Models\TipeBarang;
 use App\Models\DetailBarang;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+
 
 class SparepartController extends Controller
 {
@@ -32,24 +34,24 @@ class SparepartController extends Controller
         }
 
 
-if ($request->filled('search')) {
-    $search = $request->search;
-    $query->where(function ($q) use ($search) {
-        $keywords = explode(' ', $search); 
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $keywords = explode(' ', $search);
 
-        $q->where('tiket_sparepart', 'like', "%$search%")
-            ->orWhere(function ($q2) use ($keywords) {
-                if (count($keywords) > 1) {
-                    $q2->whereHas('jenisBarang', function ($q3) use ($keywords) {
-                        $q3->where('jenis', 'like', "%{$keywords[0]}%");
-                    })
-                    ->whereHas('tipeBarang', function ($q3) use ($keywords) {
-                        $q3->where('tipe', 'like', "%{$keywords[1]}%"); 
+                $q->where('tiket_sparepart', 'like', "%$search%")
+                    ->orWhere(function ($q2) use ($keywords) {
+                        if (count($keywords) > 1) {
+                            $q2->whereHas('jenisBarang', function ($q3) use ($keywords) {
+                                $q3->where('jenis', 'like', "%{$keywords[0]}%");
+                            })
+                                ->whereHas('tipeBarang', function ($q3) use ($keywords) {
+                                    $q3->where('tipe', 'like', "%{$keywords[1]}%");
+                                });
+                        }
                     });
-                }
             });
-    });
-}
+        }
 
         $listBarang = $query->orderBy('tiket_sparepart', 'desc')->paginate(5);
 
@@ -59,28 +61,29 @@ if ($request->filled('search')) {
             ->pluck('total_quantity', 'status');
 
         $totalTersedia = $totalPerStatus->get('tersedia', 0);
-        $totalDipesan  = $totalPerStatus->get('dipesan', 0);
+        $totalDikirim  = $totalPerStatus->get('dikirim', 0);
         $totalHabis    = $totalPerStatus->get('habis', 0);
 
         $totalsPerTiket = [];
 
-foreach ($listBarang as $barang) {
-    $tiket = $barang->tiket_sparepart;
+        foreach ($listBarang as $barang) {
+            $tiket = $barang->tiket_sparepart;
 
-    $totalPerStatus = collect($barang->details)
-        ->groupBy('status')
-        ->map(fn($items) => $items->sum('quantity'));
+            $totalPerStatus = collect($barang->details)
+                ->groupBy('status')
+                ->map(fn($items) => $items->sum('quantity'));
 
-    $totalsPerTiket[$tiket] = [
-        'tersedia' => $totalPerStatus->get('tersedia', 0),
-        'dipesan'  => $totalPerStatus->get('dipesan', 0),
-        'habis'    => $totalPerStatus->get('habis', 0),
-    ];
-}
+            $totalsPerTiket[$tiket] = [
+                'tersedia' => $totalPerStatus->get('tersedia', 0),
+                'dikirim'  => $totalPerStatus->get('dikirim', 0),
+                'habis'    => $totalPerStatus->get('habis', 0),
+            ];
+        }
 
         $regions = Region::all();
         $jenis = JenisBarang::all();
         $tipe = TipeBarang::all();
+        $vendor = TipeBarang::all();
         $totalQty = DetailBarang::sum('quantity');
 
         return view('kepalagudang.sparepart', [
@@ -88,10 +91,11 @@ foreach ($listBarang as $barang) {
             'regions'       => $regions,
             'jenis'         => $jenis,
             'tipe'          => $tipe,
+            'vendor'         => $vendor,
             'jenisSparepart' => $jenisSparepart,
             'totalQty'      => $totalQty,
             'totalTersedia' => $totalTersedia,
-            'totalDipesan'  => $totalDipesan,
+            'totalDikirim'  => $totalDikirim,
             'totalHabis'    => $totalHabis,
             'totalsPerTiket' => $totalsPerTiket,
             'filterJenis'   => $request->jenis,
@@ -119,24 +123,24 @@ foreach ($listBarang as $barang) {
         }
 
 
-if ($request->filled('search')) {
-    $search = $request->search;
-    $query->where(function ($q) use ($search) {
-        $keywords = explode(' ', $search); 
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $keywords = explode(' ', $search);
 
-        $q->where('tiket_sparepart', 'like', "%$search%")
-            ->orWhere(function ($q2) use ($keywords) {
-                if (count($keywords) > 1) {
-                    $q2->whereHas('jenisBarang', function ($q3) use ($keywords) {
-                        $q3->where('jenis', 'like', "%{$keywords[0]}%");
-                    })
-                    ->whereHas('tipeBarang', function ($q3) use ($keywords) {
-                        $q3->where('tipe', 'like', "%{$keywords[1]}%"); 
+                $q->where('tiket_sparepart', 'like', "%$search%")
+                    ->orWhere(function ($q2) use ($keywords) {
+                        if (count($keywords) > 1) {
+                            $q2->whereHas('jenisBarang', function ($q3) use ($keywords) {
+                                $q3->where('jenis', 'like', "%{$keywords[0]}%");
+                            })
+                                ->whereHas('tipeBarang', function ($q3) use ($keywords) {
+                                    $q3->where('tipe', 'like', "%{$keywords[1]}%");
+                                });
+                        }
                     });
-                }
             });
-    });
-}
+        }
 
         $listBarang = $query->orderBy('tiket_sparepart', 'desc')->paginate(5);
 
@@ -146,24 +150,24 @@ if ($request->filled('search')) {
             ->pluck('total_quantity', 'status');
 
         $totalTersedia = $totalPerStatus->get('tersedia', 0);
-        $totalDipesan  = $totalPerStatus->get('dipesan', 0);
+        $totalDikirim  = $totalPerStatus->get('dikirim', 0);
         $totalHabis    = $totalPerStatus->get('habis', 0);
 
         $totalsPerTiket = [];
 
-foreach ($listBarang as $barang) {
-    $tiket = $barang->tiket_sparepart;
+        foreach ($listBarang as $barang) {
+            $tiket = $barang->tiket_sparepart;
 
-    $totalPerStatus = collect($barang->details)
-        ->groupBy('status')
-        ->map(fn($items) => $items->sum('quantity'));
+            $totalPerStatus = collect($barang->details)
+                ->groupBy('status')
+                ->map(fn($items) => $items->sum('quantity'));
 
-    $totalsPerTiket[$tiket] = [
-        'tersedia' => $totalPerStatus->get('tersedia', 0),
-        'dipesan'  => $totalPerStatus->get('dipesan', 0),
-        'habis'    => $totalPerStatus->get('habis', 0),
-    ];
-}
+            $totalsPerTiket[$tiket] = [
+                'tersedia' => $totalPerStatus->get('tersedia', 0),
+                'dikirim'  => $totalPerStatus->get('dikirim', 0),
+                'habis'    => $totalPerStatus->get('habis', 0),
+            ];
+        }
 
         $regions = Region::all();
         $jenis = JenisBarang::all();
@@ -178,7 +182,7 @@ foreach ($listBarang as $barang) {
             'jenisSparepart' => $jenisSparepart,
             'totalQty'      => $totalQty,
             'totalTersedia' => $totalTersedia,
-            'totalDipesan'  => $totalDipesan,
+            'totalDikirim'  => $totalDikirim,
             'totalHabis'    => $totalHabis,
             'totalsPerTiket' => $totalsPerTiket,
             'filterJenis'   => $request->jenis,
@@ -231,37 +235,43 @@ foreach ($listBarang as $barang) {
     }
 
 
-    // Update the specified sparepart
-public function updateDetail(Request $request, $serial_number)
-{
-    // validasi input detail (sesuaikan dengan fieldmu)
-    $request->validate([
-        'serial_number' => 'required|string',
-        'harga'         => 'required|numeric',
-        'vendor'        => 'nullable|string',
-        'spk'           => 'nullable|string',
-        'pic'           => 'required|string',
-        'department'    => 'nullable|string',
-        'keterangan'    => 'nullable|string',
-        'tanggal'       => 'required|date',
-    ]);
+    public function update(Request $request, $serial_number)
+    {
+        $request->validate([
+            'serial_number' => 'required|string',
+            'harga'         => 'required|numeric',
+            'vendor'        => 'nullable|string',
+            'spk'           => 'nullable|string',
+            'pic'           => 'required|string',
+            'department'    => 'nullable|string',
+            'keterangan'    => 'nullable|string',
+            'tanggal'       => 'required|date',
+        ]);
 
-    $detail = DetailBarang::where('serial_number', $serial_number)->firstOrFail();
+        $detail = DetailBarang::where('serial_number', $serial_number)->firstOrFail();
 
-    $detail->update([
-        'serial_number' => $request->serial_number,
-        'harga'         => $request->harga,
-        'vendor'        => $request->vendor,
-        'spk'           => $request->spk,
-        'pic'           => $request->pic,
-        'department'    => $request->department,
-        'keterangan'    => $request->keterangan,
-        'tanggal'       => $request->tanggal,
-    ]);
+        $detail->update([
+            'serial_number' => $request->serial_number,
+            'harga'         => $request->harga,
+            'vendor'        => $request->vendor,
+            'spk'           => $request->spk,
+            'pic'           => $request->pic,
+            'department'    => $request->department,
+            'keterangan'    => $request->keterangan,
+            'tanggal'       => $request->tanggal,
+        ]);
 
-    return redirect()->route('kepalagudang.sparepart.index')->with('success', 'Detail sparepart berhasil diperbarui.');
+        // If AJAX request, send JSON; otherwise redirect as before
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Detail sparepart berhasil diperbarui.',
+                'data' => $detail
+            ]);
+        }
 
-}
+        return redirect()->route('kepalagudang.sparepart.index')->with('success', 'Detail sparepart berhasil diperbarui.');
+    }
 
 
     public function showDetail($tiket_sparepart)
@@ -291,4 +301,41 @@ public function updateDetail(Request $request, $serial_number)
             }),
         ]);
     }
+
+public function destroy(Request $request, $serial)
+{
+    $detail = DetailBarang::where('serial_number', $serial)->firstOrFail();
+
+    // aturan bisnis / autorizasi jika perlu...
+    if ($detail->status === 'dipesan') {
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => false, 'message' => 'Tidak dapat menghapus item berstatus dipesan.'], 403);
+        }
+        return redirect()->route('kepalagudang.sparepart.index')->with('error', 'Tidak dapat menghapus item berstatus dipesan.');
+    }
+
+    $tiket = $detail->tiket_sparepart;
+    $detail->delete();
+
+    // optional: delete list if empty...
+    $listDeleted = false;
+    $list = ListBarang::where('tiket_sparepart', $tiket)->first();
+    if ($list && $list->details()->count() === 0) {
+        $list->delete();
+        $listDeleted = true;
+    }
+
+    // jika request AJAX, kembalikan JSON berisi redirect URL
+    if ($request->ajax() || $request->wantsJson()) {
+        return response()->json([
+            'success' => true,
+            'message' => 'Detail sparepart berhasil dihapus.',
+            'redirect' => route('kepalagudang.sparepart.index'),
+            'listDeleted' => $listDeleted
+        ]);
+    }
+
+    // non-AJAX: redirect dengan flash message
+    return redirect()->route('kepalagudang.sparepart.index')->with('success', 'Detail sparepart berhasil dihapus.');
+}
 }

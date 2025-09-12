@@ -14,17 +14,22 @@ class DetailBarang extends Model
         'tiket_sparepart',
         'jenis_id',
         'tipe_id',
+        'vendor_id',
         'serial_number',
         'spk',
         'harga',
         'quantity',
-        'vendor',
         'keterangan',
         'kode_region',
         'tanggal',
         'pic',
         'department'
     ];
+
+        protected $casts = [
+        'tanggal' => 'date',
+    ];
+
 
     public function listBarang()
     {

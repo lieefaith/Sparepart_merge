@@ -15,12 +15,8 @@ class ListBarang extends Model
         'tiket_sparepart',
         'jenis_id',
         'tipe_id',
+        'kategori'
     ];
-
-    protected $casts = [
-        'tanggal' => 'date',
-    ];
-
 
     protected static function boot()
     {
@@ -39,6 +35,11 @@ class ListBarang extends Model
     public function jenisBarang()
     {
         return $this->belongsTo(JenisBarang::class, 'jenis_id');
+    }
+
+    public function vendor()
+    {
+        return $this->belongsTo(Vendor::class, 'vendor_id');
     }
 
     public function tipeBarang()

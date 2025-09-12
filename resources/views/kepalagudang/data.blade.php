@@ -798,18 +798,18 @@
         });
 
         // ===== TIPE SPAREPART =====
-        // Tipe Sparepart Form Submission
+
+        // Form submission
         document.getElementById('formTipe').addEventListener('submit', function (e) {
             e.preventDefault();
             const id = document.getElementById('tipeId').value;
             const namaTipe = document.getElementById('namaTipe').value;
-            const kategoriTipe = document.getElementById('kategoriTipe').value; // New category field
+            const kategoriTipe = document.getElementById('kategoriTipe').value;
 
             if (namaTipe.trim() === '') {
                 alert('Nama tipe sparepart tidak boleh kosong!');
                 return;
             }
-
             if (kategoriTipe === '') {
                 alert('Kategori harus dipilih!');
                 return;
@@ -820,14 +820,14 @@
                 const index = tipeData.findIndex(item => item.id == id);
                 if (index !== -1) {
                     tipeData[index].nama = namaTipe;
-                    tipeData[index].kategori = kategoriTipe; // Update category
+                    tipeData[index].kategori = kategoriTipe;
                     alert('Data tipe sparepart berhasil diupdate!');
                 }
             } else {
                 // Add new
                 const newId = tipeData.length > 0 ? Math.max(...tipeData.map(item => item.id)) + 1 : 1;
-                tipeData.push({ id: newId, nama: namaTipe, kategori: kategoriTipe }); // Add category
-                alert('Data tipe sparepart "' + namaTipe + '" berhasil disimpan!');
+                tipeData.push({ id: newId, nama: namaTipe, kategori: kategoriTipe });
+                alert(`Data tipe sparepart "${namaTipe}" berhasil disimpan!`);
             }
 
             renderTipeTable();
@@ -835,15 +835,16 @@
             resetForm('tipe');
         });
 
-        // Edit Tipe Function
+        // Edit tipe
         function editTipe(id, nama, kategori) {
             document.getElementById('tipeId').value = id;
             document.getElementById('namaTipe').value = nama;
-            document.getElementById('kategoriTipe').value = kategori; // Set category
+            document.getElementById('kategoriTipe').value = kategori;
             document.getElementById('namaTipe').focus();
             toggleEditMode('tipe', true);
         }
 
+        // Hapus tipe
         function hapusTipe(id) {
             currentDeleteId = id;
             currentDeleteType = 'tipe';
@@ -858,31 +859,36 @@
             alert('Data berhasil dihapus!');
         }
 
+        // Render table
         function renderTipeTable() {
             const tableBody = document.getElementById('tableTipeBody');
             tableBody.innerHTML = '';
 
             tipeData.forEach((item, index) => {
+                const badgeClass = item.kategori === 'Aset' ? 'badge-aset' : 'badge-non-aset';
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${item.nama}</td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editTipe(${item.id}, '${item.nama}')">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="hapusTipe(${item.id})">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </td>
-                `;
+            <td>${index + 1}</td>
+            <td>${item.nama}</td>
+            <td><span class="badge ${badgeClass}">${item.kategori}</span></td>
+            <td>
+                <button class="btn btn-sm btn-outline-primary me-1" onclick="editTipe(${item.id}, '${item.nama}', '${item.kategori}')">
+                    <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="hapusTipe(${item.id})">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
+        `;
                 tableBody.appendChild(row);
             });
         }
 
+        // Batal edit
         document.getElementById('batalEditTipe').addEventListener('click', function () {
             resetForm('tipe');
         });
+
 
         // ===== VENDOR =====
         document.getElementById('formVendor').addEventListener('submit', function (e) {

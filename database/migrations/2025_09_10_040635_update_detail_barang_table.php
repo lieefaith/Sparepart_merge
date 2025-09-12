@@ -9,29 +9,51 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('detail_barang', function (Blueprint $table) {
-            // Hapus foreign key kalau ada
-            $table->dropForeign(['kode_region']); 
+            // 1. Drop foreign key kode_region (kalau ada)
+            $table->dropForeign(['kode_region']);
 
-            // Ubah kolom quantity (default jadi 1)
+            // 2. Ubah default quantity menjadi 1
             $table->integer('quantity')->default(1)->change();
 
-            // Tambah kolom baru
-            $table->enum('status', ['tersedia', 'dipesan', 'habis'])->default('tersedia');
+            // 3. Tambah kolom status
+            $table->enum('status', ['tersedia', 'dikirim', 'habis'])->default('tersedia')->after('kode_region');
+
+            // 4. Pastikan kolom 'vendor' cocok dengan vendor.nama_vendor
+            $table->dropColumn(['vendor']);
+
+            $table->unsignedBigInteger('vendor_id')->nullable()->after('tipe_id');
+
+            $table->foreign('vendor_id')
+                ->references('id')
+                ->on('vendor')
+                ->onDelete('set null');
         });
     }
 
-    public function down(): void
-    {
-        Schema::table('detail_barang', function (Blueprint $table) {
-            // Rollback: hapus kolom status
-            $table->dropColumn('status');
+public function down(): void
+{
+    Schema::table('detail_barang', function (Blueprint $table) {
+        // Drop foreign key vendor_id dulu sebelum drop kolomnya
+        $table->dropForeign(['vendor_id']);
+        
+        // Drop kolom vendor_id
+        $table->dropColumn('vendor_id');
+        
+        // Tambah kolom vendor lagi (sesuaikan tipe datanya, misal string 100)
+        $table->string('vendor')->nullable()->after('spk');
+        
+        // Drop kolom status
+        $table->dropColumn('status');
+        
+        // Kembalikan default quantity ke 0
+        $table->integer('quantity')->default(0)->change();
+        
+        // Tambah kembali foreign key kode_region
+        $table->foreign('kode_region')
+            ->references('kode_region')
+            ->on('region')
+            ->onDelete('cascade');
+    });
+}
 
-            // Balikin quantity default ke 0
-            $table->integer('quantity')->default(0)->change();
-
-            // Balikin foreign key
-            $table->foreign('kode_region')->references('kode_region')->on('region')->onDelete('cascade');
-        });
-    }
 };
-

@@ -1,633 +1,234 @@
-<!DOCTYPE html>
-<html lang="id">
+@extends('layouts.kepalagudang')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Sparepart - Kepala Gudang</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <style>
-        :root {
-            --primary: #4361ee;
-            --secondary: #3f37c9;
-            --success: #4cc9f0;
-            --info: #4895ef;
-            --warning: #f72585;
-            --danger: #e63946;
-            --light: #f8f9fa;
-            --dark: #212529;
-            --sidebar-width: 250px;
-            --header-height: 70px;
-            --card-border-radius: 12px;
-            --sidebar-bg: #2c3e50;
-            --sidebar-color: #ecf0f1;
-            --sidebar-active: #3498db;
-        }
+@section('title', 'Daftar Sparepart - Kepalagudang')
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f7fb;
-            color: #333;
-            overflow-x: hidden;
-            padding-top: var(--header-height);
-        }
+@push('styles')
+@endpush
 
-        /* Navbar Styling */
-        .navbar {
-            background: linear-gradient(120deg, var(--primary), var(--secondary));
-            height: var(--header-height);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-        }
+@section('content')
+    <input type="hidden" name="_token" id="csrf_token" value="{{ csrf_token() }}">
 
-        .navbar-brand {
-            font-weight: 700;
-            font-size: 1.5rem;
-        }
-
-        .navbar-brand i {
-            font-size: 1.8rem;
-        }
-
-        /* Sidebar Styling */
-        .sidebar {
-            background-color: var(--sidebar-bg);
-            color: var(--sidebar-color);
-            min-height: calc(100vh - var(--header-height));
-            width: var(--sidebar-width);
-            position: fixed;
-            left: 0;
-            top: var(--header-height);
-            transition: all 0.3s ease;
-            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
-            z-index: 900;
-        }
-
-        .sidebar .list-group-item {
-            background: transparent;
-            color: var(--sidebar-color);
-            border: none;
-            border-left: 4px solid transparent;
-            border-radius: 0;
-            padding: 1rem 1.5rem;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-
-        .sidebar .list-group-item:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-left-color: var(--sidebar-active);
-        }
-
-        .sidebar .list-group-item.active {
-            background: linear-gradient(90deg, rgba(52, 152, 219, 0.2), transparent);
-            border-left-color: var(--sidebar-active);
-            color: white;
-        }
-
-        .sidebar .list-group-item i {
-            width: 24px;
-            margin-right: 12px;
-            transition: all 0.3s;
-        }
-
-        .sidebar .list-group-item.active i {
-            transform: scale(1.2);
-        }
-
-        /* Main Content Area */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            padding: 2rem;
-            width: calc(100% - var(--sidebar-width));
-            transition: all 0.3s;
-        }
-
-        /* Dashboard Cards */
-        .dashboard-card {
-            background: white;
-            border-radius: var(--card-border-radius);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s, box-shadow 0.3s;
-            overflow: hidden;
-            position: relative;
-            height: 100%;
-        }
-
-        .dashboard-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .dashboard-card .card-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .stats-number {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: var(--dark);
-        }
-
-        .stats-title {
-            color: #6c757d;
-            font-weight: 500;
-            margin-bottom: 0;
-        }
-
-        /* Table Styling */
-        .table-container {
-            background: white;
-            border-radius: var(--card-border-radius);
-            padding: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            margin-bottom: 2rem;
-        }
-
-        .table-container h5 {
-            color: var(--primary);
-            font-weight: 600;
-            margin-bottom: 1.2rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 2px solid #f0f0f0;
-        }
-
-        .table-hover tbody tr:hover {
-            background-color: rgba(67, 97, 238, 0.05);
-        }
-
-        .table th {
-            font-weight: 600;
-            color: #495057;
-            border-top: none;
-            border-bottom: 2px solid #f0f0f0;
-        }
-
-        .table td {
-            vertical-align: middle;
-            padding: 1rem 0.75rem;
-        }
-
-        /* Page Header */
-        .page-header {
-            background: white;
-            border-radius: var(--card-border-radius);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        /* Filter Card */
-        .filter-card {
-            background: white;
-            border-radius: var(--card-border-radius);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        /* Pagination */
-        .pagination-container {
-            background: white;
-            border-radius: var(--card-border-radius);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            padding: 1rem 1.5rem;
-            margin-top: 1.5rem;
-        }
-
-        /* Status Badge */
-        .status-badge {
-            padding: 0.5em 0.8em;
-            font-size: 0.75em;
-            font-weight: 600;
-            border-radius: 0.5rem;
-        }
-
-        /* Button Action */
-        .btn-action {
-            padding: 0.3rem 0.5rem;
-            font-size: 0.875rem;
-            margin: 0 2px;
-        }
-
-        /* Date Badge */
-        .badge-date {
-            background: linear-gradient(45deg, var(--primary), var(--info));
-            padding: 0.6rem 1.2rem;
-            border-radius: 30px;
-            font-weight: 500;
-            box-shadow: 0 4px 8px rgba(67, 97, 238, 0.2);
-            color: white;
-        }
-
-        /* Responsive Adjustments */
-        @media (max-width: 992px) {
-            .sidebar {
-                width: 70px;
-                text-align: center;
-            }
-
-            .sidebar .list-group-item span {
-                display: none;
-            }
-
-            .sidebar .list-group-item i {
-                margin-right: 0;
-                font-size: 1.3rem;
-            }
-
-            .main-content {
-                margin-left: 70px;
-                width: calc(100% - 70px);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 0;
-                overflow: hidden;
-            }
-
-            .sidebar.show {
-                width: var(--sidebar-width);
-            }
-
-            .main-content {
-                margin-left: 0;
-                width: 100%;
-            }
-        }
-
-        /* Animation for cards */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .dashboard-card {
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--secondary);
-        }
-
-        /* Additional improvements */
-        .card-icon.bg-primary {
-            background-color: rgba(67, 97, 238, 0.1) !important;
-        }
-
-        .card-icon.bg-danger {
-            background-color: rgba(230, 57, 70, 0.1) !important;
-        }
-
-        .card-icon.bg-success {
-            background-color: rgba(76, 201, 240, 0.1) !important;
-        }
-
-        .card-icon.bg-warning {
-            background-color: rgba(247, 37, 133, 0.1) !important;
-        }
-
-        .bg-primary {
-            background-color: var(--primary) !important;
-        }
-
-        .bg-danger {
-            background-color: var(--danger) !important;
-        }
-
-        .bg-success {
-            background-color: var(--success) !important;
-        }
-
-        .bg-warning {
-            background-color: var(--warning) !important;
-        }
-
-        .text-primary {
-            color: var(--primary) !important;
-        }
-
-        .text-danger {
-            color: var(--danger) !important;
-        }
-
-        .text-success {
-            color: var(--success) !important;
-        }
-
-        .text-warning {
-            color: var(--warning) !important;
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            border-color: var(--primary);
-        }
-
-        .btn-primary:hover {
-            background-color: var(--secondary);
-            border-color: var(--secondary);
-        }
-
-        .btn-outline-primary {
-            color: var(--primary);
-            border-color: var(--primary);
-        }
-
-        .btn-outline-primary:hover {
-            background-color: var(--primary);
-            color: white;
-        }
-    </style>
-</head>
-
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container-fluid">
-            <button class="navbar-toggler me-2 d-lg-none" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <a class="navbar-brand" href="{{ route('kepalagudang.dashboard') }}">
-                <i class="bi bi-archive-fill me-2"></i>
-                <span>Kepala Gudang</span>
-            </a>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle me-1"></i> Kepala Gudang
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{{ route('profile.index') }}"><i
-                                        class="bi bi-person me-2"></i>Profil</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="{{ route('logout') }}"><i
-                                        class="bi bi-box-arrow-right me-2"></i>Logout</a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h4 class="fw-bold mb-0"><i class="bi bi-tools me-2"></i>Daftar Sparepart</h4>
+                <p class="text-muted mb-0">Kelola data sparepart di gudang</p>
+            </div>
+            <div>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tambahSparepartModal">
+                    <i class="bi bi-plus-circle me-1"></i> Tambah Sparepart
+                </button>
+                <a href="{{ route('kepalagudang.dashboard') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Kembali
+                </a>
             </div>
         </div>
-    </nav>
-
-    <!-- Sidebar -->
-    <div class="sidebar">
-    <div class="list-group list-group-flush">
-        <a href="{{ route('kepalagudang.dashboard') }}" class="list-group-item list-group-item-action py-3">
-            <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
-        </a>
-        <a href="{{ route('kepalagudang.request.index') }}" class="list-group-item list-group-item-action py-3">
-            <i class="bi bi-send"></i> <span>Request / Send</span>
-        </a>
-        <a href="{{ route('kepalagudang.sparepart.index') }}" class="list-group-item list-group-item-action py-3">
-            <i class="bi bi-tools"></i> <span>Daftar Sparepart</span>
-        </a>
-        <a href="{{ route('kepalagudang.data') }}" class="list-group-item list-group-item-action py-3">
-            <i class="bi bi-folder2-open"></i> <span>Data</span>
-        </a>
-        <a href="{{ route('kepalagudang.history.index') }}" class="list-group-item list-group-item-action py-3">
-            <i class="bi bi-clock-history"></i> <span>Histori Barang</span>
-        </a>
     </div>
-</div>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <!-- Page Header -->
-        <div class="page-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h4 class="fw-bold mb-0"><i class="bi bi-tools me-2"></i>Daftar Sparepart</h4>
-                    <p class="text-muted mb-0">Kelola data sparepart di gudang</p>
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="dashboard-card p-4">
+                <div class="card-icon bg-primary bg-opacity-10 text-primary">
+                    <i class="bi bi-tools"></i>
                 </div>
-                <div>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tambahSparepartModal">
-                        <i class="bi bi-plus-circle me-1"></i> Tambah Sparepart
-                    </button>
-                    <a href="{{ route('kepalagudang.dashboard') }}" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-left me-1"></i> Kembali
-                    </a>
-                </div>
+                <h4 class="stats-number">{{ $totalQty }}</h4>
+                <p class="stats-title">Total Sparepart</p>
             </div>
         </div>
-
-        <!-- Stats Cards -->
-        <div class="row g-4 mb-4">
-            <div class="col-xl-3 col-md-6">
-                <div class="dashboard-card p-4">
-                    <div class="card-icon bg-primary bg-opacity-10 text-primary">
-                        <i class="bi bi-tools"></i>
-                    </div>
-                    <h4 class="stats-number">{{ $totalQty }}</h4>
-                    <p class="stats-title">Total Sparepart</p>
+        <div class="col-xl-3 col-md-6">
+            <div class="dashboard-card p-4">
+                <div class="card-icon bg-success bg-opacity-10 text-success">
+                    <i class="bi bi-check-circle"></i>
                 </div>
-            </div>
-            <div class="col-xl-3 col-md-6">
-                <div class="dashboard-card p-4">
-                    <div class="card-icon bg-success bg-opacity-10 text-success">
-                        <i class="bi bi-check-circle"></i>
-                    </div>
-                    <h4 class="stats-number">{{ $totalTersedia }}</h4>
-                    <p class="stats-title">Tersedia</p>
-                </div>
-            </div>
-            <div class="col-xl-3 col-md-6">
-                <div class="dashboard-card p-4">
-                    <div class="card-icon bg-warning bg-opacity-10 text-warning">
-                        <i class="bi bi-clock-history"></i>
-                    </div>
-                    <h4 class="stats-number">{{ $totalDipesan }}</h4>
-                    <p class="stats-title">Dikirim</p>
-                </div>
-            </div>
-            <div class="col-xl-3 col-md-6">
-                <div class="dashboard-card p-4">
-                    <div class="card-icon bg-danger bg-opacity-10 text-danger">
-                        <i class="bi bi-exclamation-circle"></i>
-                    </div>
-                    <h4 class="stats-number">{{ $totalHabis }}</h4>
-                    <p class="stats-title">Habis</p>
-                </div>
+                <h4 class="stats-number">{{ $totalTersedia }}</h4>
+                <p class="stats-title">Tersedia</p>
             </div>
         </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="dashboard-card p-4">
+                <div class="card-icon bg-warning bg-opacity-10 text-warning">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <h4 class="stats-number">{{ $totalDikirim }}</h4>
+                <p class="stats-title">Dikirim</p>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="dashboard-card p-4">
+                <div class="card-icon bg-danger bg-opacity-10 text-danger">
+                    <i class="bi bi-exclamation-circle"></i>
+                </div>
+                <h4 class="stats-number">{{ $totalHabis }}</h4>
+                <p class="stats-title">Habis</p>
+            </div>
+        </div>
+    </div>
 
-        <!-- Filter Section -->
-        <div class="filter-card">
-            <h5 class="mb-3"><i class="bi bi-funnel me-2"></i>Filter Data</h5>
-            <form method="GET" action="{{ route('kepalagudang.sparepart.index') }}">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label for="jenisFilter" class="form-label">Jenis Sparepart</label>
-                        <select class="form-select" name="jenis" id="jenisFilter" onchange="this.form.submit()">
-                            <option value="">Semua Jenis</option>
-                            @foreach ($jenis as $j)
-                                <option value="{{ $j->id }}"
-                                    {{ (string) request('jenis') === (string) $j->id ? 'selected' : '' }}>
-                                    {{ $j->jenis }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="statusFilter" class="form-label">Status Sparepart</label>
-                        <select class="form-select" name="status" id="statusFilter">
-                            <option value="">Semua Status</option>
-                            <option value="tersedia" {{ request('status') == 'tersedia' ? 'selected' : '' }}>
-                                Tersedia</option>
-                            <option value="habis" {{ request('status') == 'habis' ? 'selected' : '' }}>Habis
+    <!-- Filter Card -->
+    <div class="filter-card">
+        <h5 class="mb-3"><i class="bi bi-funnel me-2"></i>Filter Data</h5>
+        <form method="GET" action="{{ route('kepalagudang.sparepart.index') }}">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="jenisFilter" class="form-label">Jenis Sparepart</label>
+                    <select class="form-select" name="jenis" id="jenisFilter" onchange="this.form.submit()">
+                        <option value="">Semua Jenis</option>
+                        @foreach ($jenis as $j)
+                            <option value="{{ $j->id }}"
+                                {{ (string) request('jenis') === (string) $j->id ? 'selected' : '' }}>
+                                {{ $j->jenis }}
                             </option>
-                            <option value="dipesan" {{ request('status') == 'dipesan' ? 'selected' : '' }}>
-                                Dipesan</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="searchFilter" class="form-label">Cari Sparepart</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Cari ID atau nama sparepart..."
-                                name="search" value="{{ request('search') }}">
-                            <button class="btn btn-primary" type="submit">
-                                <i class="bi bi-search"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="col-12 text-end">
-                        <a href="{{ route('kepalagudang.sparepart.index') }}" class="btn btn-light me-2">
-                            <i class="bi bi-arrow-clockwise me-1"></i> Reset
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-filter me-1"></i> Terapkan Filter
-                        </button>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="statusFilter" class="form-label">Status Sparepart</label>
+                    <select class="form-select" name="status" id="statusFilter">
+                        <option value="">Semua Status</option>
+                        <option value="tersedia" {{ request('status') == 'tersedia' ? 'selected' : '' }}>Tersedia</option>
+                        <option value="habis" {{ request('status') == 'habis' ? 'selected' : '' }}>Habis</option>
+                        <option value="dikirim" {{ request('status') == 'dikirim' ? 'selected' : '' }}>Dikirim</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="searchFilter" class="form-label">Cari Sparepart</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Cari ID atau nama sparepart..."
+                            name="search" value="{{ request('search') }}">
+                        <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i></button>
                     </div>
                 </div>
-            </form>
-        </div>
+                <div class="col-md-4">
+                    <label for="tanggalMulai" class="form-label">Tanggal Mulai</label>
+                    <input type="date" class="form-control" id="tanggalMulai" name="tanggal_mulai"
+                        value="{{ request('tanggal_mulai') }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="tanggalBerakhir" class="form-label">Tanggal Berakhir</label>
+                    <input type="date" class="form-control" id="tanggalBerakhir" name="tanggal_berakhir"
+                        value="{{ request('tanggal_berakhir') }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="kategoriFilter" class="form-label">Kategori Sparepart</label>
+                    <select class="form-select" name="kategori" id="kategoriFilter" onchange="this.form.submit()">
+                        <option value="">Semua Kategori</option>
+                        <option value="aset" {{ old('kategori') == 'aset' ? 'selected' : '' }}>Aset</option>
+                        <option value="non_aset" {{ old('kategori') == 'non_aset' ? 'selected' : '' }}>Non
+                            Aset</option>
+                    </select>
+                </div>
+                <div class="col-12 text-end">
+                    <a href="{{ route('kepalagudang.sparepart.index') }}" class="btn btn-light me-2">
+                        <i class="bi bi-arrow-clockwise me-1"></i> Reset
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-filter me-1"></i> Terapkan Filter
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
 
-        <!-- Table -->
-        <div class="table-container">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
+    <!-- Table -->
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID Sparepart</th>
+                        <th>Jenis & Type</th>
+                        <th>Quantity</th>
+                        @if ($filterStatus === 'habis')
+                            <th>Habis</th>
+                        @elseif ($filterStatus === 'dikirim')
+                            <th>Dikirim</th>
+                        @else
+                            <th>Tersedia</th>
+                        @endif
+                        <th>Kategori</th>
+                        <th>Detail</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($listBarang as $barang)
                         <tr>
-                            <th>ID Sparepart</th>
-                            <th>Jenis & Type</th>
-                            <th>Quantity</th>
+                            <td><span class="fw-bold">{{ $barang->tiket_sparepart }}</span></td>
+                            <td>{{ $barang->jenisBarang->jenis }} {{ $barang->tipeBarang->tipe }}</td>
+                            <td>{{ $barang->quantity }}</td>
                             @if ($filterStatus === 'habis')
-                                <th>Habis</th>
-                            @elseif ($filterStatus === 'dipesan')
-                                <th>Dipesan</th>
+                                <td>{{ $totalsPerTiket[$barang->tiket_sparepart]['habis'] ?? 0 }}</td>
+                            @elseif ($filterStatus === 'dikirim')
+                                <td>{{ $totalsPerTiket[$barang->tiket_sparepart]['dikirim'] ?? 0 }}</td>
                             @else
-                                <th>Tersedia</th>
+                                <td>{{ $totalsPerTiket[$barang->tiket_sparepart]['tersedia'] ?? 0 }}</td>
                             @endif
-                            <th>Detail</th>
+                            <td>
+                                <button class="btn btn-info btn-sm btn-detail"
+                                    onclick="showDetail('{{ $barang->tiket_sparepart }}')" title="Detail">
+                                    <i class="bi bi-eye"></i> Detail
+                                </button>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($listBarang as $barang)
-                            <tr>
-                                <td><span class="fw-bold">{{ $barang->tiket_sparepart }}</span></td>
-                                <td>{{ $barang->jenisBarang->jenis }} {{ $barang->tipeBarang->tipe }}</td>
-                                <td>{{ $barang->quantity }}</td>
-                                @if ($filterStatus === 'habis')
-                                    <td>{{ $totalsPerTiket[$barang->tiket_sparepart]['habis'] ?? 0 }}</td>
-                                @elseif ($filterStatus === 'dipesan')
-                                    <td>{{ $totalsPerTiket[$barang->tiket_sparepart]['dipesan'] ?? 0 }}</td>
-                                @else
-                                    <td>{{ $totalsPerTiket[$barang->tiket_sparepart]['tersedia'] ?? 0 }}</td>
-                                @endif
-                                <td>
-                                    <button class="btn btn-info btn-sm btn-detail"
-                                        onclick="showDetail('{{ $barang->tiket_sparepart }}')" title="Detail">
-                                        <i class="bi bi-eye"></i> Detail
-                                    </button>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="7" class="text-center text-muted py-4">
-                                    Tidak ada data
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                <i class="bi bi-inbox display-4 d-block mb-2"></i>
+                                Tidak ada data sparepart
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
+    </div>
 
-        <div class="d-flex justify-content-between align-items-center mt-3">
-            <div class="text-muted">
-                Menampilkan {{ $listBarang->firstItem() }} hingga {{ $listBarang->lastItem() }} dari
-                {{ $listBarang->total() }} entri
-            </div>
-            <nav aria-label="Page navigation">
-                {{ $listBarang->links('pagination::bootstrap-5') }}
-            </nav>
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <div class="text-muted">
+            Menampilkan {{ $listBarang->firstItem() }} hingga {{ $listBarang->lastItem() }} dari
+            {{ $listBarang->total() }} entri
         </div>
+        <nav aria-label="Page navigation">
+            {{ $listBarang->links('pagination::bootstrap-5') }}
+        </nav>
     </div>
 
     <!-- Modal Tambah Sparepart -->
     <div class="modal fade" id="tambahSparepartModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="tambahSparepartModalLabel"><i
-                            class="bi bi-plus-circle me-2"></i>Tambah
-                        Sparepart Baru</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form method="POST" action="{{ route('kepalagudang.sparepart.store') }}" id="sparepartForm">
+                <form method="POST" action="{{ route('kepalagudang.sparepart.store') }}" id="sparepartForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="tambahSparepartModalLabel"><i
+                                class="bi bi-plus-circle me-2"></i>Tambah Sparepart Baru</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        @csrf
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                         <div class="row g-3">
-                            @csrf
-                            @if ($errors->any())
-                                <div class="alert alert-danger">
-                                    <ul>
-                                        @foreach ($errors->all() as $error)
-                                            <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            @endif
+                            <div class="col-md-6">
+                                <label for="kategori" class="form-label">Kategori</label>
+                                <select class="form-select @error('kategori') is-invalid @enderror" id="kategori"
+                                    name="kategori" required>
+                                    <option value="" selected>Pilih kategori</option>
+                                    <option value="aset" {{ old('kategori') == 'aset' ? 'selected' : '' }}>Aset</option>
+                                    <option value="non_aset" {{ old('kategori') == 'non_aset' ? 'selected' : '' }}>Non
+                                        Aset</option>
+                                </select>
+
+                                @error('kategori')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
                             <div class="col-md-6">
                                 <label for="jenisSparepart" class="form-label">Jenis Sparepart</label>
                                 <select class="form-select @error('jenisSparepart') is-invalid @enderror"
@@ -635,8 +236,7 @@
                                     <option value="" selected>Pilih jenis sparepart</option>
                                     @foreach ($jenis as $j)
                                         <option value="{{ $j->id }}"
-                                            {{ old('jenisSparepart') == $j->id ? 'selected' : '' }}>
-                                            {{ $j->jenis }}
+                                            {{ old('jenisSparepart') == $j->id ? 'selected' : '' }}>{{ $j->jenis }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -644,6 +244,7 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+
                             <div class="col-md-6">
                                 <label for="typeSparepart" class="form-label">Type Sparepart</label>
                                 <select class="form-select @error('typeSparepart') is-invalid @enderror"
@@ -659,25 +260,27 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+
                             <div class="col-md-6">
                                 <label for="serialNumber" class="form-label">Serial Number</label>
-                                <input type="text"
-                                    class="form-control @error('serial_number') is-invalid @enderror"
-                                    id="serialNumber" name="serial_number" placeholder="Masukkan serial number"
-                                    value="{{ old('serial_number') }}">
+                                <input type="text" class="form-control @error('serial_number') is-invalid @enderror"
+                                    id="serialNumber" name="serial_number" value="{{ old('serial_number') }}"
+                                    placeholder="Masukkan serial number">
                                 @error('serial_number')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+
                             <div class="col-md-6">
                                 <label for="quantity" class="form-label">Quantity</label>
                                 <input type="number" class="form-control @error('quantity') is-invalid @enderror"
-                                    id="quantity" name="quantity" placeholder="Masukkan jumlah" required
-                                    min="1" value="{{ old('quantity', 1) }}">
+                                    id="quantity" name="quantity" min="1" required
+                                    value="{{ old('quantity', 1) }}">
                                 @error('quantity')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+
                             <div class="col-md-6">
                                 <label for="tanggal" class="form-label">Tanggal</label>
                                 <input type="date" class="form-control @error('tanggal') is-invalid @enderror"
@@ -686,178 +289,208 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+
                             <div class="col-md-6">
                                 <label for="spk" class="form-label">SPK</label>
                                 <input type="text" class="form-control @error('spk') is-invalid @enderror"
-                                    id="spk" name="spk" placeholder="Masukkan SPK"
-                                    value="{{ old('spk') }}">
+                                    id="spk" name="spk" value="{{ old('spk') }}">
                                 @error('spk')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+
                             <div class="col-md-6">
                                 <label for="harga" class="form-label">Harga</label>
                                 <input type="number" class="form-control @error('harga') is-invalid @enderror"
-                                    id="harga" name="harga" placeholder="Masukkan harga" required
-                                    value="{{ old('harga') }}">
+                                    id="harga" name="harga" required value="{{ old('harga') }}">
                                 @error('harga')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+
                             <div class="col-md-6">
                                 <label for="vendor" class="form-label">Vendor</label>
-                                <input type="text" class="form-control @error('vendor') is-invalid @enderror"
-                                    id="vendor" name="vendor" placeholder="Masukkan vendor"
-                                    value="{{ old('vendor') }}">
+                                <select class="form-select @error('vendor') is-invalid @enderror" id="vendor"
+                                    name="vendor" required>
+                                    <option value="" selected>Pilih vendor</option>
+                                    @foreach ($vendor as $v)
+                                        <option value="{{ $v->id }}"
+                                            {{ old('vendor') == $v->id ? 'selected' : '' }}>{{ $v->nama_vendor }}</option>
+                                    @endforeach
+                                </select>
                                 @error('vendor')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+
                             <div class="col-md-6">
                                 <label for="pic" class="form-label">PIC</label>
                                 <input type="text" class="form-control @error('pic') is-invalid @enderror"
-                                    id="pic" name="pic" placeholder="Masukkan PIC" required
-                                    value="{{ old('pic') }}">
+                                    id="pic" name="pic" required value="{{ old('pic') }}">
                                 @error('pic')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+
                             <div class="col-md-6">
                                 <label for="department" class="form-label">Department</label>
                                 <input type="text" class="form-control @error('department') is-invalid @enderror"
-                                    id="department" name="department" placeholder="Masukkan department"
-                                    value="{{ old('department') }}">
+                                    id="department" name="department" value="{{ old('department') }}">
                                 @error('department')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+                            <div class="col-md-6">
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-select @error('status') is-invalid @enderror" id="status"
+                                    name="status" required>
+                                    <option value="" selected>Pilih Status</option>
+                                    <option value="tersedia" {{ old('status') == 'aset' ? 'selected' : '' }}>Tersedia
+                                    </option>
+                                    <option value="dikirim" {{ old('status') == 'non_aset' ? 'selected' : '' }}>Dikirim
+                                    </option>
+                                    <option value="habis" {{ old('status') == 'non_aset' ? 'selected' : '' }}>Habis
+                                    </option>
+                                </select>
+
+                                @error('status')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
                             <div class="col-12">
                                 <label for="keterangan" class="form-label">Keterangan</label>
-                                <textarea class="form-control" id="keterangan" rows="3" placeholder="Tambahkan keterangan tambahan..."></textarea>
+                                <textarea class="form-control" id="keterangan" name="keterangan" rows="3">{{ old('keterangan') }}</textarea>
                             </div>
                         </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan Sparepart</button>
-                </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan Sparepart</button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
-    {{-- <div class="modal fade" id="editSparepartModal{{ $sparepart->id }}" tabindex="-1" aria-labelledby="editSparepartModalLabel{{ $sparepart->id }}" aria-hidden="true">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="editSparepartModalLabel"><i class="bi bi-pencil-square me-2"></i>Edit Sparepart</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form method="POST" id="editSparepartForm">
-    @csrf
-    @method('PUT')
-                    <div class="row g-3">
-                        @if ($errors->any())
-                            <div class="alert alert-danger">
-                                <ul>
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
+
+    <!-- Modal Edit Sparepart (mirip form tambah) -->
+    <div class="modal fade" id="editSparepartModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="editSparepartForm">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="bi bi-pencil me-2"></i>Edit Sparepart</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="original_serial" id="edit-original-serial" />
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="edit-kategori" class="form-label">Kategori</label>
+                                <select class="form-select" id="edit-kategori " name="kategori" disabled>
+                                    <option value="" selected>Pilih kategori</option>
+                                    <option value="aset" {{ old('kategori') == 'aset' ? 'selected' : '' }}>Aset</option>
+                                    <option value="non_aset" {{ old('kategori') == 'non_aset' ? 'selected' : '' }}>Non
+                                        Aset</option>
+                                </select>
                             </div>
-                        @endif
-                        <!-- ID Sparepart -->
-                        <div class="col-12">
-                            <label for="tiketSparepart" class="form-label">ID Sparepart</label>
-                            <input type="text" class="form-control" id="tiketSparepart" name="tiket_sparepart" value="{{ $sparepart->tiket_sparepart }}" disabled>
-                        </div>
-                        <!-- Serial Number -->
-                        <div class="col-md-6">
-                            <label for="serialNumber" class="form-label">Serial Number</label>
-                            <input type="text" class="form-control @error('serial_number') is-invalid @enderror" id="serialNumber" name="serial_number" placeholder="Masukkan serial number" value="{{ old('serial_number', $sparepart->serial_number) }}">
-                            @error('serial_number')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <!-- Type Sparepart -->
-                        <div class="col-md-6">
-                            <label for="typeSparepart" class="form-label">Type Sparepart</label>
-                            <select class="form-select @error('typeSparepart') is-invalid @enderror" id="typeSparepart" name="typeSparepart" required>
-                                <option value="" selected>Pilih tipe sparepart</option>
-                                @foreach ($tipe as $t)
-                                    <option value="{{ $t->id }}" {{ old('typeSparepart', $sparepart->tipe_id) == $t->id ? 'selected' : '' }}>
-                                        {{ $t->tipe }}
+                            <div class="col-md-6">
+                                <label for="edit-jenisSparepart" class="form-label">Jenis Sparepart</label>
+                                <select class="form-select" id="edit-jenisSparepart" name="jenisSparepart" disabled>
+                                    @foreach ($jenis as $j)
+                                        <option value="{{ $j->id }}">{{ $j->jenis }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="edit-typeSparepart" class="form-label">Type Sparepart</label>
+                                <select class="form-select" id="edit-typeSparepart" name="typeSparepart" disabled>
+                                    <option value="">Pilih tipe sparepart</option>
+                                    @foreach ($tipe as $t)
+                                        <option value="{{ $t->id }}">{{ $t->tipe }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="edit-serialNumber" class="form-label">Serial Number</label>
+                                <input type="text" class="form-control" id="edit-serialNumber" name="serial_number"
+                                    required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="edit-quantity" class="form-label">Quantity</label>
+                                <input type="number" class="form-control" id="edit-quantity" name="quantity"
+                                    min="1" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="edit-tanggal" class="form-label">Tanggal</label>
+                                <input type="date" class="form-control" id="edit-tanggal" name="tanggal" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="edit-spk" class="form-label">SPK</label>
+                                <input type="text" class="form-control" id="edit-spk" name="spk">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="edit-harga" class="form-label">Harga</label>
+                                <input type="number" class="form-control" id="edit-harga" name="harga" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="edit-vendor" class="form-label">Vendor</label>
+                                <select class="form-select" id="edit-vendor" name="vendor" disabled>
+                                    <option value="">Pilih vendor</option>
+                                    @foreach ($vendor as $v)
+                                        <option value="{{ $v->id }}">{{ $v->nama_vendor }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="edit-pic" class="form-label">PIC</label>
+                                <input type="text" class="form-control" id="edit-pic" name="pic" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="edit-department" class="form-label">Department</label>
+                                <input type="text" class="form-control" id="edit-department" name="department">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="edit-status" class="form-label">Status</label>
+                                <select class="form-select" id="edit-status" name="status">
+                                    <option value="" selected>Pilih Status</option>
+                                    <option value="tersedia" {{ old('status') == 'aset' ? 'selected' : '' }}>Tersedia
                                     </option>
-                                @endforeach
-                            </select>
-                            @error('typeSparepart')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <!-- Quantity -->
-                        <div class="col-md-6">
-                            <label for="quantity" class="form-label">Quantity</label>
-                            <input type="number" class="form-control @error('quantity') is-invalid @enderror" id="quantity" name="quantity" placeholder="Masukkan jumlah" required min="1" value="{{ old('quantity', $sparepart->quantity) }}">
-                            @error('quantity')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <!-- Tanggal -->
-                        <div class="col-md-6">
-                            <label for="tanggal" class="form-label">Tanggal</label>
-                            <input type="date" class="form-control @error('tanggal') is-invalid @enderror" id="tanggal" name="tanggal" value="{{ old('tanggal', $sparepart->tanggal) }}" required>
-                            @error('tanggal')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <!-- Harga -->
-                        <div class="col-md-6">
-                            <label for="harga" class="form-label">Harga</label>
-                            <input type="number" class="form-control @error('harga') is-invalid @enderror" id="harga" name="harga" placeholder="Masukkan harga" required value="{{ old('harga', $sparepart->harga) }}">
-                            @error('harga')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <!-- Vendor -->
-                        <div class="col-md-6">
-                            <label for="vendor" class="form-label">Vendor</label>
-                            <input type="text" class="form-control @error('vendor') is-invalid @enderror" id="vendor" name="vendor" placeholder="Masukkan vendor" value="{{ old('vendor', $sparepart->vendor) }}">
-                            @error('vendor')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <!-- PIC -->
-                        <div class="col-md-6">
-                            <label for="pic" class="form-label">PIC</label>
-                            <input type="text" class="form-control @error('pic') is-invalid @enderror" id="pic" name="pic" placeholder="Masukkan PIC" required value="{{ old('pic', $sparepart->pic) }}">
-                            @error('pic')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <!-- Keterangan -->
-                        <div class="col-md-6">
-                            <label for="department" class="form-label">Department</label>
-                            <input type="text" class="form-control @error('department') is-invalid @enderror" id="department" name="department" placeholder="Masukkan department" value="{{ old('department', $sparepart->department) }}">
-                            @error('department')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="col-12">
-                            <label for="keterangan" class="form-label">Keterangan</label>
-                            <textarea class="form-control" id="keterangan" name="keterangan" rows="3" placeholder="Tambahkan keterangan tambahan...">{{ old('keterangan', $sparepart->keterangan) }}</textarea>
+                                    <option value="dikirim" {{ old('status') == 'non_aset' ? 'selected' : '' }}>Dikirim
+                                    </option>
+                                    <option value="habis" {{ old('status') == 'non_aset' ? 'selected' : '' }}>Habis
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label for="edit-keterangan" class="form-label">Keterangan</label>
+                                <textarea class="form-control" id="edit-keterangan" name="keterangan" rows="3"></textarea>
+                            </div>
                         </div>
                     </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary" id="editSaveBtn">Simpan Perubahan</button>
+                    </div>
+                </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="submit" class="btn btn-primary">Update Sparepart</button>
-            </div>
-            </form>
-            @endforeach
         </div>
-    </div> --}}
     </div>
 
-
+    <!-- Detail Modal -->
     <div class="modal fade" id="sparepartDetailModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -867,15 +500,15 @@
                 </div>
                 <div class="modal-body">
                     <div class="d-flex justify-content-center">
-                        <div class="spinner-border text-primary" id="sparepart-spinner" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
+                        <div class="spinner-border text-primary" id="sparepart-spinner" role="status"><span
+                                class="visually-hidden">Loading...</span></div>
                     </div>
 
                     <div id="sparepart-content" style="display:none;">
                         <div class="row mb-3">
                             <div class="col-md-6"><strong>ID Sparepart:</strong> <span id="trx-id"></span></div>
                         </div>
+
                         <h6 class="mt-3 mb-2">Daftar Sparepart:</h6>
                         <div class="table-responsive">
                             <table class="table table-bordered">
@@ -887,34 +520,157 @@
                                         <th>Jenis</th>
                                         <th>Status</th>
                                         <th>Harga</th>
-                                        <th>Vendor (Supplier)</th>
+                                        <th>Vendor</th>
                                         <th>SPK</th>
+                                        <th>Qty</th>
                                         <th>PIC</th>
                                         <th>Keterangan</th>
                                         <th>Tanggal</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody id="trx-items-list">
-                                </tbody>
-
+                                <tbody id="trx-items-list"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary"
+                        data-bs-dismiss="modal">Tutup</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Konfirmasi Hapus -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Konfirmasi Hapus</h5><button type="button" class="btn-close"
+                        data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="confirmDeleteText" class="mb-0">Yakin ingin menghapus item?</p>
+                </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-secondary" id="confirmCancelBtn"
+                        data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn"><span
+                            id="confirmDeleteBtnText">Hapus</span><span id="confirmDeleteSpinner"
+                            class="spinner-border spinner-border-sm ms-2" role="status"
+                            style="display:none;"></span></button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Toast container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer" style="z-index:10800;"></div>
 
+@endsection
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+@push('scripts')
     <script>
-        let sparepartDetailModal;
+        /* ====== Helpers ====== */
+        function showToast(message, type = 'info', options = {
+            delay: 5000,
+            autohide: true
+        }) {
+            const container = document.getElementById('toastContainer');
+            if (!container) return console.warn('Toast container not found');
 
+            const id = 'toast-' + Date.now() + Math.floor(Math.random() * 1000);
+            const bgClass = {
+                success: 'bg-success text-white',
+                danger: 'bg-danger text-white',
+                warning: 'bg-warning text-dark',
+                info: 'bg-info text-white',
+                secondary: 'bg-secondary text-white'
+            } [type] || 'bg-secondary text-white';
+
+            const closeBtnClass = bgClass.includes('text-white') ? 'btn-close btn-close-white' : 'btn-close';
+
+            const icon = {
+                success: '<i class="bi bi-check-circle-fill me-2"></i>',
+                danger: '<i class="bi bi-x-circle-fill me-2"></i>',
+                warning: '<i class="bi bi-exclamation-triangle-fill me-2"></i>',
+                info: '<i class="bi bi-info-circle-fill me-2"></i>',
+                secondary: '<i class="bi bi-bell-fill me-2"></i>'
+            } [type] || '';
+
+            const html = `
+    <div id="${id}" class="toast ${bgClass} shadow" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">${icon}<span>${message}</span></div>
+        <button type="button" class="${closeBtnClass} me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+    `;
+            container.insertAdjacentHTML('beforeend', html);
+            const toastEl = document.getElementById(id);
+            const toast = new bootstrap.Toast(toastEl, {
+                delay: options.delay,
+                autohide: options.autohide
+            });
+            toast.show();
+            toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
+            return toast;
+        }
+
+        function showConfirm(message, okLabel = 'Hapus', cancelLabel = 'Batal') {
+            return new Promise((resolve) => {
+                const modalEl = document.getElementById('confirmDeleteModal');
+                const bodyText = document.getElementById('confirmDeleteText');
+                const okBtn = document.getElementById('confirmDeleteBtn');
+                const cancelBtn = document.getElementById('confirmCancelBtn');
+                const spinner = document.getElementById('confirmDeleteSpinner');
+                const okText = document.getElementById('confirmDeleteBtnText');
+
+                bodyText.textContent = message;
+                okText.textContent = okLabel;
+                cancelBtn.textContent = cancelLabel;
+
+                const modal = new bootstrap.Modal(modalEl, {
+                    backdrop: 'static',
+                    keyboard: false
+                });
+                let resolved = false;
+
+                const cleanup = () => {
+                    okBtn.removeEventListener('click', onOk);
+                    cancelBtn.removeEventListener('click', onCancel);
+                    modalEl.removeEventListener('hidden.bs.modal', onHidden);
+                    spinner.style.display = 'none';
+                    okBtn.disabled = false;
+                };
+
+                const onOk = () => {
+                    resolved = true;
+                    cleanup();
+                    modal.hide();
+                    resolve(true);
+                };
+                const onCancel = () => {
+                    resolved = true;
+                    cleanup();
+                    modal.hide();
+                    resolve(false);
+                };
+                const onHidden = () => {
+                    if (!resolved) {
+                        cleanup();
+                        resolve(false);
+                    }
+                };
+
+                okBtn.addEventListener('click', onOk);
+                cancelBtn.addEventListener('click', onCancel);
+                modalEl.addEventListener('hidden.bs.modal', onHidden);
+                modal.show();
+            });
+        }
+
+        /* ====== Page logic ====== */
+        let sparepartDetailModal;
         document.addEventListener("DOMContentLoaded", function() {
             sparepartDetailModal = new bootstrap.Modal(document.getElementById('sparepartDetailModal'));
 
@@ -929,71 +685,272 @@
             return 'Rp ' + new Intl.NumberFormat('id-ID').format(num);
         }
 
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         function showTransaksiDetail(data) {
-            // spinner dan konten sesuai dengan id modal detail kamu
             document.getElementById('sparepart-spinner').style.display = 'block';
             document.getElementById('sparepart-content').style.display = 'none';
-
             document.getElementById('trx-id').textContent = data.id || '-';
 
             const tbody = document.getElementById('trx-items-list');
             tbody.innerHTML = "";
 
+            console.log(data)
+
             data.items.forEach((item, i) => {
                 let statusClass = 'bg-secondary';
-                if (item.status === 'tersedia') {
-                    statusClass = 'bg-success';
-                } else if (item.status === 'habis') {
-                    statusClass = 'bg-danger';
-                } else if (item.status === 'dipesan') {
-                    statusClass = 'bg-warning';
-                }
+                if (item.status === 'tersedia') statusClass = 'bg-success';
+                else if (item.status === 'habis') statusClass = 'bg-danger';
+                else if (item.status === 'dipesan' || item.status === 'dikirim') statusClass = 'bg-warning';
+
+                const dataAttrs = [
+                    `data-item-serial="${escapeHtml(item.serial)}"`,
+                    `data-item-quantity="${escapeHtml(item.quantity)}"`,
+                    `data-item-tanggal="${escapeHtml(item.tanggal)}"`,
+                    `data-item-spk="${escapeHtml(item.spk)}"`,
+                    `data-item-harga="${escapeHtml(item.harga)}"`,
+                    `data-item-vendor="${escapeHtml(item.vendor)}"`,
+                    `data-item-pic="${escapeHtml(item.pic)}"`,
+                    `data-item-department="${escapeHtml(item.department)}"`,
+                    `data-item-keterangan="${escapeHtml(item.keterangan)}"`,
+                    `data-item-jenis="${escapeHtml(data.jenis)}"`,
+                    `data-item-type="${escapeHtml(data.type)}"`
+                ].join(' ');
 
                 const row = `
-            <tr>
-                <td>${i + 1}</td>
-                <td>${item.serial || '-'}</td>
-                <td>${data.type || '-'}</td>
-                <td>${data.jenis || '-'}</td>
-                <td><span class="badge ${statusClass}">${item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1) : '-'}</span></td>
-                <td>${item.harga ? formatRupiah(item.harga) : '-'}</td>
-                <td>${item.vendor || '-'}</td>
-                <td>${item.spk || '-'}</td>
-                <td>${item.pic || '-'}</td>
-                <td>${item.keterangan || '-'}</td>
-                <td>${item.tanggal || '-'}</td>
-                <td>
-                    <button class="btn btn-primary btn-action" data-bs-toggle="tooltip" title="Edit">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button class="btn btn-danger btn-action" data-bs-toggle="tooltip" title="Hapus">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </td>
-            </tr>
+        <tr>
+            <td>${i + 1}</td>
+            <td>${escapeHtml(item.serial) || '-'}</td>
+            <td>${escapeHtml(data.type) || '-'}</td>
+            <td>${escapeHtml(data.jenis) || '-'}</td>
+            <td><span class="badge ${statusClass}">${item.status ? (item.status.charAt(0).toUpperCase() + item.status.slice(1)) : '-'}</span></td>
+            <td>${item.harga ? formatRupiah(item.harga) : '-'}</td>
+            <td>${escapeHtml(item.vendor) || '-'}</td>
+            <td>${escapeHtml(item.spk) || '-'}</td>
+            <td>${escapeHtml(item.quantity) || '-'}</td>
+            <td>${escapeHtml(item.pic) || '-'}</td>
+            <td>${escapeHtml(item.keterangan) || '-'}</td>
+            <td>${escapeHtml(item.tanggal) || '-'}</td>
+            <td>
+                <button class="btn btn-primary btn-action btn-edit" ${dataAttrs} data-bs-toggle="tooltip" title="Edit">
+                    <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-danger btn-action btn-delete" data-item-serial="${escapeHtml(item.serial)}" data-bs-toggle="tooltip" title="Hapus">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
+        </tr>
         `;
                 tbody.insertAdjacentHTML("beforeend", row);
             });
 
+            // re-init tooltip
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function(el) {
+                return new bootstrap.Tooltip(el);
+            });
+
             document.getElementById('sparepart-spinner').style.display = 'none';
             document.getElementById('sparepart-content').style.display = 'block';
-
             sparepartDetailModal.show();
         }
 
         function showDetail(tiket_sparepart) {
             fetch(`/kepalagudang/sparepart/${tiket_sparepart}/detail`)
-                .then(res => res.json())
-                .then(data => {
-                    showTransaksiDetail(data);
-                    console.log(data);
+                .then(res => {
+                    if (!res.ok) throw new Error('Network response was not ok');
+                    return res.json();
                 })
+                .then(data => showTransaksiDetail(data))
                 .catch(err => {
                     console.error('Fetch error:', err);
-                    alert('Gagal mengambil detail!');
+                    showToast('Gagal mengambil detail!', 'danger');
                 });
         }
-    </script>
-</body>
 
-</html>
+        /* Event delegation: edit + delete handlers inside detail modal */
+        document.addEventListener('click', (e) => {
+            // Edit button
+            const editBtn = e.target.closest('.btn-edit');
+            if (editBtn) {
+                const serial = editBtn.getAttribute('data-item-serial') || '';
+                const jenis = editBtn.getAttribute('data-item-jenis') || '';
+                const tipe = editBtn.getAttribute('data-item-type') || '';
+                const quantity = editBtn.getAttribute('data-item-quantity') || '';
+                const tanggal = editBtn.getAttribute('data-item-tanggal') || '';
+                const spk = editBtn.getAttribute('data-item-spk') || '';
+                const harga = editBtn.getAttribute('data-item-harga') || '';
+                const vendor = editBtn.getAttribute('data-item-vendor') || '';
+                const pic = editBtn.getAttribute('data-item-pic') || '';
+                const department = editBtn.getAttribute('data-item-department') || '';
+                const keterangan = editBtn.getAttribute('data-item-keterangan') || '';
+
+                document.getElementById('edit-original-serial').value = serial;
+                document.getElementById('edit-serialNumber').value = serial;
+                document.getElementById('edit-quantity').value = quantity;
+                document.getElementById('edit-tanggal').value = tanggal;
+                document.getElementById('edit-spk').value = spk;
+                document.getElementById('edit-harga').value = harga;
+                document.getElementById('edit-vendor').value = vendor;
+                document.getElementById('edit-pic').value = pic;
+                document.getElementById('edit-department').value = department;
+                document.getElementById('edit-keterangan').value = keterangan;
+
+                // select jenis & tipe by value if id was provided, otherwise try matching by text
+                const jenisSelect = document.getElementById('edit-jenisSparepart');
+                const tipeSelect = document.getElementById('edit-typeSparepart');
+
+                for (let opt of jenisSelect.options) {
+                    if (opt.value === jenis || opt.text.trim() === jenis.trim()) {
+                        opt.selected = true;
+                        break;
+                    }
+                }
+                for (let opt of tipeSelect.options) {
+                    if (opt.value === tipe || opt.text.trim() === tipe.trim()) {
+                        opt.selected = true;
+                        break;
+                    }
+                }
+
+                const editModalEl = document.getElementById('editSparepartModal');
+                const editModal = new bootstrap.Modal(editModalEl);
+                editModal.show();
+                return;
+            }
+
+            // Delete button (delegated to any btn-delete)
+            const delBtn = e.target.closest('.btn-delete');
+            if (!delBtn) return;
+
+            (async () => {
+                const btn = delBtn;
+                const serial = btn.dataset.itemSerial;
+                if (!serial) {
+                    showToast('Serial tidak ditemukan.', 'warning');
+                    return;
+                }
+
+                const confirmed = await showConfirm('Yakin ingin menghapus item dengan serial: ' + serial +
+                    ' ?', 'Hapus', 'Batal');
+                if (!confirmed) return;
+
+                btn.disabled = true;
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML =
+                    '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+
+                try {
+                    const tokenInput = document.querySelector('input[name="_token"]');
+                    const token = tokenInput ? tokenInput.value : '';
+
+                    const params = new URLSearchParams();
+                    params.append('_token', token);
+                    params.append('_method', 'DELETE');
+
+                    const res = await fetch(
+                        `/kepalagudang/sparepart/serial/${encodeURIComponent(serial)}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                                'Accept': 'application/json'
+                            },
+                            body: params.toString()
+                        });
+
+                    const data = await res.json().catch(() => ({}));
+                    if (!res.ok) throw new Error(data.message || `Gagal menghapus (status ${res.status})`);
+
+                    const tr = btn.closest('tr');
+                    if (tr) tr.remove();
+
+                    if (data.totalsPerStatus) {
+                        if (document.getElementById('total-tersedia')) document.getElementById(
+                            'total-tersedia').textContent = data.totalsPerStatus.tersedia;
+                        if (document.getElementById('total-dikirim')) document.getElementById(
+                            'total-dikirim').textContent = data.totalsPerStatus.dikirim;
+                        if (document.getElementById('total-habis')) document.getElementById('total-habis')
+                            .textContent = data.totalsPerStatus.habis;
+                    }
+
+                    if (data.listDeleted && typeof sparepartDetailModal !== 'undefined')
+                        sparepartDetailModal.hide();
+                    showToast(data.message || 'Berhasil dihapus.', 'success');
+
+                    // auto reload so main table syncs with backend
+                    setTimeout(() => location.reload(), 1200);
+                } catch (err) {
+                    console.error(err);
+                    showToast('Terjadi kesalahan: ' + (err.message || err), 'danger');
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                }
+            })();
+        });
+
+        /* Submit edit form via AJAX */
+        document.getElementById('editSparepartForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const saveBtn = document.getElementById('editSaveBtn');
+            const originalHtml = saveBtn.innerHTML;
+            saveBtn.disabled = true;
+            saveBtn.innerHTML =
+                '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Menyimpan...';
+
+            try {
+                const originalSerial = document.getElementById('edit-original-serial').value;
+                const tokenInput = document.querySelector('input[name="_token"]');
+                const token = tokenInput ? tokenInput.value : '';
+
+                const params = new URLSearchParams();
+                params.append('_token', token);
+                params.append('_method', 'PUT');
+
+                params.append('jenisSparepart', document.getElementById('edit-jenisSparepart').value);
+                params.append('typeSparepart', document.getElementById('edit-typeSparepart').value);
+                params.append('serial_number', document.getElementById('edit-serialNumber').value);
+                params.append('quantity', document.getElementById('edit-quantity').value);
+                params.append('tanggal', document.getElementById('edit-tanggal').value);
+                params.append('spk', document.getElementById('edit-spk').value);
+                params.append('harga', document.getElementById('edit-harga').value);
+                params.append('vendor', document.getElementById('edit-vendor').value);
+                params.append('pic', document.getElementById('edit-pic').value);
+                params.append('department', document.getElementById('edit-department').value);
+                params.append('keterangan', document.getElementById('edit-keterangan').value);
+
+                const res = await fetch(
+                    `/kepalagudang/sparepart/serial/${encodeURIComponent(originalSerial)}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                            'Accept': 'application/json'
+                        },
+                        body: params.toString()
+                    });
+
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.message || `Gagal menyimpan (status ${res.status})`);
+
+                const editModalEl = document.getElementById('editSparepartModal');
+                const editModalInstance = bootstrap.Modal.getInstance(editModalEl);
+                if (editModalInstance) editModalInstance.hide();
+
+                showToast(data.message || 'Perubahan berhasil disimpan.', 'success');
+                setTimeout(() => location.reload(), 1200);
+            } catch (err) {
+                console.error(err);
+                showToast('Terjadi kesalahan: ' + (err.message || err), 'danger');
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = originalHtml;
+            }
+        });
+    </script>
+@endpush
