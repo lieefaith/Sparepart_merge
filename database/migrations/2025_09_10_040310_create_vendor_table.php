@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,8 +12,9 @@ return new class extends Migration
     {
         Schema::create('vendor', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_vendor', 255)->unique();
+            $table->string('nama');
         });
+
     }
 
     /**
@@ -22,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-       Schema::dropIfExists('vendor');
+        Schema::dropIfExists('vendor');
     }
 };

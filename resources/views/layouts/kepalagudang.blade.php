@@ -34,6 +34,59 @@
             overflow-x: hidden;
         }
 
+        .page-title {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: #6c757d;
+            margin-bottom: 1.5rem;
+        }
+
+        .required-field::after {
+            content: " *";
+            color: var(--danger);
+        }
+
+        .simple-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .edit-mode {
+            display: none;
+        }
+
+        .badge-aset {
+            background-color: var(--success);
+        }
+
+        .badge-non-aset {
+            background-color: var(--info);
+        }
+
+        .form-container {
+            background: white;
+            border-radius: var(--card-border-radius);
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+        }
+
         /* Sidebar Styling */
         .sidebar {
             background-color: var(--sidebar-bg);
@@ -326,6 +379,7 @@
             justify-content: center;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
+        
 
         /* Responsive Adjustments */
         @media (max-width: 992px) {
@@ -474,24 +528,24 @@
             <h4 class="text-white"><i class="bi bi-gear-fill"></i> <span>Kepala gudang</span></h4>
         </div>
 
-    <div class="list-group list-group-flush">
-        <a href="{{ route('kepalagudang.dashboard') }}" class="list-group-item list-group-item-action py-3 ">
-            <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
-        </a>
-        <a href="{{ route('kepalagudang.request.index') }}" class="list-group-item list-group-item-action py-3">
-            <i class="bi bi-send"></i> <span>Request / Send</span>
-        </a>
-        <a href="{{ route('kepalagudang.sparepart.index') }}" class="list-group-item list-group-item-action py-3">
-            <i class="bi bi-tools"></i> <span>Daftar Sparepart</span>
-        </a>
-        <a href="{{ route('kepalagudang.data') }}" class="list-group-item list-group-item-action py-3">
-            <i class="bi bi-folder2-open"></i> <span>Data</span>
-        </a>
-        <a href="{{ route('kepalagudang.history.index') }}" class="list-group-item list-group-item-action py-3">
-            <i class="bi bi-clock-history"></i> <span>Histori Barang</span>
-        </a>
-    </div>
-     
+        <div class="list-group list-group-flush">
+            <a href="{{ route('kepalagudang.dashboard') }}" class="list-group-item list-group-item-action py-3 ">
+                <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
+            </a>
+            <a href="{{ route('kepalagudang.request.index') }}" class="list-group-item list-group-item-action py-3">
+                <i class="bi bi-send"></i> <span>Request / Send</span>
+            </a>
+            <a href="{{ route('kepalagudang.sparepart.index') }}" class="list-group-item list-group-item-action py-3">
+                <i class="bi bi-tools"></i> <span>Daftar Sparepart</span>
+            </a>
+            <a href="{{ route('kepalagudang.data') }}" class="list-group-item list-group-item-action py-3">
+                <i class="bi bi-folder2-open"></i> <span>Data</span>
+            </a>
+            <a href="{{ route('kepalagudang.history.index') }}" class="list-group-item list-group-item-action py-3">
+                <i class="bi bi-clock-history"></i> <span>Histori Barang</span>
+            </a>
+        </div>
+
 
         <div class="sidebar-footer">
             <a href="{{ route('profile.edit') }}" class="d-flex align-items-center text-decoration-none text-white">

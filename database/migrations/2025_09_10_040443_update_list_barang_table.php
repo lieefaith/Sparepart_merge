@@ -15,12 +15,6 @@ return new class extends Migration {
             }
 
             $table->dropColumn('kode_region');
-
-            // Drop kolom-kolom lain
-            $table->dropColumn(['status', 'pic', 'department', 'tanggal']);
-            
-            // Tambah kolom kategori setelah tipe_id
-            $table->string('kategori')->after('tipe_id')->nullable();
         });
     }
 
@@ -28,13 +22,6 @@ return new class extends Migration {
     {
         Schema::table('list_barang', function (Blueprint $table) {
             $table->string('kode_region')->nullable();
-            $table->enum('status', ['tersedia', 'dipesan', 'habis'])->default('tersedia');
-            $table->string('pic')->nullable();
-            $table->string('department')->nullable();
-            $table->date('tanggal');
-
-            // Hapus kolom kategori
-            $table->dropColumn('kategori');
 
             $table->foreign('kode_region')
                 ->references('kode_region')

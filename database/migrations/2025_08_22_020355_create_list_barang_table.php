@@ -14,10 +14,6 @@ class CreateListBarangTable extends Migration
             $table->unsignedBigInteger('jenis_id')->nullable();
             $table->unsignedBigInteger('tipe_id')->nullable();
             $table->string('kode_region')->nullable();
-            $table->enum('status', ['tersedia', 'dipesan', 'habis'])->default('tersedia');
-            $table->string('pic')->nullable();
-            $table->string('department')->nullable();
-            $table->date('tanggal');
 
             $table->foreign('jenis_id')
                 ->references('id')

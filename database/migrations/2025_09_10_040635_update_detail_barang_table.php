@@ -12,12 +12,6 @@ return new class extends Migration
             // 1. Drop foreign key kode_region (kalau ada)
             $table->dropForeign(['kode_region']);
 
-            // 2. Ubah default quantity menjadi 1
-            $table->integer('quantity')->default(1)->change();
-
-            // 3. Tambah kolom status
-            $table->enum('status', ['tersedia', 'dikirim', 'habis'])->default('tersedia')->after('kode_region');
-
             // 4. Pastikan kolom 'vendor' cocok dengan vendor.nama_vendor
             $table->dropColumn(['vendor']);
 
@@ -42,11 +36,6 @@ public function down(): void
         // Tambah kolom vendor lagi (sesuaikan tipe datanya, misal string 100)
         $table->string('vendor')->nullable()->after('spk');
         
-        // Drop kolom status
-        $table->dropColumn('status');
-        
-        // Kembalikan default quantity ke 0
-        $table->integer('quantity')->default(0)->change();
         
         // Tambah kembali foreign key kode_region
         $table->foreign('kode_region')
