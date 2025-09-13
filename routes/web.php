@@ -10,6 +10,7 @@ use App\Http\Controllers\KepalaGudangController;
 use App\Http\Controllers\SparepartController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\KepalaROController;
+use App\Http\Controllers\DataController;
 
 require __DIR__ . '/auth.php';
 
@@ -107,7 +108,23 @@ Route::middleware(['auth', 'role:3'])
         Route::get('/history/{id}', 'historyDetail')->name('history.detail');
 
         Route::get('/profile', fn() => view('kepalagudang.profile'))->name('profile');
-        Route::get('/data', fn() => view('kepalagudang.data'))->name('data');
+
+        Route::get('/data', [DataController::class, 'index'])->name('data');
+
+        // Jenis
+        Route::post('/data/jenis/', [DataController::class, 'storeJenis'])->name('jenis.store');
+        Route::put('/data/jenis/{id}', [DataController::class, 'updateJenis'])->name('jenis.update');
+        Route::delete('/data/jenis/{id}', [DataController::class, 'destroyJenis'])->name('jenis.destroy');
+
+        // Tipe
+        Route::post('/data/tipe', [DataController::class, 'storeTipe'])->name('tipe.store');
+        Route::put('/data/tipe/{id}', [DataController::class, 'updateTipe'])->name('tipe.update');
+        Route::delete('/data/tipe/{id}', [DataController::class, 'destroyTipe'])->name('tipe.destroy');
+
+        // Vendor
+        Route::post('/data/vendor', [DataController::class, 'storeVendor'])->name('vendor.store');
+        Route::put('/data/vendor/{id}', [DataController::class, 'updateVendor'])->name('vendor.update');
+        Route::delete('/data/vendor/{id}', [DataController::class, 'destroyVendor'])->name('vendor.destroy');
 
     });
 

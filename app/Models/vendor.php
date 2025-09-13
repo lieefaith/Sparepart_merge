@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Vendor extends Model
 {
-    protected $fillable = ['nama_vendor'];
+    protected $fillable = ['nama'];
 
     protected $table = 'vendor';
 

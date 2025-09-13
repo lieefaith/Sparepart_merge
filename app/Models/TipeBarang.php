@@ -8,7 +8,7 @@ class TipeBarang extends Model
 {
     public $timestamps = false;
 
-    protected $fillable = ['jenis','kategori'];
+    protected $fillable = ['nama','kategori'];
 
     protected $table = 'tipe_barang';
 
