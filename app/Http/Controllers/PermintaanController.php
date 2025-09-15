@@ -13,6 +13,7 @@ class PermintaanController extends Controller
      */
    public function index(Request $request)
 {
+    
     $query = Permintaan::with(['user', 'details'])
         ->where('user_id', Auth::id());
 
@@ -96,4 +97,24 @@ class PermintaanController extends Controller
             }),
         ]);
     }
+    /**
+ * Ambil status approval per tahap
+ */
+public function getStatus($tiket)
+{
+    $permintaan = Permintaan::where('tiket', $tiket)->firstOrFail();
+
+    return response()->json([
+        'ro' => $permintaan->status_ro,
+        'gudang' => $permintaan->status_gudang,
+        'admin' => $permintaan->status_admin,
+        'super_admin' => $permintaan->status_super_admin,
+        'catatan' => collect([
+            $permintaan->catatan_ro,
+            $permintaan->catatan_gudang,
+            $permintaan->catatan_admin,
+            $permintaan->catatan_super_admin,
+        ])->filter()->first(),
+    ]);
+}
 }

@@ -1,117 +1,274 @@
-@extends('layouts.kepalagudang') @section('title', 'Request Barang - Kepala Gudang')
+@extends('layouts.kepalagudang')
+
+@section('title', 'Request Sparepart - Kepalagudang')
 
 @push('styles')
-
 @endpush
 
 @section('content')
-
-<h4 class="page-title"><i class="bi bi-cart-check me-2"></i> Daftar Request Barang</h4>
+        <h4 class="page-title"><i class="bi bi-cart-check me-2"></i> Daftar Request Barang</h4>
         <p class="page-subtitle">Kelola permintaan barang yang sudah di-approve Superadmin</p>
-
-<!-- Filter Section -->
-<div class="card mb-4">
-    <div class="card-body">
-        <div class="row g-3">
-            <div class="col-md-3">
-                <label for="statusFilter" class="form-label">Status</label>
-                <select class="form-select" id="statusFilter">
-                    <option value="">Semua Status</option>
-                    <option value="disetujui">Disetujui</option>
-                    <option value="diproses">Diproses</option>
-                    <option value="dikirim">Dikirim</option>
-                    <option value="diterima">Diterima</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label for="dateFilter" class="form-label">Tanggal</label>
-                <input type="date" class="form-control" id="dateFilter">
-            </div>
-            <div class="col-md-4">
-                <label for="searchFilter" class="form-label">Pencarian</label>
-                <input type="text" class="form-control" id="searchFilter" placeholder="Cari ID Request, Requester, atau Barang...">
-            </div>
-            <div class="col-md-2 d-flex align-items-end">
-                <button class="btn btn-primary w-100">Terapkan Filter</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Table -->
-<div class="card shadow-sm">
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>ID Request</th>
-                        <th>Requester</th>
-                        <th>Barang</th>
-                        <th>Jumlah</th>
-                        <th>Tanggal Request</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><span class="fw-bold">REQ001</span></td>
-                        <td>RO Batam</td>
-                        <td>Oli Mesin</td>
-                        <td>50</td>
-                        <td>28 Agu 2025</td>
-                        <td><span class="badge bg-success">Disetujui</span></td>
-                        <td class="action-buttons">
-                            <a href="#" class="btn btn-sm btn-info"><i class="bi bi-eye"></i> Detail</a>
-                            <a href="#" class="btn btn-sm btn-primary"><i class="bi bi-box-arrow-in-down"></i> Terima</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><span class="fw-bold">REQ002</span></td>
-                        <td>RO Bekasi</td>
-                        <td>Kampas Rem</td>
-                        <td>25</td>
-                        <td>27 Agu 2025</td>
-                        <td><span class="badge bg-success">Disetujui</span></td>
-                        <td class="action-buttons">
-                            <a href="#" class="btn btn-sm btn-info"><i class="bi bi-eye"></i> Detail</a>
-                            <a href="#" class="btn btn-sm btn-primary"><i class="bi bi-box-arrow-in-down"></i> Terima</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><span class="fw-bold">REQ003</span></td>
-                        <td>RO Surabaya</td>
-                        <td>Filter Udara</td>
-                        <td>30</td>
-                        <td>26 Agu 2025</td>
-                        <td><span class="badge bg-warning">Menunggu</span></td>
-                        <td class="action-buttons">
-                            <a href="#" class="btn btn-sm btn-info"><i class="bi bi-eye"></i> Detail</a>
-                            <a href="#" class="btn btn-sm btn-secondary disabled"><i class="bi bi-clock"></i> Proses</a>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
         
-        <!-- Pagination -->
-        <nav aria-label="Page navigation" class="mt-4">
-            <ul class="pagination justify-content-center">
-                <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a></li>
-                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item"><a class="page-link" href="#">Next</a></li>
-            </ul>
-        </nav>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label for="statusFilter" class="form-label">Status</label>
+                        <select class="form-select" id="statusFilter">
+                            <option value="">Semua Status</option>
+                            <option value="disetujui">Disetujui</option>
+                            <option value="diproses">Diproses</option>
+                            <option value="dikirim">Dikirim</option>
+                            <option value="diterima">Diterima</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="dateFilter" class="form-label">Tanggal</label>
+                        <input type="date" class="form-control" id="dateFilter">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="searchFilter" class="form-label">Pencarian</label>
+                        <input type="text" class="form-control" id="searchFilter" placeholder="Cari ID Request, Requester, atau Barang...">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button class="btn btn-primary w-100">Terapkan Filter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID Request</th>
+                                <th>Requester</th>
+                                <th>Barang</th>
+                                <th>Jumlah</th>
+                                <th>Tanggal Request</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="fw-bold">REQ001</span></td>
+                                <td>RO Batam</td>
+                                <td>Oli Mesin</td>
+                                <td>50</td>
+                                <td>28 Agu 2025</td>
+                                <td><span class="badge bg-success">Disetujui</span></td>
+                                <td class="action-buttons">
+                                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalTerima">
+                                        <i class="bi bi-check-circle"></i> Terima
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="fw-bold">REQ002</span></td>
+                                <td>RO Bekasi</td>
+                                <td>Kampas Rem</td>
+                                <td>25</td>
+                                <td>27 Agu 2025</td>
+                                <td><span class="badge bg-success">Disetujui</span></td>
+                                <td class="action-buttons">
+                                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalTerima">
+                                        <i class="bi bi-check-circle"></i> Terima
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="fw-bold">REQ003</span></td>
+                                <td>RO Surabaya</td>
+                                <td>Filter Udara</td>
+                                <td>30</td>
+                                <td>26 Agu 2025</td>
+                                <td><span class="badge bg-warning">Menunggu</span></td>
+                                <td class="action-buttons">
+                                    <a href="#" class="btn btn-sm btn-secondary disabled">
+                                        <i class="bi bi-clock"></i> Proses
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
     </div>
-</div>
+    
+    <div class="modal fade" id="modalRequest" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-cart-check"></i> Form Request Barang</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="table-primary">
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama Item</th>
+                                        <th>Deskripsi</th>
+                                        <th>Jumlah</th>
+                                        <th>Keterangan</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td><input type="text" class="form-control" placeholder="Nama Item"></td>
+                                        <td><input type="text" class="form-control" placeholder="Deskripsi"></td>
+                                        <td><input type="number" class="form-control" value="1"></td>
+                                        <td><input type="text" class="form-control" placeholder="Keterangan"></td>
+                                        <td><button class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <button type="button" class="btn btn-outline-primary"><i class="bi bi-plus"></i> Tambah Baris</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button class="btn btn-success">Kirim Request</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-@endsection
+    <div class="modal fade" id="modalTerima" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="bi bi-box-seam"></i> Terima & Kirim Barang</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                
+                <div class="modal-body">
+                    
+                    <h6 class="fw-bold text-primary mb-3"><i class="bi bi-cart-check"></i> Data Request (readonly)</h6>
+                    
+                    <div class="mb-3">
+                        <p><strong>No Tiket:</strong> REQ-2025-002</p>
+                        <p><strong>Requester:</strong> Kepala RO</p>
+                        <p><strong>Tanggal Request:</strong> 10 September 2025</p>
+                    </div>
+                    
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama Item</th>
+                                    <th>Deskripsi</th>
+                                    <th>Jumlah Diminta</th>
+                                    <th>Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Kampas Rem</td>
+                                    <td>OEM</td>
+                                    <td>25</td>
+                                    <td>-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h6 class="fw-bold text-success mb-3"><i class="bi bi-truck"></i> Form Pengiriman</h6>
+                    
+                    <form id="formPengiriman">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Tanggal Pengiriman</label>
+                                <input type="date" class="form-control" name="tanggal_pengiriman" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3 table-responsive">
+                            <table class="table table-bordered" id="tabelBarang">
+                                <thead class="table-success">
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama</th>
+                                        <th>Merk</th>
+                                        <th>SN</th>
+                                        <th>Tipe</th>
+                                        <th>Jumlah</th>
+                                        <th>Keterangan</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td><input type="text" class="form-control" placeholder="Nama Item" required></td>
+                                        <td><input type="text" class="form-control" placeholder="Merk"></td>
+                                        <td><input type="text" class="form-control" placeholder="Serial Number"></td>
+                                        <td><input type="text" class="form-control" placeholder="Tipe"></td>
+                                        <td><input type="number" class="form-control" value="1" min="1" required></td>
+                                        <td><input type="text" class="form-control" placeholder="Keterangan"></td>
+                                        <td>
+                                            <button type="button" class="btn btn-danger btn-sm" onclick="hapusBaris(this)">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <button type="button" class="btn btn-outline-success mt-2" onclick="tambahBaris()">
+                            <i class="bi bi-plus"></i> Tambah Baris
+                        </button>
+                        
+                        <div class="mt-3">
+                            <label class="form-label">Catatan</label>
+                            <textarea class="form-control" name="catatan" rows="3" placeholder="Tambahkan catatan jika ada..."></textarea>
+                        </div>
+                    </form>
+                    
+                </div>
+                
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" form="formPengiriman" class="btn btn-success">
+                        <i class="bi bi-send"></i> Kirim Barang
+                    </button>
+                </div>
+                
+            </div>
+        </div>
+    @endsection
 
-@push('scripts')
-<script>
+    @push('scripts')
+    <script>
         // Function to toggle sidebar on mobile
         document.querySelector('.navbar-toggler').addEventListener('click', function() {
             document.querySelector('.sidebar').classList.toggle('show');

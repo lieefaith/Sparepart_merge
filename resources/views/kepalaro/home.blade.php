@@ -393,10 +393,10 @@
 
     <div class="container">
         <div class="header">
-            <h1>Manajemen Sparepart</h1>
-            <h2>Kepala Regional Office</h2>
+            <h1>Sistem Manajemen Sparepart</h1>
+            <h2>Head Regional Office</h2>
             <p class="description">
-                monitoring dan persetujuan permintaan sparepart operasional
+                Monitoring dan Persetujuan Permintaan Sparepart
             </p>
         </div>
 

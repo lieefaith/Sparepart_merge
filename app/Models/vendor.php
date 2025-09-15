@@ -12,8 +12,8 @@ class Vendor extends Model
 
     public $timestamps = false;
 
-    public function listBarang()
+    public function details()
     {
-        return $this->hasMany(ListBarang::class, 'vendor_id');
+        return $this->hasMany(DetailBarang::class, 'vendor_id');
     }
 }

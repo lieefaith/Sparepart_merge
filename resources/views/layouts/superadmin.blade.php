@@ -471,7 +471,7 @@
                 <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
             </a>
             <a href="{{ route('superadmin.request.index') }}" class="list-group-item list-group-item-action">
-                <i class="bi bi-cart-check"></i> <span>List Request</span>
+                <i class="bi bi-cart-check"></i> <span>Request Barang</span>
             </a>
             <a href="{{ route('superadmin.sparepart.index') }}" class="list-group-item list-group-item-action">
                 <i class="bi bi-tools"></i> <span>Daftar Sparepart</span>
@@ -482,13 +482,13 @@
         </div>
 
         <div class="sidebar-footer">
-            <a href="{{ route('profile.edit') }}" class="d-flex align-items-center text-decoration-none text-white">
+            <a href="{{ route('profile.show') }}" class="d-flex align-items-center text-decoration-none text-white">
                 <div class="user-avatar">
                     <i class="bi bi-person-fill"></i>
                 </div>
                 <div class="user-details">
                     <p class="user-name mb-0">{{ Auth::user()->name }}</p>
-                    <small class="user-role">Administrator</small>
+                    <small class="user-role">{{ Auth::user()->bagian }}</small>
                 </div>
             </a>
 

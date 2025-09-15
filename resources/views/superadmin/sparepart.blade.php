@@ -104,7 +104,7 @@
                     </div>
                     <div>
                         <h6 class="mb-0">Dipesan</h6>
-                        <h4 class="mb-0 fw-bold text-warning">{{ $totalDipesan }}</h4>
+                        <h4 class="mb-0 fw-bold text-warning">{{ $totalDikirim }}</h4>
                     </div>
                 </div>
             </div>

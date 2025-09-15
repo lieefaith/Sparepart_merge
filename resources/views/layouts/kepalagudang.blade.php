@@ -379,7 +379,7 @@
             justify-content: center;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
-        
+
 
         /* Responsive Adjustments */
         @media (max-width: 992px) {
@@ -548,13 +548,13 @@
 
 
         <div class="sidebar-footer">
-            <a href="{{ route('profile.edit') }}" class="d-flex align-items-center text-decoration-none text-white">
+            <a href="{{ route('profile.show') }}" class="d-flex align-items-center text-decoration-none text-white">
                 <div class="user-avatar">
                     <i class="bi bi-person-fill"></i>
                 </div>
                 <div class="user-details">
                     <p class="user-name mb-0">{{ Auth::user()->name }}</p>
-                    <small class="user-role">Administrator</small>
+                    <small class="user-role">Kepala Gudang</small>
                 </div>
             </a>
 
@@ -565,6 +565,7 @@
                 </button>
             </form>
         </div>
+
     </div>
 
 

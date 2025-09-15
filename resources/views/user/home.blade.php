@@ -319,11 +319,11 @@
                         <div class="icon-container icon-jenis">
                             <i class="fas fa-cogs fa-1x"></i>
                         </div>
-                        <h3 class="card-title">Jenis Barang</h3>
+                        <h3 class="card-title">Daftar Sparepart</h3>
                     </div>
                     <div class="card-content">
                         <p class="card-description">
-                            Lihat daftar semua jenis sparepart yang tersedia di sistem dengan detail lengkap.
+                            Lihat daftar semua sparepart  .
                         </p>
                     </div>
                 </div>
@@ -337,11 +337,11 @@
                         <div class="icon-container icon-request">
                             <i class="fas fa-clipboard-list fa-1x"></i>
                         </div>
-                        <h3 class="card-title">Request Barang</h3>
+                        <h3 class="card-title">Request Sparepart</h3>
                     </div>
                     <div class="card-content">
                         <p class="card-description">
-                            Ajukan permintaan sparepart dengan mudah dan lacak status request.
+                          Request sparepart dengan mudah dan lacak status request.
                         </p>
                     </div>
                 </div>

@@ -84,15 +84,17 @@
                                         <td>
                                             <!-- Tombol Edit -->
                                             <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
-                                                data-bs-target="#editModal{{ $j->id }}">
+                                                data-bs-target="#editJenisModal{{ $j->id }}">
                                                 <i class="bi bi-pencil"></i>
                                             </button>
 
                                             <!-- Modal Edit -->
-                                            <div class="modal fade" id="editModal{{ $j->id }}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal fade" id="editJenisModal{{ $j->id }}" tabindex="-1"
+                                                aria-hidden="true">
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
-                                                        <form action="{{ route('kepalagudang.jenis.update', $j->id) }}" method="POST">
+                                                        <form action="{{ route('kepalagudang.jenis.update', $j->id) }}"
+                                                            method="POST">
                                                             @csrf
                                                             @method('PUT')
 
@@ -128,7 +130,8 @@
                                             </div>
 
                                             <!-- Tombol Hapus -->
-                                            <form action="{{ route('kepalagudang.jenis.destroy', $j->id) }}" method="POST" class="d-inline">
+                                            <form action="{{ route('kepalagudang.jenis.destroy', $j->id) }}" method="POST"
+                                                class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-sm btn-outline-danger"
@@ -198,15 +201,17 @@
                                         <td>
                                             <!-- Tombol Edit -->
                                             <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
-                                                data-bs-target="#editModal{{ $t->id }}">
+                                                data-bs-target="#editTipeModal{{ $t->id }}">
                                                 <i class="bi bi-pencil"></i>
                                             </button>
 
                                             <!-- Modal Edit -->
-                                            <div class="modal fade" id="editModal{{ $t->id }}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal fade" id="editTipeModal{{ $t->id }}" tabindex="-1"
+                                                aria-hidden="true">
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
-                                                        <form action="{{ route('kepalagudang.tipe.update', $t->id) }}" method="POST">
+                                                        <form action="{{ route('kepalagudang.tipe.update', $t->id) }}"
+                                                            method="POST">
                                                             @csrf
                                                             @method('PUT')
 
@@ -242,7 +247,8 @@
                                             </div>
 
                                             <!-- Tombol Hapus -->
-                                            <form action="{{ route('kepalagudang.tipe.destroy', $t->id) }}" method="POST" class="d-inline">
+                                            <form action="{{ route('kepalagudang.tipe.destroy', $t->id) }}" method="POST"
+                                                class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-sm btn-outline-danger"
@@ -295,8 +301,56 @@
                                         <td>{{ $index + 1 }}</td>
                                         <td>{{ $v->nama }}</td>
                                         <td>
-                                            <a href="#" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
-                                            <a href="#" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                                            <!-- Tombol Edit -->
+                                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                                                data-bs-target="#editVendorModal{{ $v->id }}">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+
+                                            <!-- Modal Edit Vendor -->
+                                            <div class="modal fade" id="editVendorModal{{ $v->id }}" tabindex="-1"
+                                                aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <form action="{{ route('kepalagudang.vendor.update', $v->id) }}"
+                                                            method="POST">
+                                                            @csrf
+                                                            @method('PUT')
+
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">Edit Vendor</h5>
+                                                                <button type="button" class="btn-close"
+                                                                    data-bs-dismiss="modal"></button>
+                                                            </div>
+
+                                                            <div class="modal-body">
+                                                                <div class="mb-3">
+                                                                    <label>Nama Vendor</label>
+                                                                    <input type="text" name="nama" class="form-control"
+                                                                        value="{{ $v->nama }}" required>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary"
+                                                                    data-bs-dismiss="modal">Batal</button>
+                                                                <button type="submit" class="btn btn-primary">Simpan</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Tombol Hapus -->
+                                            <form action="{{ route('kepalagudang.vendor.destroy', $v->id) }}" method="POST"
+                                                class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                    onclick="return confirm('Yakin ingin menghapus vendor ini?')">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -330,26 +384,26 @@
     </div>
 @endsection
 @push('scripts')
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Ambil tab terakhir dari localStorage
-        let activeTab = localStorage.getItem("activeTab");
-        if (activeTab) {
-            let tabElement = document.querySelector(`[data-bs-target="${activeTab}"]`);
-            if (tabElement) {
-                let tab = new bootstrap.Tab(tabElement);
-                tab.show();
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Ambil tab terakhir dari localStorage
+            let activeTab = localStorage.getItem("activeTab");
+            if (activeTab) {
+                let tabElement = document.querySelector(`[data-bs-target="${activeTab}"]`);
+                if (tabElement) {
+                    let tab = new bootstrap.Tab(tabElement);
+                    tab.show();
+                }
             }
-        }
 
-        // Simpan tab terakhir saat user klik
-        const tabButtons = document.querySelectorAll('button[data-bs-toggle="tab"]');
-        tabButtons.forEach(button => {
-            button.addEventListener("shown.bs.tab", function (e) {
-                let target = e.target.getAttribute("data-bs-target");
-                localStorage.setItem("activeTab", target);
+            // Simpan tab terakhir saat user klik
+            const tabButtons = document.querySelectorAll('button[data-bs-toggle="tab"]');
+            tabButtons.forEach(button => {
+                button.addEventListener("shown.bs.tab", function (e) {
+                    let target = e.target.getAttribute("data-bs-target");
+                    localStorage.setItem("activeTab", target);
+                });
             });
         });
-    });
-</script>
+    </script>
 @endpush
