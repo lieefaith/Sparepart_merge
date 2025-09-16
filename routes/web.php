@@ -11,6 +11,9 @@ use App\Http\Controllers\SparepartController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\KepalaROController;
 use App\Http\Controllers\DataController;
+use App\Http\Controllers\PengirimanController;
+
+
 
 require __DIR__ . '/auth.php';
 
@@ -110,11 +113,11 @@ Route::middleware(['auth', 'role:3'])
         Route::get('/profile', fn() => view('kepalagudang.profile'))->name('profile');
 
         Route::put('/sparepart/{id}', [SparepartController::class, 'update'])->name('sparepart.update');
-       
+
         Route::delete('/sparepart/{id}', [SparepartController::class, 'destroy'])
-    ->name('.sparepart.details.destroy')
-    ->middleware('auth')
-    ->where('serial', '.*');
+            ->name('.sparepart.details.destroy')
+            ->middleware('auth')
+            ->where('serial', '.*');
 
         Route::get('/data', [DataController::class, 'index'])->name('data');
 
@@ -133,6 +136,8 @@ Route::middleware(['auth', 'role:3'])
         Route::put('/data/vendor/{id}', [DataController::class, 'updateVendor'])->name('vendor.update');
         Route::delete('/data/vendor/{id}', [DataController::class, 'destroyVendor'])->name('vendor.destroy');
 
+        // 🔥 Baru: Simpan data pengiriman
+        Route::post('/pengiriman', [PengirimanController::class, 'store'])->name('pengiriman.store');
     });
 
 
@@ -144,7 +149,7 @@ Route::middleware(['auth', 'role:4'])
     ->prefix('user')
     ->group(function () {
         Route::get('/home', [HomeController::class, 'index'])->name('home');
-        Route::get('/jenisbarang', [HomeController::class, 'jenisBarang'])->name('jenis.barang');
+        Route::get('/sparepart', [HomeController::class, 'jenisBarang'])->name('jenis.barang');
         Route::get('/jenis-barang', [PermintaanController::class, 'getJenis']);
         Route::get('/tipe-barang', [PermintaanController::class, 'getTipe']);
     });

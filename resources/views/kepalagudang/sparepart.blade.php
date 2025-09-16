@@ -75,8 +75,7 @@
                     <select class="form-select" name="jenis" id="jenisFilter" onchange="this.form.submit()">
                         <option value="">Semua Jenis</option>
                         @foreach ($jenis as $j)
-                            <option value="{{ $j->id }}"
-                                {{ (string) request('nama') === (string) $j->id ? 'selected' : '' }}>
+                            <option value="{{ $j->id }}" {{ (string) request('nama') === (string) $j->id ? 'selected' : '' }}>
                                 {{ $j->nama }}
                             </option>
                         @endforeach
@@ -94,8 +93,8 @@
                 <div class="col-md-4">
                     <label for="searchFilter" class="form-label">Cari Sparepart</label>
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Cari ID atau nama sparepart..."
-                            name="search" value="{{ request('search') }}">
+                        <input type="text" class="form-control" placeholder="Cari ID atau nama sparepart..." name="search"
+                            value="{{ request('search') }}">
                         <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i></button>
                     </div>
                 </div>
@@ -154,7 +153,10 @@
                     @forelse($listBarang as $barang)
                         <tr>
                             <td><span class="fw-bold">{{ $barang->tiket_sparepart }}</span></td>
-                            <td>{{ $barang->jenisBarang->nama }} {{ $barang->tipeBarang->nama }}</td>
+                            <td>
+                                {{ $barang->jenisBarang?->nama ?? '-' }}
+                                {{ $barang->tipeBarang?->nama ?? '-' }}
+                            </td>
                             <td>{{ $barang->quantity }}</td>
                             @if ($filterStatus === 'habis')
                                 <td>{{ $totalsPerTiket[$barang->tiket_sparepart]['habis'] ?? 0 }}</td>
@@ -200,8 +202,8 @@
             <div class="modal-content">
                 <form method="POST" action="{{ route('kepalagudang.sparepart.store') }}" id="sparepartForm">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="tambahSparepartModalLabel"><i
-                                class="bi bi-plus-circle me-2"></i>Tambah Sparepart Baru</h5>
+                        <h5 class="modal-title" id="tambahSparepartModalLabel"><i class="bi bi-plus-circle me-2"></i>Tambah
+                            Sparepart Baru</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -236,8 +238,8 @@
                                     id="jenisSparepart" name="jenisSparepart" required>
                                     <option value="" selected>Pilih jenis sparepart</option>
                                     @foreach ($jenis as $j)
-                                        <option value="{{ $j->id }}"
-                                            {{ old('jenisSparepart') == $j->id ? 'selected' : '' }}>{{ $j->nama }}
+                                        <option value="{{ $j->id }}" {{ old('jenisSparepart') == $j->id ? 'selected' : '' }}>
+                                            {{ $j->nama }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -248,12 +250,12 @@
 
                             <div class="col-md-6">
                                 <label for="typeSparepart" class="form-label">Type Sparepart</label>
-                                <select class="form-select @error('typeSparepart') is-invalid @enderror"
-                                    id="typeSparepart" name="typeSparepart" required>
+                                <select class="form-select @error('typeSparepart') is-invalid @enderror" id="typeSparepart"
+                                    name="typeSparepart" required>
                                     <option value="" selected>Pilih tipe sparepart</option>
                                     @foreach ($tipe as $t)
-                                        <option value="{{ $t->id }}"
-                                            {{ old('typeSparepart') == $t->id ? 'selected' : '' }}>{{ $t->nama }}
+                                        <option value="{{ $t->id }}" {{ old('typeSparepart') == $t->id ? 'selected' : '' }}>
+                                            {{ $t->nama }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -275,8 +277,7 @@
                             <div class="col-md-6">
                                 <label for="quantity" class="form-label">Quantity</label>
                                 <input type="number" class="form-control @error('quantity') is-invalid @enderror"
-                                    id="quantity" name="quantity" min="1" required
-                                    value="{{ old('quantity', 1) }}">
+                                    id="quantity" name="quantity" min="1" required value="{{ old('quantity', 1) }}">
                                 @error('quantity')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -284,8 +285,8 @@
 
                             <div class="col-md-6">
                                 <label for="tanggal" class="form-label">Tanggal</label>
-                                <input type="date" class="form-control @error('tanggal') is-invalid @enderror"
-                                    id="tanggal" name="tanggal" value="{{ old('tanggal') }}" required>
+                                <input type="date" class="form-control @error('tanggal') is-invalid @enderror" id="tanggal"
+                                    name="tanggal" value="{{ old('tanggal') }}" required>
                                 @error('tanggal')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -293,8 +294,8 @@
 
                             <div class="col-md-6">
                                 <label for="spk" class="form-label">SPK</label>
-                                <input type="text" class="form-control @error('spk') is-invalid @enderror"
-                                    id="spk" name="spk" value="{{ old('spk') }}">
+                                <input type="text" class="form-control @error('spk') is-invalid @enderror" id="spk"
+                                    name="spk" value="{{ old('spk') }}">
                                 @error('spk')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -314,12 +315,12 @@
 
                             <div class="col-md-6">
                                 <label for="vendor" class="form-label">Vendor</label>
-                                <select class="form-select @error('vendor') is-invalid @enderror" id="vendor"
-                                    name="vendor" required>
+                                <select class="form-select @error('vendor') is-invalid @enderror" id="vendor" name="vendor"
+                                    required>
                                     <option value="" selected>Pilih vendor</option>
                                     @foreach ($vendor as $v)
-                                        <option value="{{ $v->id }}"
-                                            {{ old('vendor') == $v->id ? 'selected' : '' }}>{{ $v->nama }}</option>
+                                        <option value="{{ $v->id }}" {{ old('vendor') == $v->id ? 'selected' : '' }}>
+                                            {{ $v->nama }}</option>
                                     @endforeach
                                 </select>
                                 @error('vendor')
@@ -329,8 +330,8 @@
 
                             <div class="col-md-6">
                                 <label for="pic" class="form-label">PIC</label>
-                                <input type="text" class="form-control @error('pic') is-invalid @enderror"
-                                    id="pic" name="pic" required value="{{ old('pic') }}">
+                                <input type="text" class="form-control @error('pic') is-invalid @enderror" id="pic"
+                                    name="pic" required value="{{ old('pic') }}">
                                 @error('pic')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -346,8 +347,8 @@
                             </div>
                             <div class="col-md-6">
                                 <label for="status" class="form-label">Status</label>
-                                <select class="form-select @error('status') is-invalid @enderror" id="status"
-                                    name="status" required>
+                                <select class="form-select @error('status') is-invalid @enderror" id="status" name="status"
+                                    required>
                                     <option value="" selected>Pilih Status</option>
                                     <option value="tersedia" {{ old('status') == 'tersedia' ? 'selected' : '' }}>Tersedia
                                     </option>
@@ -364,7 +365,8 @@
 
                             <div class="col-12">
                                 <label for="keterangan" class="form-label">Keterangan</label>
-                                <textarea class="form-control" id="keterangan" name="keterangan" rows="3">{{ old('keterangan') }}</textarea>
+                                <textarea class="form-control" id="keterangan" name="keterangan"
+                                    rows="3">{{ old('keterangan') }}</textarea>
                             </div>
                         </div>
                     </div>
@@ -394,11 +396,9 @@
                             <div class="col-md-6">
                                 <label for="edit-kategori" class="form-label">Kategori</label>
                                 <select class="form-select" id="edit-kategori" name="kategori" disabled>
-                                    <option value="aset"
-                                        {{ old('ketegori', $listBarang->first()->kategori) == 'aset' ? 'selected' : '' }}>
+                                    <option value="aset" {{ old('kategori', $listBarang->first()->kategori) == 'aset' ? 'selected' : '' }}>
                                         Aset</option>
-                                    <option value="non-aset"
-                                        {{ old('kategori', $listBarang->first()->kategori) == 'non-aset' ? 'selected' : '' }}>
+                                    <option value="non-aset" {{ old('kategori', $listBarang->first()->kategori) == 'non-aset' ? 'selected' : '' }}>
                                         Non Aset</option>
                                 </select>
                             </div>
@@ -428,8 +428,8 @@
 
                             <div class="col-md-6">
                                 <label for="edit-quantity" class="form-label">Quantity</label>
-                                <input type="number" class="form-control" id="edit-quantity" name="quantity"
-                                    min="1" required>
+                                <input type="number" class="form-control" id="edit-quantity" name="quantity" min="1"
+                                    required>
                             </div>
 
                             <div class="col-md-6">
@@ -472,19 +472,16 @@
                             <div class="col-md-6">
                                 <label for="edit-status" class="form-label">Status</label>
                                 <select class="form-select" id="edit-status" name="status" required>
-                                    <option value="tersedia"
-    {{ old('status', $detail->first()->status ?? '') == 'tersedia' ? 'selected' : '' }}>
-    Tersedia
-</option>
+                                    <option value="tersedia" {{ old('status', $detail->first()->status ?? '') == 'tersedia' ? 'selected' : '' }}>
+                                        Tersedia
+                                    </option>
 
-                                   <option value="dikirim"
-    {{ old('status', $detail->first()->status ?? '') == 'dikirim' ? 'selected' : '' }}>
-    Dikirim
-</option>
-<option value="habis"
-    {{ old('status', $detail->first()->status ?? '') == 'habis' ? 'selected' : '' }}>
-    Habis
-</option>
+                                    <option value="dikirim" {{ old('status', $detail->first()->status ?? '') == 'dikirim' ? 'selected' : '' }}>
+                                        Dikirim
+                                    </option>
+                                    <option value="habis" {{ old('status', $detail->first()->status ?? '') == 'habis' ? 'selected' : '' }}>
+                                        Habis
+                                    </option>
 
                                 </select>
 
@@ -602,7 +599,7 @@
                 warning: 'bg-warning text-dark',
                 info: 'bg-info text-white',
                 secondary: 'bg-secondary text-white'
-            } [type] || 'bg-secondary text-white';
+            }[type] || 'bg-secondary text-white';
 
             const closeBtnClass = bgClass.includes('text-white') ? 'btn-close btn-close-white' : 'btn-close';
 
@@ -612,16 +609,16 @@
                 warning: '<i class="bi bi-exclamation-triangle-fill me-2"></i>',
                 info: '<i class="bi bi-info-circle-fill me-2"></i>',
                 secondary: '<i class="bi bi-bell-fill me-2"></i>'
-            } [type] || '';
+            }[type] || '';
 
             const html = `
-<div id="${id}" class="toast ${bgClass} shadow" role="alert" aria-live="assertive" aria-atomic="true">
-  <div class="d-flex">
-    <div class="toast-body">${icon}<span>${message}</span></div>
-    <button type="button" class="${closeBtnClass} me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-  </div>
-</div>
-`;
+    <div id="${id}" class="toast ${bgClass} shadow" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">${icon}<span>${message}</span></div>
+        <button type="button" class="${closeBtnClass} me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+    `;
             container.insertAdjacentHTML('beforeend', html);
             const toastEl = document.getElementById(id);
             const toast = new bootstrap.Toast(toastEl, {
@@ -688,14 +685,14 @@
 
         /* ====== Page logic ====== */
         let sparepartDetailModal;
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             sparepartDetailModal = new bootstrap.Modal(document.getElementById('sparepartDetailModal'));
 
             @if ($errors->any())
                 const modal = new bootstrap.Modal(document.getElementById('tambahSparepartModal'));
                 modal.show();
             @endif
-        });
+            });
 
         function formatRupiah(val) {
             const num = Number(String(val).replace(/\D/g, '')) || 0;
@@ -724,7 +721,7 @@
 
             const tbody = document.getElementById('trx-items-list');
             tbody.innerHTML = "";
-            
+
 
             data.items.forEach((item, i) => {
                 let statusClass = 'bg-secondary';
@@ -750,35 +747,35 @@
                 ].join(' ');
 
                 const row = `
-<tr>
-    <td>${i + 1}</td>
-    <td>${escapeHtml(item.serial) || '-'}</td>
-    <td>${escapeHtml(data.type) || '-'}</td>
-    <td>${escapeHtml(data.jenis) || '-'}</td>
-    <td><span class="badge ${statusClass}">${item.status ? (item.status.charAt(0).toUpperCase() + item.status.slice(1)) : '-'}</span></td>
-    <td>${item.harga ? formatRupiah(item.harga) : '-'}</td>
-    <td>${escapeHtml(item.vendor) || '-'}</td>
-    <td>${escapeHtml(item.spk) || '-'}</td>
-    <td>${escapeHtml(item.quantity) || '-'}</td>
-    <td>${escapeHtml(item.pic) || '-'}</td>
-    <td>${escapeHtml(item.keterangan) || '-'}</td>
-    <td>${escapeHtml(item.tanggal) || '-'}</td>
-    <td>
-        <button class="btn btn-primary btn-action btn-edit" ${dataAttrs} data-bs-toggle="tooltip" title="Edit">
-            <i class="bi bi-pencil"></i>
-        </button>
-        <button class="btn btn-danger btn-action btn-delete" data-id="${escapeHtml(idForBtn)}" data-bs-toggle="tooltip" title="Hapus">
-            <i class="bi bi-trash"></i>
-        </button>
-    </td>
-</tr>
-`;
+    <tr>
+        <td>${i + 1}</td>
+        <td>${escapeHtml(item.serial) || '-'}</td>
+        <td>${escapeHtml(data.type) || '-'}</td>
+        <td>${escapeHtml(data.jenis) || '-'}</td>
+        <td><span class="badge ${statusClass}">${item.status ? (item.status.charAt(0).toUpperCase() + item.status.slice(1)) : '-'}</span></td>
+        <td>${item.harga ? formatRupiah(item.harga) : '-'}</td>
+        <td>${escapeHtml(item.vendor) || '-'}</td>
+        <td>${escapeHtml(item.spk) || '-'}</td>
+        <td>${escapeHtml(item.quantity) || '-'}</td>
+        <td>${escapeHtml(item.pic) || '-'}</td>
+        <td>${escapeHtml(item.keterangan) || '-'}</td>
+        <td>${escapeHtml(item.tanggal) || '-'}</td>
+        <td>
+            <button class="btn btn-primary btn-action btn-edit" ${dataAttrs} data-bs-toggle="tooltip" title="Edit">
+                <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-danger btn-action btn-delete" data-id="${escapeHtml(idForBtn)}" data-bs-toggle="tooltip" title="Hapus">
+                <i class="bi bi-trash"></i>
+            </button>
+        </td>
+    </tr>
+    `;
                 tbody.insertAdjacentHTML("beforeend", row);
             });
 
             // re-init tooltip
             const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            tooltipTriggerList.map(function(el) {
+            tooltipTriggerList.map(function (el) {
                 return new bootstrap.Tooltip(el);
             });
 
@@ -867,7 +864,7 @@
                 if (!id) {
                     showToast('Id tidak ditemukan.', 'warning');
                     return;
-                } else {}
+                } else { }
 
                 const confirmed = await showConfirm('Yakin ingin menghapus item dengan id: ' + id + ' ?',
                     'Hapus', 'Batal');
@@ -979,7 +976,7 @@
             });
         })();
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const kategoriSelect = document.getElementById('kategori');
             const jenisSelect = document.getElementById('jenisSparepart');
             const tipeSelect = document.getElementById('typeSparepart');
@@ -989,7 +986,7 @@
             otherFields.forEach(field => field.disabled = true);
 
             if (kategoriSelect) {
-                kategoriSelect.addEventListener('change', function() {
+                kategoriSelect.addEventListener('change', function () {
                     const kategori = this.value;
 
                     if (kategori) {

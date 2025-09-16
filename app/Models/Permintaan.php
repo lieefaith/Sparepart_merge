@@ -10,9 +10,21 @@ class Permintaan extends Model
     protected $table = 'permintaan';
 
     protected $fillable = [
-        'user_id',
-        'tanggal_permintaan',
-        'status',
+    'user_id',
+    'tanggal_permintaan',
+    'status',
+    'status_ro',          
+    'status_gudang',
+    'status_admin',
+    'status_super_admin',
+    'catatan_ro',
+    'catatan_gudang',
+    'catatan_admin',
+    'catatan_super_admin',
+    'approved_by_ro',
+    'approved_by_gudang',
+    'approved_by_admin',
+    'approved_by_super_admin',
     ];
 
     public $timestamps = false;
@@ -60,16 +72,5 @@ class Permintaan extends Model
     public function histori()
     {
         return $this->hasOne(HistoriPermintaan::class, 'tiket', 'tiket');
-    }
-
-    public function jenis()
-    {
-        return $this->belongsTo(JenisBarang::class, 'nama_item');
-    }
-   
-
-    public function tipe()
-    {
-        return $this->belongsTo(TipeBarang::class, 'deskripsi');
     }
 }

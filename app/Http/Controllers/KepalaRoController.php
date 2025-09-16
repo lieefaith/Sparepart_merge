@@ -56,33 +56,42 @@ class KepalaROController extends Controller
 
     // Approve permintaan
     public function approve($id)
-    {
-        $user = Auth::user();
+{
+    $user = Auth::user();
 
-        $request = Permintaan::where('id', $id)
-            ->whereHas('user', function($q) use ($user) {
-                $q->where('region', $user->region);
-            })
-            ->firstOrFail();
+    $request = Permintaan::where('id', $id)
+        ->whereHas('user', function($q) use ($user) {
+            $q->where('region', $user->region);
+        })
+        ->firstOrFail();
 
-        $request->update(['status' => 'diterima']);
+    // ✅ Update status RO & status global
+    $request->update([
+        'status_ro' => 'approved',
+        'approved_by_ro' => Auth::id(),
+        'status' => 'pending', // Tetap pending, karena belum sampai ke Super Admin
+    ]);
 
-        return redirect()->back()->with('success', 'Permintaan disetujui!');
-    }
+    return redirect()->back()->with('success', 'Permintaan disetujui!');
+}
 
-    // Reject permintaan
-    public function reject($id)
-    {
-        $user = Auth::user();
+public function reject($id)
+{
+    $user = Auth::user();
 
-        $request = Permintaan::where('id', $id)
-            ->whereHas('user', function($q) use ($user) {
-                $q->where('region', $user->region);
-            })
-            ->firstOrFail();
+    $request = Permintaan::where('id', $id)
+        ->whereHas('user', function($q) use ($user) {
+            $q->where('region', $user->region);
+        })
+        ->firstOrFail();
 
-        $request->update(['status' => 'ditolak']);
+    // ✅ Update status RO & status global
+    $request->update([
+        'status_ro' => 'rejected',
+        'catatan_ro' => $request->catatan ?? 'Ditolak oleh Kepala RO',
+        'status' => 'ditolak by: Kepala RO',
+    ]);
 
-        return redirect()->back()->with('success', 'Permintaan ditolak!');
-    }
+    return redirect()->back()->with('success', 'Permintaan ditolak!');
+}
 }

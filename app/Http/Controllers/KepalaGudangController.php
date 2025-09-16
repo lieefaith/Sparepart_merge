@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Permintaan;
 use Illuminate\Http\Request;
 
 class KepalaGudangController extends Controller
@@ -11,9 +12,18 @@ class KepalaGudangController extends Controller
         return view('kepalagudang.dashboard');
     }
 
+    /**
+     * Tampilkan daftar request yang sudah di-approve Kepala RO
+     */
     public function requestIndex()
     {
-        return view('kepalagudang.request');
+        $requests = Permintaan::where('status_ro', 'approved')
+            ->where('status_gudang', 'pending')
+            ->with(['user', 'details']) // Load relasi jika diperlukan
+            ->orderBy('tanggal_permintaan', 'desc')
+            ->get();
+
+        return view('kepalagudang.request', compact('requests'));
     }
 
     public function sparepartIndex()
@@ -23,8 +33,7 @@ class KepalaGudangController extends Controller
 
     public function sparepartStore(Request $request)
     {
-        // Fungsi ini akan gagal jika tidak ada model RequestBarang
-        // dan tabel di database. Anda bisa hapus fungsi ini jika tidak digunakan.
+        // Akan kita isi nanti jika diperlukan
     }
 
     public function historyIndex()
@@ -34,7 +43,6 @@ class KepalaGudangController extends Controller
 
     public function historyDetail($id)
     {
-        // Fungsi ini juga akan gagal jika tidak ada model HistoriPermintaan
-        // dan tabel di database. Anda bisa hapus fungsi ini jika tidak digunakan.
+        // Akan kita isi nanti jika diperlukan
     }
 }
