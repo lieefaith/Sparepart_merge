@@ -109,6 +109,13 @@ Route::middleware(['auth', 'role:3'])
 
         Route::get('/profile', fn() => view('kepalagudang.profile'))->name('profile');
 
+        Route::put('/sparepart/{id}', [SparepartController::class, 'update'])->name('sparepart.update');
+       
+        Route::delete('/sparepart/{id}', [SparepartController::class, 'destroy'])
+    ->name('.sparepart.details.destroy')
+    ->middleware('auth')
+    ->where('serial', '.*');
+
         Route::get('/data', [DataController::class, 'index'])->name('data');
 
         // Jenis

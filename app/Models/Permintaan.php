@@ -61,4 +61,15 @@ class Permintaan extends Model
     {
         return $this->hasOne(HistoriPermintaan::class, 'tiket', 'tiket');
     }
+
+    public function jenis()
+    {
+        return $this->belongsTo(JenisBarang::class, 'nama_item');
+    }
+   
+
+    public function tipe()
+    {
+        return $this->belongsTo(TipeBarang::class, 'deskripsi');
+    }
 }
