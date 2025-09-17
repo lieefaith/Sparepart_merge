@@ -422,7 +422,7 @@
                 targetSelect.innerHTML = '<option value="">Pilih Item</option>';
                 items.forEach(item => {
                     const option = document.createElement('option');
-                    option.value = item.id; // Simpan ID untuk ambil tipe nanti
+                    option.value = item.id;  // Simpan ID untuk ambil tipe nanti
                     option.textContent = item.nama;
                     targetSelect.appendChild(option);
                 });

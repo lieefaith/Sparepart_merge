@@ -28,7 +28,8 @@
                 </div>
                 <div class="col-md-4">
                     <label for="searchFilter" class="form-label">Pencarian</label>
-                    <input type="text" class="form-control" id="searchFilter" placeholder="Cari ID Request, Requester, atau Barang...">
+                    <input type="text" class="form-control" id="searchFilter"
+                        placeholder="Cari ID Request, Requester, atau Barang...">
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
                     <button class="btn btn-primary w-100">Terapkan Filter</button>
@@ -55,12 +56,11 @@
                             <tr>
                                 <td><span class="fw-bold">{{ $req->tiket }}</span></td>
                                 <td>{{ $req->user->name ?? 'User' }}</td>
-                                <td>{{ \Illuminate\Support\Carbon::parse($req->tanggal_permintaan)->translatedFormat('d M Y') }}</td>
+                                <td>{{ \Illuminate\Support\Carbon::parse($req->tanggal_permintaan)->translatedFormat('d M Y') }}
+                                </td>
                                 <td><span class="badge bg-success">Disetujui</span></td>
                                 <td class="action-buttons">
-                                    <button 
-                                        class="btn btn-success btn-sm btn-terima"
-                                        data-tiket="{{ $req->tiket }}"
+                                    <button class="btn btn-success btn-sm btn-terima" data-tiket="{{ $req->tiket }}"
                                         data-requester="{{ $req->user->name ?? 'User' }}"
                                         data-tanggal="{{ \Illuminate\Support\Carbon::parse($req->tanggal_permintaan)->translatedFormat('d M Y') }}">
                                         <i class="bi bi-check-circle"></i> Terima
@@ -126,7 +126,8 @@
                                 </tbody>
                             </table>
                         </div>
-                        <button type="button" class="btn btn-outline-primary"><i class="bi bi-plus"></i> Tambah Baris</button>
+                        <button type="button" class="btn btn-outline-primary"><i class="bi bi-plus"></i> Tambah
+                            Baris</button>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -232,7 +233,8 @@
 
                         <div class="mt-3">
                             <label class="form-label">Catatan</label>
-                            <textarea class="form-control" name="catatan" rows="3" placeholder="Tambahkan catatan jika ada..."></textarea>
+                            <textarea class="form-control" name="catatan" rows="3"
+                                placeholder="Tambahkan catatan jika ada..."></textarea>
                         </div>
                     </form>
                 </div>
@@ -249,164 +251,180 @@
 @endsection
 
 @push('scripts')
-<script>
-    // Toggle sidebar
-    document.querySelector('.navbar-toggler')?.addEventListener('click', function() {
-        document.querySelector('.sidebar')?.classList.toggle('show');
-    });
-
-    // Filter pencarian
-    document.getElementById('searchFilter')?.addEventListener('keyup', function() {
-        const filter = this.value.toLowerCase();
-        document.querySelectorAll('tbody tr').forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(filter) ? '' : 'none';
+    <script>
+        // Toggle sidebar
+        document.querySelector('.navbar-toggler')?.addEventListener('click', function () {
+            document.querySelector('.sidebar')?.classList.toggle('show');
         });
-    });
 
-    // Tambah baris
-    function tambahBaris() {
-        const tbody = document.querySelector('#tabelBarang tbody');
-        const nomorBaru = tbody.children.length + 1;
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${nomorBaru}</td>
-            <td><input type="text" class="form-control" placeholder="Nama Item" required></td>
-            <td><input type="text" class="form-control" placeholder="Merk"></td>
-            <td><input type="text" class="form-control" placeholder="Serial Number"></td>
-            <td><input type="text" class="form-control" placeholder="Tipe"></td>
-            <td><input type="number" class="form-control" value="1" min="1" required></td>
-            <td>
-                <select class="form-control">
-                    <option value="">Pilih Keterangan</option>
-                    <option value="Baru">Baru</option>
-                    <option value="Bekas">Bekas</option>
-                    <option value="Dipakai">Dipakai</option>
-                </select>
-            </td>
-            <td>
-                <button type="button" class="btn btn-danger btn-sm" onclick="hapusBaris(this)">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    }
-
-    // Hapus baris
-    function hapusBaris(button) {
-        const tr = button.closest('tr');
-        const tbody = tr.parentElement;
-        if (tbody.children.length > 1) {
-            tr.remove();
-            Array.from(tbody.children).forEach((row, i) => row.cells[0].textContent = i + 1);
-        } else {
-            alert('Minimal satu baris harus ada.');
-        }
-    }
-
-    // Simpan daftar requests untuk akses global
-    const allRequests = @json($requests);
-
-    // Isi modal saat tombol "Terima" diklik
-    document.querySelectorAll('.btn-terima').forEach(button => {
-        button.addEventListener('click', function () {
-            const tiket = this.dataset.tiket;
-            const requester = this.dataset.requester;
-            const tanggal = this.dataset.tanggal;
-
-            // Isi header modal
-            document.getElementById('tiketInput').value = tiket;
-            document.getElementById('modal-tiket-display').textContent = tiket;
-            document.getElementById('modal-requester').textContent = requester;
-            document.getElementById('modal-tanggal').textContent = tanggal;
-
-            // Cari request berdasarkan tiket
-            const req = allRequests.find(r => r.tiket === tiket);
-            const detailBody = document.getElementById('detail-request-body');
-            detailBody.innerHTML = '';
-
-            if (req && req.details.length > 0) {
-                req.details.forEach((item, index) => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${index + 1}</td>
-                        <td>${item.nama || '-'}</td>
-                        <td>${item.deskripsi || '-'}</td>
-                        <td>${item.jumlah}</td>
-                        <td>${item.keterangan || '-'}</td>
-                    `;
-                    detailBody.appendChild(tr);
-                });
-            } else {
-                const tr = document.createElement('tr');
-                tr.innerHTML = '<td colspan="5" class="text-center">Tidak ada item.</td>';
-                detailBody.appendChild(tr);
-            }
-
-            // Buka modal
-            const modal = new bootstrap.Modal(document.getElementById('modalTerima'));
-            modal.show();
-        });
-    });
-
-    // Submit form pengiriman
-    document.getElementById('formPengiriman').addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const formData = new FormData(this);
-        const items = [];
-        const rows = document.querySelectorAll('#tabelBarang tbody tr');
-
-        let valid = true;
-        rows.forEach(row => {
-            const cells = row.cells;
-            const nama = cells[1].querySelector('input').value.trim();
-            const jumlah = cells[5].querySelector('input').value.trim();
-            const keterangan = cells[6].querySelector('select').value; // Ambil dari select
-
-            if (!nama || !jumlah) valid = false;
-
-            items.push({
-                nama_item: nama,
-                deskripsi: cells[2].querySelector('input').value.trim(),
-                merk: cells[3].querySelector('input').value.trim(),
-                sn: cells[4].querySelector('input').value.trim(),
-                tipe: cells[4].querySelector('input').value.trim(),
-                jumlah: parseInt(jumlah),
-                keterangan: keterangan
+        // Filter pencarian
+        document.getElementById('searchFilter')?.addEventListener('keyup', function () {
+            const filter = this.value.toLowerCase();
+            document.querySelectorAll('tbody tr').forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(filter) ? '' : 'none';
             });
         });
 
-        if (!valid) {
-            alert('Semua nama item dan jumlah harus diisi.');
-            return;
+        // Tambah baris
+        function tambahBaris() {
+            const tbody = document.querySelector('#tabelBarang tbody');
+            const nomorBaru = tbody.children.length + 1;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                    <td>${nomorBaru}</td>
+                    <td><input type="text" class="form-control" placeholder="Nama Item" required></td>
+                    <td><input type="text" class="form-control" placeholder="Merk"></td>
+                    <td><input type="text" class="form-control" placeholder="Serial Number"></td>
+                    <td><input type="text" class="form-control" placeholder="Tipe"></td>
+                    <td><input type="number" class="form-control" value="1" min="1" required></td>
+                    <td>
+                        <select class="form-control">
+                            <option value="">Pilih Keterangan</option>
+                            <option value="Baru">Baru</option>
+                            <option value="Bekas">Bekas</option>
+                            <option value="Dipakai">Dipakai</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="hapusBaris(this)">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                `;
+            tbody.appendChild(tr);
         }
 
-        formData.append('items', JSON.stringify(items));
-
-        fetch("{{ route('kepalagudang.pengiriman.store') }}", {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert(data.message);
-                const modal = bootstrap.Modal.getInstance(document.getElementById('modalTerima'));
-                modal.hide();
-                location.reload();
+        // Hapus baris
+        function hapusBaris(button) {
+            const tr = button.closest('tr');
+            const tbody = tr.parentElement;
+            if (tbody.children.length > 1) {
+                tr.remove();
+                Array.from(tbody.children).forEach((row, i) => row.cells[0].textContent = i + 1);
             } else {
-                alert('Gagal: ' + data.message);
+                alert('Minimal satu baris harus ada.');
             }
-        })
-        .catch(err => {
-            console.error('Error:', err);
-            alert('Terjadi kesalahan teknis.');
+        }
+
+        // Simpan daftar requests untuk akses global
+        const allRequests = @json($requests);
+
+        // ini yang di ganti dari kode // const req = allRequests.find(r => r.tiket === tiket);
+
+        // Isi modal saat tombol "Terima" diklik
+        document.querySelectorAll('.btn-terima').forEach(button => {
+            button.addEventListener('click', function () {
+                const tiket = this.dataset.tiket;
+                const requester = this.dataset.requester;
+                const tanggal = this.dataset.tanggal;
+
+                // Isi header modal
+                document.getElementById('tiketInput').value = tiket;
+                document.getElementById('modal-tiket-display').textContent = tiket;
+                document.getElementById('modal-requester').textContent = requester;
+                document.getElementById('modal-tanggal').textContent = tanggal;
+
+                // ✅ Reset isi tabel data request (bagian atas)
+                const detailBody = document.getElementById('detail-request-body');
+                detailBody.innerHTML = '<tr><td colspan="5" class="text-center">Memuat data...</td></tr>';
+
+                // ✅ Ambil data request dari API (permintaan_detail)
+                fetch(`/requestbarang/${tiket}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Gagal ambil data request');
+                        return response.json();
+                    })
+                    .then(data => {
+                        detailBody.innerHTML = '';
+
+                        if (data.details && data.details.length > 0) {
+                            data.details.forEach((item, index) => {
+                                const tr = document.createElement('tr');
+                                tr.innerHTML = `
+                                <td>${index + 1}</td>
+                                <td>${item.nama || '-'}</td>
+                                <td>${item.deskripsi || '-'}</td>
+                                <td>${item.jumlah}</td>
+                                <td>${item.keterangan || '-'}</td>
+                            `;
+                                detailBody.appendChild(tr);
+                            });
+                        } else {
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = '<td colspan="5" class="text-center">Tidak ada item diminta.</td>';
+                            detailBody.appendChild(tr);
+                        }
+
+                        // ✅ Baru buka modal setelah data siap
+                        const modal = new bootstrap.Modal(document.getElementById('modalTerima'));
+                        modal.show();
+                    })
+                    .catch(err => {
+                        console.error('Error:', err);
+                        detailBody.innerHTML = '<td colspan="5" class="text-center text-danger">Gagal memuat data request.</td>';
+                        alert('Gagal memuat detail request.');
+                    });
+            });
         });
-    });
-</script>
+
+        // Submit form pengiriman
+        document.getElementById('formPengiriman').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const items = [];
+            const rows = document.querySelectorAll('#tabelBarang tbody tr');
+
+            let valid = true;
+            rows.forEach(row => {
+                const cells = row.cells;
+                const nama = cells[1].querySelector('input').value.trim();
+                const jumlah = cells[5].querySelector('input').value.trim();
+                const keterangan = cells[6].querySelector('select').value; // Ambil dari select
+
+                if (!nama || !jumlah) valid = false;
+
+                items.push({
+                    nama_item: nama,
+                    deskripsi: cells[2].querySelector('input').value.trim(),
+                    merk: cells[3].querySelector('input').value.trim(),
+                    sn: cells[4].querySelector('input').value.trim(),
+                    tipe: cells[4].querySelector('input').value.trim(),
+                    jumlah: parseInt(jumlah),
+                    keterangan: keterangan
+                });
+            });
+
+            if (!valid) {
+                alert('Semua nama item dan jumlah harus diisi.');
+                return;
+            }
+
+            formData.append('items', JSON.stringify(items));
+
+            fetch("{{ route('kepalagudang.pengiriman.store') }}", {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalTerima'));
+                        modal.hide();
+                        location.reload();
+                    } else {
+                        alert('Gagal: ' + data.message);
+                    }
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                    alert('Terjadi kesalahan teknis.');
+                });
+        });
+    </script>
 @endpush
