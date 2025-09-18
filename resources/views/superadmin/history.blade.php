@@ -24,42 +24,34 @@
     <!-- Filter Section -->
     <div class="filter-card mb-4">
         <h5 class="mb-4"><i class="bi bi-funnel me-2"></i>Filter Data</h5>
-        <div class="row">
-            <div class="col-md-3 mb-3">
+        <form method="GET" action="{{ route('superadmin.history.index') }}" class="row g-3">
+            <div class="col-md-3">
                 <label for="dateFrom" class="form-label">Dari Tanggal</label>
-                <input type="date" class="form-control" id="dateFrom">
+                <input type="date" class="form-control" id="dateFrom" name="dateFrom" value="{{ request('dateFrom') }}">
             </div>
-            <div class="col-md-3 mb-3">
+            <div class="col-md-3">
                 <label for="dateTo" class="form-label">Sampai Tanggal</label>
-                <input type="date" class="form-control" id="dateTo">
+                <input type="date" class="form-control" id="dateTo" name="dateTo" value="{{ request('dateTo') }}">
             </div>
-            <div class="col-md-3 mb-3">
+            <div class="col-md-3">
                 <label for="statusFilter" class="form-label">Status</label>
-                <select class="form-select" id="statusFilter">
+                <select class="form-select" id="statusFilter" name="statusFilter">
                     <option value="">Semua Status</option>
-                    <option value="dikirim">Dikirim</option>
-                    <option value="diterima">Diterima</option>
-                    <option value="diproses">Diproses</option>
-                    <option value="ditolak">Ditolak</option>
+                    <option value="diterima" {{ request('statusFilter') == 'diterima' ? 'selected' : '' }}>Diterima</option>
+                    <option value="ditolak" {{ request('statusFilter') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                    <option value="diproses" {{ request('statusFilter') == 'diproses' ? 'selected' : '' }}>Diproses</option>
+                    <option value="dikirim" {{ request('statusFilter') == 'dikirim' ? 'selected' : '' }}>Dikirim</option>
                 </select>
             </div>
-            <div class="col-md-3 mb-3">
-                <label for="jenisFilter" class="form-label">Jenis</label>
-                <select class="form-select" id="jenisFilter">
-                    <option value="">Semua Jenis</option>
-                    <option value="masuk">Masuk</option>
-                    <option value="keluar">Keluar</option>
-                </select>
+            <div class="col-12 d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search me-1"></i> Terapkan Filter
+                </button>
+                <a href="{{ route('superadmin.history.index') }}" class="btn btn-light ms-2">
+                    <i class="bi bi-arrow-clockwise me-1"></i> Reset
+                </a>
             </div>
-        </div>
-        <div class="d-flex justify-content-end">
-            <button class="btn btn-light me-2">
-                <i class="bi bi-arrow-clockwise me-1"></i> Reset
-            </button>
-            <button class="btn btn-primary">
-                <i class="bi bi-search me-1"></i> Terapkan Filter
-            </button>
-        </div>
+        </form>
     </div>
 
     <!-- Export Button -->
@@ -83,136 +75,101 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><span class="fw-bold">HIST001</span></td>
-                        <td>RO BATAM</td>
-                        <td><span class="badge bg-success status-badge">Dikirim</span></td>
-                        <td>2025-08-25</td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
-                                data-bs-target="#detailModal1">
-                                <i class="bi bi-eye"></i> Detail
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><span class="fw-bold">HIST002</span></td>
-                        <td>RO JAKARTA</td>
-                        <td><span class="badge bg-warning status-badge">Diproses</span></td>
-                        <td>2025-08-24</td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
-                                data-bs-target="#detailModal2">
-                                <i class="bi bi-eye"></i> Detail
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><span class="fw-bold">HIST003</span></td>
-                        <td>RO SURABAYA</td>
-                        <td><span class="badge bg-danger status-badge">Ditolak</span></td>
-                        <td>2025-08-23</td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
-                                data-bs-target="#detailModal3">
-                                <i class="bi bi-eye"></i> Detail
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><span class="fw-bold">HIST004</span></td>
-                        <td>RO BANDUNG</td>
-                        <td><span class="badge bg-success status-badge">Dikirim</span></td>
-                        <td>2025-08-22</td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
-                                data-bs-target="#detailModal4">
-                                <i class="bi bi-eye"></i> Detail
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><span class="fw-bold">HIST005</span></td>
-                        <td>RO MEDAN</td>
-                        <td><span class="badge bg-info status-badge">Diterima</span></td>
-                        <td>2025-08-21</td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
-                                data-bs-target="#detailModal5">
-                                <i class="bi bi-eye"></i> Detail
-                            </button>
-                        </td>
-                    </tr>
+                    @foreach($requests as $req)
+                                <tr>
+                                    <td><span class="fw-bold">{{ $req->tiket }}</span></td>
+                                    <td>{{ $req->user->name ?? '-' }}</td> <!-- ✅ Requester -->
+                                    <td>
+                                        <span class="badge 
+                        @if($req->status_super_admin == 'approved') bg-success
+                        @elseif($req->status_super_admin == 'rejected') bg-danger
+                        @else bg-secondary
+                        @endif">
+                                            {{ $req->status_super_admin == 'approved' ? 'Diterima' : ($req->status_super_admin == 'rejected' ? 'Ditolak' : 'Unknown') }}
+                                        </span>
+                                    </td>
+                                    <td>{{ \Carbon\Carbon::parse($req->tanggal_permintaan)->format('Y-m-d') }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary btn-history" data-bs-toggle="modal"
+                                            data-bs-target="#modalHistory" data-tiket="{{ $req->tiket }}">
+                                            <i class="bi bi-eye"></i> Detail
+                                        </button>
+                                    </td>
+                                </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
     </div>
 
     <!-- Modal contoh (HIST001) -->
-    <div class="modal fade" id="detailModal1" tabindex="-1" aria-labelledby="detailModalLabel1"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+    <!-- Modal Detail History -->
+    <div class="modal fade" id="modalHistory" tabindex="-1">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Detail Transaksi HIST001</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title"><i class="bi bi-clock-history"></i> Detail History Barang</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
+
                 <div class="modal-body">
-                    <!-- Tabs -->
-                    <ul class="nav nav-tabs" role="tablist">
-                        <li class="nav-item">
-                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#request1"
-                                type="button">Form Request</button>
-                        </li>
-                        <li class="nav-item">
-                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#pengiriman1"
-                                type="button">Form Pengiriman</button>
-                        </li>
-                    </ul>
-
-                    <div class="tab-content mt-3">
-                        <!-- Request -->
-                        <div class="tab-pane fade show active" id="request1">
-                            <form>
-                                <div class="mb-3">
-                                    <label class="form-label">Barang</label>
-                                    <input type="text" class="form-control" value="Filter Oli" readonly>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Jumlah</label>
-                                    <input type="number" class="form-control" value="50">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Keterangan</label>
-                                    <textarea class="form-control">Request untuk maintenance</textarea>
-                                </div>
-                            </form>
-                        </div>
-
-                        <!-- Pengiriman -->
-                        <div class="tab-pane fade" id="pengiriman1">
-                            <form>
-                                <div class="mb-3">
-                                    <label class="form-label">Status Pengiriman</label>
-                                    <select class="form-select">
-                                        <option selected>Dikirim</option>
-                                        <option>Dalam Perjalanan</option>
-                                        <option>Sampai</option>
-                                        <option>Ditolak</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Tanggal Kirim</label>
-                                    <input type="date" class="form-control" value="2025-08-25">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Catatan</label>
-                                    <textarea class="form-control">Pengiriman sesuai jadwal</textarea>
-                                </div>
-                            </form>
-                        </div>
+                    <h6 class="fw-bold text-primary mb-3"><i class="bi bi-cart-check"></i> Data Request</h6>
+                    <div class="mb-3">
+                        <p><strong>No Tiket:</strong> <span id="modal-tiket-display">-</span></p>
+                        <p><strong>Requester:</strong> <span id="modal-requester-display">-</span></p>
+                        <p><strong>Tanggal Request:</strong> <span id="modal-tanggal-request-display">-</span></p>
                     </div>
+
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama Item</th>
+                                    <th>Deskripsi</th>
+                                    <th>Jumlah Diminta</th>
+                                    <th>Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="request-table-body">
+                                <tr>
+                                    <td colspan="5" class="text-center">Pilih tiket untuk melihat detail.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <hr>
+
+                    <h6 class="fw-bold text-success mb-3"><i class="bi bi-truck"></i> Data Pengiriman</h6>
+                    <div class="mb-3">
+                        <p><strong>Tanggal Pengiriman:</strong> <span id="modal-tanggal-pengiriman-display">-</span></p>
+                    </div>
+
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered">
+                            <thead class="table-success">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama Item</th>
+                                    <th>Merk</th>
+                                    <th>SN</th>
+                                    <th>Tipe</th>
+                                    <th>Jumlah Dikirim</th>
+                                    <th>Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pengiriman-table-body">
+                                <tr>
+                                    <td colspan="7" class="text-center">Pilih tiket untuk melihat detail.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
@@ -240,14 +197,101 @@
 @endsection
 
 @push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Set tanggal default untuk filter
-        const today = new Date();
-        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Set tanggal default
+            const today = new Date();
+            const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            document.getElementById('dateFrom').valueAsDate = firstDayOfMonth;
+            document.getElementById('dateTo').valueAsDate = today;
 
-        document.getElementById('dateFrom').valueAsDate = firstDayOfMonth;
-        document.getElementById('dateTo').valueAsDate = today;
-    });
-</script>
+            // Load detail history
+            document.querySelectorAll('.btn-history').forEach(button => {
+                button.addEventListener('click', function () {
+                    const tiket = this.dataset.tiket;
+
+                    // Reset modal
+                    document.getElementById('modal-tiket-display').textContent = '-';
+                    document.getElementById('modal-requester-display').textContent = '-';
+                    document.getElementById('modal-tanggal-request-display').textContent = '-';
+                    document.getElementById('modal-tanggal-pengiriman-display').textContent = '-';
+
+                    document.getElementById('request-table-body').innerHTML = '<tr><td colspan="5" class="text-center">Memuat data...</td></tr>';
+                    document.getElementById('pengiriman-table-body').innerHTML = '<tr><td colspan="7" class="text-center">Memuat data...</td></tr>';
+
+                    // Fetch data
+                    fetch(`/superadmin/history/${tiket}/api`)
+                        .then(response => {
+                            if (!response.ok) throw new Error('Gagal ambil data');
+                            return response.json();
+                        })
+                        .then(data => {
+                            // Isi data request
+                            document.getElementById('modal-tiket-display').textContent = data.permintaan.tiket;
+                            document.getElementById('modal-requester-display').textContent = data.permintaan.user?.name || '-';
+                            document.getElementById('modal-tanggal-request-display').textContent = new Date(data.permintaan.tanggal_permintaan)
+                                .toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+
+                            // Isi tabel request
+                            const requestTable = document.getElementById('request-table-body');
+                            requestTable.innerHTML = '';
+                            data.permintaan.details.forEach((item, index) => {
+                                const tr = document.createElement('tr');
+                                tr.innerHTML = `
+                                                <td>${index + 1}</td>
+                                                <td>${item.nama_item}</td>
+                                                <td>${item.deskripsi || '-'}</td>
+                                                <td>${item.jumlah}</td>
+                                                <td>${item.keterangan || '-'}</td>
+                                            `;
+                                requestTable.appendChild(tr);
+                            });
+
+                            // Isi data pengiriman
+                            if (data.pengiriman) {
+                                document.getElementById('modal-tanggal-pengiriman-display').textContent = new Date(data.pengiriman.tanggal_transaksi)
+                                    .toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+
+                                const pengirimanTable = document.getElementById('pengiriman-table-body');
+                                pengirimanTable.innerHTML = '';
+                                data.pengiriman.details.forEach((item, index) => {
+                                    const tr = document.createElement('tr');
+                                    tr.innerHTML = `
+                                                    <td>${index + 1}</td>
+                                                    <td>${item.nama_item}</td>
+                                                    <td>${item.merk || '-'}</td>
+                                                    <td>${item.sn || '-'}</td>
+                                                    <td>${item.tipe || '-'}</td>
+                                                    <td>${item.jumlah}</td>
+                                                    <td>${item.keterangan || '-'}</td>
+                                                `;
+                                    pengirimanTable.appendChild(tr);
+                                });
+                            } else {
+                                document.getElementById('modal-tanggal-pengiriman-display').textContent = '-';
+                                document.getElementById('pengiriman-table-body').innerHTML = '<tr><td colspan="7" class="text-center">Belum ada pengiriman.</td></tr>';
+                            }
+
+                            // Buka modal
+                            const modal = new bootstrap.Modal(document.getElementById('modalHistory'));
+                            modal.show();
+                        })
+                        .catch(err => {
+                            console.error('Error:', err);
+                            alert('Gagal memuat detail: ' + err.message);
+                        });
+                });
+            });
+
+            // Fix backdrop
+            const modalElement = document.getElementById('modalHistory');
+            if (modalElement) {
+                modalElement.addEventListener('hidden.bs.modal', function () {
+                    document.querySelector('.modal-backdrop')?.remove();
+                    document.body.style.overflow = '';
+                    document.body.classList.remove('modal-open');
+                });
+            }
+        });
+    </script>
 @endpush

@@ -16,22 +16,22 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    const ROLE_SUPER_ADMIN = 'super_admin';
-    const ROLE_KEPALA_RO = 'kepala_ro';
-    const ROLE_KEPALA_GUDANG = 'kepala_gudang';
-    const ROLE_USER = 'user';
+
+    protected $table = 'users';
 
     protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'role',
-        'region',
-        'mobile_number',
-        'perusahaan',
-        'noktp',
-        'alamat',
-        'bagian'
+        'name', 
+        'email', 
+        'password', 
+        'role', 
+        'region', 
+        'mobile_number', 
+        'perusahaan', 
+        'nokt', 
+        'alamat', 
+        'bagian', 
+        'atasan',
+        'email_verified_at'
     ];
 
     /**
@@ -57,35 +57,6 @@ class User extends Authenticatable
         ];
     }
 
-    public static function roles(): array
-    {
-        return [
-            self::ROLE_SUPER_ADMIN,
-            self::ROLE_KEPALA_RO,
-            self::ROLE_KEPALA_GUDANG,
-            self::ROLE_USER,
-        ];
-    }
-
-        public function isSuperAdmin(): bool
-    {
-        return $this->role === self::ROLE_SUPER_ADMIN;
-    }
-
-    public function isKepalaRO(): bool
-    {
-        return $this->role === self::ROLE_KEPALA_RO;
-    }
-
-    public function isKepalaGudang(): bool
-    {
-        return $this->role === self::ROLE_KEPALA_GUDANG;
-    }
-
-    public function isUser(): bool
-    {
-        return $this->role === self::ROLE_USER;
-    }
 
     public function permintaan()
     {
@@ -106,4 +77,27 @@ class User extends Authenticatable
     {
         return $this->hasMany(VerifikasiPermintaan::class, 'signed_by');
     }
+
+    public function getRoleNameAttribute()
+{
+    return match($this->role) {
+        '1' => 'Superadmin',
+        '2' => 'Regional Office Head',
+        '3' => 'Warehouse Head',
+        '4' => 'Field Technician',
+        default => '-',
+    };
+}
+
+public function getRoleBadgeAttribute()
+{
+    return match($this->role) {
+        '1' => 'bg-primary',
+        '2' => 'bg-success',
+        '3' => 'bg-warning text-dark',
+        '4' => 'bg-info',
+        default => 'bg-secondary',
+    };
+}
+
 }

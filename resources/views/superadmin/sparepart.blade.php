@@ -33,11 +33,10 @@
             <div class="row g-3">
                 <div class="col-md-4">
                     <label for="jenisFilter" class="form-label">Jenis Sparepart</label>
-                    <select class="form-select" name="jenis" id="jenisFilter" onchange="this.form.submit()">
+                    <select class="form-select" name="jenis" id="jenisFilter">
                         <option value="">Semua Jenis</option>
                         @foreach ($jenis as $j)
-                            <option value="{{ $j->id }}"
-                                {{ (string) request('nama') === (string) $j->id ? 'selected' : '' }}>
+                            <option value="{{ $j->id }}" {{ (string) request('nama') === (string) $j->id ? 'selected' : '' }}>
                                 {{ $j->nama }}
                             </option>
                         @endforeach
@@ -55,8 +54,8 @@
                 <div class="col-md-4">
                     <label for="searchFilter" class="form-label">Cari Sparepart</label>
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Cari ID atau nama sparepart..."
-                            name="search" value="{{ request('search') }}">
+                        <input type="text" class="form-control" placeholder="Cari ID atau nama sparepart..." name="search"
+                            value="{{ request('search') }}">
                         <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i></button>
                     </div>
                 </div>
@@ -72,15 +71,15 @@
                 </div>
                 <div class="col-md-4">
                     <label for="kategoriFilter" class="form-label">Kategori Sparepart</label>
-                    <select class="form-select" name="kategori" id="kategoriFilter" onchange="this.form.submit()">
+                    <select class="form-select" name="kategori" id="kategoriFilter">
                         <option value="">Semua Kategori</option>
-                        <option value="aset" {{ old('kategori') == 'aset' ? 'selected' : '' }}>Aset</option>
-                        <option value="non-aset" {{ old('kategori') == 'non-aset' ? 'selected' : '' }}>Non
-                            Aset</option>
+                        <option value="aset" {{ request('kategori') == 'aset' ? 'selected' : '' }}>Aset</option>
+                        <option value="non-aset" {{ request('kategori') == 'non-aset' ? 'selected' : '' }}>Non Aset
+                        </option>
                     </select>
                 </div>
                 <div class="col-12 text-end">
-                    <a href="{{ route('superadmin.sparepart.index') }}" class="btn btn-light me-2">
+                    <a href="{{ route('kepalagudang.sparepart.index') }}" class="btn btn-light me-2">
                         <i class="bi bi-arrow-clockwise me-1"></i> Reset
                     </a>
                     <button type="submit" class="btn btn-primary">
@@ -170,7 +169,10 @@
                     @forelse($listBarang as $barang)
                         <tr>
                             <td><span class="fw-bold">{{ $barang->tiket_sparepart }}</span></td>
-                            <td>{{ $barang->jenisBarang->nama }} {{ $barang->tipeBarang->nama }}</td>
+                            <td>
+                                {{ $barang->jenisBarang?->nama ?? '-' }}
+                                {{ $barang->tipeBarang?->nama ?? '-' }}
+                            </td>
                             <td>{{ $barang->quantity }}</td>
                             @if ($filterStatus === 'habis')
                                 <td>{{ $totalsPerTiket[$barang->tiket_sparepart]['habis'] ?? 0 }}</td>
@@ -280,7 +282,7 @@
                 warning: 'bg-warning text-dark',
                 info: 'bg-info text-white',
                 secondary: 'bg-secondary text-white'
-            } [type] || 'bg-secondary text-white';
+            }[type] || 'bg-secondary text-white';
 
             const closeBtnClass = bgClass.includes('text-white') ? 'btn-close btn-close-white' : 'btn-close';
 
@@ -290,16 +292,16 @@
                 warning: '<i class="bi bi-exclamation-triangle-fill me-2"></i>',
                 info: '<i class="bi bi-info-circle-fill me-2"></i>',
                 secondary: '<i class="bi bi-bell-fill me-2"></i>'
-            } [type] || '';
+            }[type] || '';
 
             const html = `
-<div id="${id}" class="toast ${bgClass} shadow" role="alert" aria-live="assertive" aria-atomic="true">
-  <div class="d-flex">
-    <div class="toast-body">${icon}<span>${message}</span></div>
-    <button type="button" class="${closeBtnClass} me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-  </div>
-</div>
-`;
+    <div id="${id}" class="toast ${bgClass} shadow" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">${icon}<span>${message}</span></div>
+        <button type="button" class="${closeBtnClass} me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+    `;
             container.insertAdjacentHTML('beforeend', html);
             const toastEl = document.getElementById(id);
             const toast = new bootstrap.Toast(toastEl, {
@@ -313,7 +315,7 @@
 
         /* ====== Page logic ====== */
         let sparepartDetailModal;
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             sparepartDetailModal = new bootstrap.Modal(document.getElementById('sparepartDetailModal'));
         });
 
@@ -352,27 +354,27 @@
                 else if (item.status === 'dipesan' || item.status === 'dikirim') statusClass = 'bg-warning';
 
                 const row = `
-<tr>
-    <td>${i + 1}</td>
-    <td>${escapeHtml(item.serial) || '-'}</td>
-    <td>${escapeHtml(data.type) || '-'}</td>
-    <td>${escapeHtml(data.jenis) || '-'}</td>
-    <td><span class="badge ${statusClass}">${item.status ? (item.status.charAt(0).toUpperCase() + item.status.slice(1)) : '-'}</span></td>
-    <td>${item.harga ? formatRupiah(item.harga) : '-'}</td>
-    <td>${escapeHtml(item.vendor) || '-'}</td>
-    <td>${escapeHtml(item.spk) || '-'}</td>
-    <td>${escapeHtml(item.quantity) || '-'}</td>
-    <td>${escapeHtml(item.pic) || '-'}</td>
-    <td>${escapeHtml(item.keterangan) || '-'}</td>
-    <td>${escapeHtml(item.tanggal) || '-'}</td>
-</tr>
-`;
+    <tr>
+        <td>${i + 1}</td>
+        <td>${escapeHtml(item.serial) || '-'}</td>
+        <td>${escapeHtml(data.type) || '-'}</td>
+        <td>${escapeHtml(data.jenis) || '-'}</td>
+        <td><span class="badge ${statusClass}">${item.status ? (item.status.charAt(0).toUpperCase() + item.status.slice(1)) : '-'}</span></td>
+        <td>${item.harga ? formatRupiah(item.harga) : '-'}</td>
+        <td>${escapeHtml(item.vendor) || '-'}</td>
+        <td>${escapeHtml(item.spk) || '-'}</td>
+        <td>${escapeHtml(item.quantity) || '-'}</td>
+        <td>${escapeHtml(item.pic) || '-'}</td>
+        <td>${escapeHtml(item.keterangan) || '-'}</td>
+        <td>${escapeHtml(item.tanggal) || '-'}</td>
+    </tr>
+    `;
                 tbody.insertAdjacentHTML("beforeend", row);
             });
 
             // re-init tooltip
             const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            tooltipTriggerList.map(function(el) {
+            tooltipTriggerList.map(function (el) {
                 return new bootstrap.Tooltip(el);
             });
 

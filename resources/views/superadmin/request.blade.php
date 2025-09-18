@@ -3,264 +3,320 @@
 @section('title', 'Request Barang - Superadmin')
 
 @section('content')
-    <!-- Page Header -->
     <div class="page-header mb-4">
         <div class="d-flex justify-content-between align-items-center">
             <div>
-                <h4 class="fw-bold mb-0"><i class="bi bi-cart-check me-2"></i>Daftar Request Barang</h4>
-                <p class="text-muted mb-0">Kelola permintaan barang dari berbagai RO</p>
+                <h4 class="fw-bold mb-0"><i class="bi bi-cart-check me-2"></i>Request Barang</h4>
+                <p class="text-muted mb-0">Kelola permintaan barang yang sudah di-approve Kepala Gudang</p>
             </div>
-            <div>
-                <span class="badge bg-light text-dark me-2">
-                    <i class="bi bi-calendar me-1"></i> {{ date('d F Y') }}
-                </span>
-                <a href="{{ route('superadmin.dashboard') }}" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left me-1"></i> Kembali ke Dashboard
-                </a>
-            </div>
+            <a href="{{ route('superadmin.dashboard') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Kembali ke Dashboard
+            </a>
         </div>
     </div>
 
-    <!-- Filter Section -->
-    <div class="filter-card card p-3 mb-4">
-        <h5 class="mb-4"><i class="bi bi-funnel me-2"></i>Filter Request</h5>
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <label for="statusFilter" class="form-label">Status Request</label>
-                <select class="form-select" id="statusFilter">
-                    <option value="">Semua Status</option>
-                    <option value="menunggu">Menunggu Approval</option>
-                    <option value="diproses">Diproses</option>
-                    <option value="disetujui">Disetujui</option>
-                    <option value="ditolak">Ditolak</option>
-                    <option value="dikirim">Dikirim</option>
-                </select>
-            </div>
-            <div class="col-md-4 mb-3">
-                <label for="dateFilter" class="form-label">Tanggal Request</label>
-                <input type="date" class="form-control" id="dateFilter">
-            </div>
-            <div class="col-md-4 mb-3">
-                <label for="searchFilter" class="form-label">Cari Request</label>
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Cari ID atau nama barang..." id="searchFilter">
-                    <button class="btn btn-primary">
-                        <i class="bi bi-search"></i>
-                    </button>
+    <!-- Filter Card -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="statusFilter" class="form-label">Status</label>
+                    <select class="form-select" id="statusFilter">
+                        <option value="">Semua Status</option>
+                        <option value="diterima">Diterima</option>
+                        <option value="ditolak">Ditolak</option>
+                    </select>
                 </div>
-            </div>
-        </div>
-        <div class="d-flex justify-content-end">
-            <button class="btn btn-light me-2">
-                <i class="bi bi-arrow-clockwise me-1"></i> Reset
-            </button>
-            <button class="btn btn-primary">
-                <i class="bi bi-filter me-1"></i> Terapkan Filter
-            </button>
-        </div>
-    </div>
-
-    <!-- Stats Cards -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-4">
-            <div class="dashboard-card p-3">
-                <div class="d-flex align-items-center">
-                    <div class="bg-warning bg-opacity-10 p-3 rounded me-3">
-                        <i class="bi bi-clock-history text-warning fs-4"></i>
-                    </div>
-                    <div>
-                        <h6 class="mb-0">Pending</h6>
-                        <h4 class="mb-0 fw-bold text-warning">3</h4>
-                    </div>
+                <div class="col-md-3">
+                    <label for="dateFilter" class="form-label">Tanggal</label>
+                    <input type="date" class="form-control" id="dateFilter">
                 </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="dashboard-card p-3">
-                <div class="d-flex align-items-center">
-                    <div class="bg-success bg-opacity-10 p-3 rounded me-3">
-                        <i class="bi bi-check-circle text-success fs-4"></i>
-                    </div>
-                    <div>
-                        <h6 class="mb-0">Disetujui</h6>
-                        <h4 class="mb-0 fw-bold text-success">12</h4>
-                    </div>
+                <div class="col-md-4">
+                    <label for="searchFilter" class="form-label">Pencarian</label>
+                    <input type="text" class="form-control" id="searchFilter"
+                        placeholder="Cari ID Request, Requester, atau Barang...">
                 </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="dashboard-card p-3">
-                <div class="d-flex align-items-center">
-                    <div class="bg-danger bg-opacity-10 p-3 rounded me-3">
-                        <i class="bi bi-x-circle text-danger fs-4"></i>
-                    </div>
-                    <div>
-                        <h6 class="mb-0">Ditolak</h6>
-                        <h4 class="mb-0 fw-bold text-danger">2</h4>
-                    </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button class="btn btn-primary w-100">Terapkan Filter</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Table -->
-    <table class="table">
-        <thead>
-            <tr>
-                <th>ID Transaksi</th>
-                <th>Tanggal</th>
-                <th>Requester</th>
-                <th>Status</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>REQ001</td>
-                <td>08/09/2025</td>
-                <td>RO Batam</td>
-                <td><span class="badge bg-warning">Pending</span></td>
-                <td>
-                    <button class="btn btn-sm btn-primary" onclick="showRequestDetail('REQ001')">Detail</button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-
-    <!-- Modal -->
-    <div class="modal fade" id="requestDetailModal" tabindex="-1" aria-labelledby="requestDetailLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="requestDetailLabel">Detail Request Barang</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-
-                <div class="modal-body">
-                    <!-- Info Request -->
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <p><strong>ID Request:</strong> <span id="detailReqId"></span></p>
-                            <p><strong>Requester:</strong> <span id="detailRequester"></span></p>
-                        </div>
-                        <div class="col-md-6">
-                            <p><strong>Tanggal:</strong> <span id="detailTanggal"></span></p>
-                            <p><strong>Status:</strong> <span class="badge bg-warning" id="detailStatus"></span></p>
-                        </div>
-                    </div>
-
-                    <!-- Table Items -->
-                    <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>No</th>
-                                    <th>Nama Item</th>
-                                    <th>Deskripsi</th>
-                                    <th>Jumlah</th>
-                                    <th>Keterangan</th>
-                                </tr>
-                            </thead>
-                            <tbody id="detailItems">
-                                <!-- isi via JS -->
-                            </tbody>
-                        </table>
-                    </div>
-
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                        <button type="button" class="btn btn-success" onclick="approveRequest()">Approve</button>
-                        <button type="button" class="btn btn-danger" onclick="rejectRequest()">Reject</button>
-                    </div>
-                </div>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID Request</th>
+                            <th>Requester</th>
+                            <th>Tanggal Request</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($requests as $req)
+                            <tr>
+                                <td><span class="fw-bold">{{ $req->tiket }}</span></td>
+                                <td>{{ $req->user->name ?? 'User' }}</td>
+                                <td>{{ \Illuminate\Support\Carbon::parse($req->tanggal_permintaan)->translatedFormat('d M Y') }}</td>
+                                <td>
+                                    <span class="badge bg-{{ $req->status_gudang == 'approved' ? 'success' : 'danger' }}">
+                                        {{ $req->status_gudang == 'approved' ? 'Diterima' : 'Ditolak' }}
+                                    </span>
+                                </td>
+                                <td class="action-buttons">
+                                    <button class="btn btn-info btn-sm btn-detail" data-tiket="{{ $req->tiket }}"
+                                        data-requester="{{ $req->user->name ?? 'User' }}"
+                                        data-tanggal="{{ \Illuminate\Support\Carbon::parse($req->tanggal_permintaan)->translatedFormat('d M Y') }}">
+                                        <i class="bi bi-eye"></i> Detail
+                                    </button>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="text-center">Tidak ada permintaan yang menunggu approval Superadmin.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
-        </div>
-    </div>
 
-
-
-
-        <!-- Pagination -->
-        <div class="pagination-container d-flex justify-content-between align-items-center mt-3">
-            <div class="text-muted">
-                Menampilkan 1 hingga 5 dari 22 entri
-            </div>
-            <nav aria-label="Page navigation">
-                <ul class="pagination mb-0">
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
                     <li class="page-item disabled">
-                        <a class="page-link" href="#">Sebelumnya</a>
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
                     </li>
                     <li class="page-item active"><a class="page-link" href="#">1</a></li>
                     <li class="page-item"><a class="page-link" href="#">2</a></li>
                     <li class="page-item"><a class="page-link" href="#">3</a></li>
                     <li class="page-item">
-                        <a class="page-link" href="#">Selanjutnya</a>
+                        <a class="page-link" href="#">Next</a>
                     </li>
                 </ul>
             </nav>
         </div>
+    </div>
 
+    <!-- Modal Detail (Read-Only) -->
+    <div class="modal fade" id="modalDetail" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title"><i class="bi bi-eye"></i> Detail Request</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <!-- Data Request (readonly) -->
+                    <h6 class="fw-bold text-primary mb-3"><i class="bi bi-cart-check"></i> Data Request</h6>
+                    <div class="mb-3">
+                        <p><strong>No Tiket:</strong> <span id="modal-tiket-display">-</span></p>
+                        <p><strong>Requester:</strong> <span id="modal-requester-display">-</span></p>
+                        <p><strong>Tanggal Request:</strong> <span id="modal-tanggal-display">-</span></p>
+                    </div>
+
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama Item</th>
+                                    <th>Deskripsi</th>
+                                    <th>Jumlah Diminta</th>
+                                    <th>Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detail-request-body">
+                                <!-- Akan diisi otomatis oleh JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <hr>
+
+                    <!-- Data Pengiriman (readonly) -->
+                    <h6 class="fw-bold text-success mb-3"><i class="bi bi-truck"></i> Data Pengiriman</h6>
+                    <div class="mb-3">
+                        <p><strong>Tanggal Pengiriman:</strong> <span id="modal-tanggal-pengiriman-display">-</span></p>
+                    </div>
+
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered">
+                            <thead class="table-success">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama Item</th>
+                                    <th>Merk</th>
+                                    <th>SN</th>
+                                    <th>Tipe</th>
+                                    <th>Jumlah Dikirim</th>
+                                    <th>Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detail-pengiriman-body">
+                                <!-- Akan diisi otomatis oleh JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-success btn-approve-modal" data-tiket="">
+                        <i class="bi bi-check-circle"></i> Approve
+                    </button>
+                    <button class="btn btn-danger btn-reject-modal" data-tiket="">
+                        <i class="bi bi-x-circle"></i> Tolak
+                    </button>
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
-    @push('scripts')
-        <script>
-            function showRequestDetail(id) {
-                const requests = {
-                    "REQ001": {
-                        requester: "RO Batam",
-                        tanggal: "2025-08-25",
-                        status: "Menunggu Approval",
-                        items: [
-                            { nama: "Oli Mesin", deskripsi: "Pelumas mesin motor", jumlah: 50, keterangan: "Urgent" },
-                            { nama: "Filter Udara", deskripsi: "Filter udara standar", jumlah: 30, keterangan: "Stok menipis" },
-                            { nama: "Busi", deskripsi: "Busi NGK", jumlah: 100, keterangan: "-" },
-                        ]
-                    }
-                };
+@push('scripts')
+<script>
+    // Filter pencarian
+    document.getElementById('searchFilter')?.addEventListener('keyup', function () {
+        const filter = this.value.toLowerCase();
+        document.querySelectorAll('tbody tr').forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(filter) ? '' : 'none';
+        });
+    });
 
-                let req = requests[id];
-                if (req) {
-                    document.getElementById("detailReqId").innerText = id;
-                    document.getElementById("detailRequester").innerText = req.requester;
-                    document.getElementById("detailTanggal").innerText = req.tanggal;
-                    document.getElementById("detailStatus").innerText = req.status;
+    // Isi modal saat tombol "Detail" diklik
+    document.querySelectorAll('.btn-detail').forEach(button => {
+        button.addEventListener('click', function () {
+            const tiket = this.dataset.tiket;
+            const requester = this.dataset.requester;
+            const tanggal = this.dataset.tanggal;
 
-                    let itemsHtml = "";
-                    req.items.forEach((item, index) => {
-                        itemsHtml += `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${item.nama}</td>
-                        <td>${item.deskripsi}</td>
-                        <td>${item.jumlah}</td>
-                        <td>${item.keterangan}</td>
-                    </tr>
-                `;
+            // Isi header modal
+            document.getElementById('modal-tiket-display').textContent = tiket;
+            document.getElementById('modal-requester-display').textContent = requester;
+            document.getElementById('modal-tanggal-display').textContent = tanggal;
+
+            // Reset isi tabel
+            document.getElementById('detail-request-body').innerHTML = '<tr><td colspan="5" class="text-center">Memuat data...</td></tr>';
+            document.getElementById('detail-pengiriman-body').innerHTML = '<tr><td colspan="7" class="text-center">Memuat data...</td></tr>';
+
+            // Ambil data dari API
+            fetch(`/requestbarang/${tiket}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Isi data request
+                    const requestTable = document.getElementById('detail-request-body');
+                    requestTable.innerHTML = '';
+                    data.details.forEach((item, index) => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${index + 1}</td>
+                            <td>${item.nama}</td>
+                            <td>${item.deskripsi || '-'}</td>
+                            <td>${item.jumlah}</td>
+                            <td>${item.keterangan || '-'}</td>
+                        `;
+                        requestTable.appendChild(tr);
                     });
-                    document.getElementById("detailItems").innerHTML = itemsHtml;
-                }
 
-                let modal = new bootstrap.Modal(document.getElementById('requestDetailModal'));
-                modal.show();
-            }
+                    // Isi data pengiriman
+                    if (data.pengiriman && data.pengiriman.details) {
+                        const pengirimanTable = document.getElementById('detail-pengiriman-body');
+                        pengirimanTable.innerHTML = '';
+                        data.pengiriman.details.forEach((item, index) => {
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td>${index + 1}</td>
+                                <td>${item.nama_item}</td>
+                                <td>${item.merk || '-'}</td>
+                                <td>${item.sn || '-'}</td>
+                                <td>${item.tipe || '-'}</td>
+                                <td>${item.jumlah}</td>
+                                <td>${item.keterangan || '-'}</td>
+                            `;
+                            pengirimanTable.appendChild(tr);
+                        });
+                    } else {
+                        document.getElementById('detail-pengiriman-body').innerHTML = '<tr><td colspan="7" class="text-center">Belum ada data pengiriman.</td></tr>';
+                    }
 
-            function approveRequest() {
-                document.getElementById("detailStatus").innerText = "Disetujui";
-                document.getElementById("detailStatus").className = "badge bg-success";
-                alert("Request berhasil disetujui!");
-            }
+                    // Set data-tiket untuk tombol approve/tolak
+                    document.querySelector('.btn-approve-modal').dataset.tiket = tiket;
+                    document.querySelector('.btn-reject-modal').dataset.tiket = tiket;
 
-            function rejectRequest() {
-                let alasan = prompt("Masukkan alasan penolakan request:");
-                if (alasan && alasan.trim() !== "") {
-                    document.getElementById("detailStatus").innerText = "Ditolak";
-                    document.getElementById("detailStatus").className = "badge bg-danger";
-                    alert("Request ditolak dengan alasan: " + alasan);
+                    // Buka modal
+                    const modal = new bootstrap.Modal(document.getElementById('modalDetail'));
+                    modal.show();
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                    alert('Gagal memuat detail request.');
+                });
+        });
+    });
+
+    // Approve request
+    document.querySelector('.btn-approve-modal').addEventListener('click', function () {
+        const tiket = this.dataset.tiket;
+
+        if (confirm('Apakah Anda yakin ingin menyetujui request ini?')) {
+            fetch(`/superadmin/request/${tiket}/approve`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Request berhasil disetujui!');
+                    location.reload();
                 } else {
-                    alert("Penolakan dibatalkan. Alasan wajib diisi!");
+                    alert('Gagal menyetujui request: ' + data.message);
                 }
-            }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                alert('Terjadi kesalahan teknis.');
+            });
+        }
+    });
 
-        </script>
-    @endpush
+    // Reject request
+    document.querySelector('.btn-reject-modal').addEventListener('click', function () {
+        const tiket = this.dataset.tiket;
+        const reason = prompt('Masukkan alasan penolakan:');
+
+        if (reason) {
+            fetch(`/superadmin/request/${tiket}/reject`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ catatan: reason })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Request berhasil ditolak!');
+                    location.reload();
+                } else {
+                    alert('Gagal menolak request: ' + data.message);
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                alert('Terjadi kesalahan teknis.');
+            });
+        }
+    });
+</script>
+@endpush

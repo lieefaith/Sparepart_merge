@@ -315,36 +315,56 @@ class SparepartController extends Controller
     }
 
 
-    public function showDetail($tiket_sparepart)
-    {
-        $list = ListBarang::with(['details', 'jenisBarang', 'tipeBarang'])
-            ->where('tiket_sparepart', $tiket_sparepart)
-            ->firstOrFail();
+public function showDetail(Request $request, $tiket_sparepart)
+{
+    $list = ListBarang::with(['jenisBarang', 'tipeBarang'])
+        ->where('tiket_sparepart', $tiket_sparepart)
+        ->firstOrFail();
 
-        return response()->json([
-            'success' => true,
-            'id'      => $list->tiket_sparepart,
-            'tanggal' => \Carbon\Carbon::parse($list->tanggal)->format('d F Y'),
-            'type'       => $list->tipeBarang->nama ?? '-',
-            'jenis'      => $list->jenisBarang->nama ?? '-',
-            'items'   => $list->details->map(function ($d) {
-                return [
-                    'id'     => $d->id,
-                    'serial'     => $d->serial_number,
-                    'status'     => $d->status,
-                    'harga'      => $d->harga,
-                    'vendor'     => $d->vendor->nama ?? '-',
-                    'vendor_id'  => $d->vendor_id ?? '-',
-                    'quantity'   => $d->quantity,
-                    'spk'        => $d->spk,
-                    'pic'        => $d->pic,
-                    'department' => $d->department,
-                    'keterangan' => $d->keterangan,
-                    'tanggal' => \Carbon\Carbon::parse($d->tanggal)->format('Y-m-d')
-                ];
-            }),
-        ]);
+    // Ambil detail berdasarkan filter
+    $detailsQuery = $list->details()->newQuery();
+
+    if ($request->filled('status')) {
+        $detailsQuery->where('status', $request->status);
     }
+
+    if ($request->filled('tanggal_mulai') && $request->filled('tanggal_berakhir')) {
+        $detailsQuery->whereBetween('tanggal', [$request->tanggal_mulai, $request->tanggal_berakhir]);
+    }
+
+    // Tambahan filter lain jika diperlukan (misalnya vendor_id, department, dsb.)
+    if ($request->filled('vendor_id')) {
+        $detailsQuery->where('vendor_id', $request->vendor_id);
+    }
+
+    $filteredDetails = $detailsQuery->with('vendor')->get();
+
+    return response()->json([
+        'success' => true,
+        'id'      => $list->tiket_sparepart,
+        'tanggal' => \Carbon\Carbon::parse($list->tanggal)->format('d F Y'),
+        'type'    => $list->tipeBarang->nama ?? '-',
+        'jenis'   => $list->jenisBarang->nama ?? '-',
+        'items'   => $filteredDetails->map(function ($d) {
+            return [
+                'id'         => $d->id,
+                'serial'     => $d->serial_number,
+                'status'     => $d->status,
+                'harga'      => $d->harga,
+                'vendor'     => $d->vendor->nama ?? '-',
+                'vendor_id'  => $d->vendor_id ?? '-',
+                'quantity'   => $d->quantity,
+                'spk'        => $d->spk,
+                'pic'        => $d->pic,
+                'department' => $d->department,
+                'keterangan' => $d->keterangan,
+                'tanggal'    => \Carbon\Carbon::parse($d->tanggal)->format('Y-m-d')
+            ];
+        }),
+    ]);
+}
+
+
 
     public function destroy(Request $request, $id)
     {

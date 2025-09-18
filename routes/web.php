@@ -12,6 +12,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\KepalaROController;
 use App\Http\Controllers\DataController;
 use App\Http\Controllers\PengirimanController;
+use App\Http\Controllers\UserController;
 
 
 
@@ -53,7 +54,6 @@ Route::middleware(['auth'])->group(function () {
 
 // =====================
 // SUPERADMIN (role:1)
-// =====================
 Route::middleware(['auth', 'role:1'])
     ->prefix('superadmin')
     ->name('superadmin.')
@@ -61,9 +61,16 @@ Route::middleware(['auth', 'role:1'])
     ->group(function () {
         Route::get('/dashboard', 'dashboard')->name('dashboard');
         Route::get('/request', 'requestIndex')->name('request.index');
+        Route::post('/pengiriman', [PengirimanController::class, 'store'])->name('pengiriman.store');
+
+        // ✅ Tambahkan ini!
+        Route::post('/request/{tiket}/approve', 'approveRequest')->name('request.approve');
+        Route::post('/request/{tiket}/reject', 'rejectRequest')->name('request.reject');
+
         Route::get('/sparepart', [SparepartController::class, 'indexAdmin'])->name('sparepart.index');
         Route::get('/sparepart/{tiket_sparepart}/detail', [SparepartController::class, 'showDetail'])->name('sparepart.detail');
         Route::get('/history', 'historyIndex')->name('history.index');
+        Route::get('/history/{tiket}/api', 'historyDetailApi')->name('history.api');
     });
 
 
@@ -107,8 +114,20 @@ Route::middleware(['auth', 'role:3'])
         Route::get('/sparepart', [SparepartController::class, 'index'])->name('sparepart.index');
         Route::get('/sparepart/{tiket_sparepart}/detail', [SparepartController::class, 'showDetail'])->name('sparepart.detail');
 
+         Route::get('/datauser', [UserController::class, 'index'])->name('user.index');
+        Route::post('/datauser/store', [UserController::class, 'store'])->name('user.store');
+        Route::get('/datauser/{id}/edit', [UserController::class, 'edit'])->name('user.edit');
+        Route::put('/datauser/{id}', [UserController::class, 'update'])->name('user.update');
+        Route::delete('/datauser/{id}', [UserController::class, 'destroy'])->name('user.destroy');
+
         Route::get('/history', 'historyIndex')->name('history.index');
-        Route::get('/history/{id}', 'historyDetail')->name('history.detail');
+        Route::get('/history/{tiket}/detail', 'historyDetail')->name('history.detail');
+        Route::get('/history/{tiket}/api', [KepalaGudangController::class, 'historyDetailApi'])
+            ->name('kepalagudang.history.api');
+        Route::post('/request/{tiket}/approve', [KepalaGudangController::class, 'approveGudang'])
+            ->name('kepalagudang.request.approve');
+        Route::post('/request/{tiket}/reject', [KepalaGudangController::class, 'rejectGudang'])
+            ->name('kepalagudang.request.reject');
 
         Route::get('/profile', fn() => view('kepalagudang.profile'))->name('profile');
 

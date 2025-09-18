@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Permintaan;
+use App\Models\Pengiriman;
 use Illuminate\Http\Request;
 
 class KepalaGudangController extends Controller
@@ -38,11 +39,51 @@ class KepalaGudangController extends Controller
 
     public function historyIndex()
     {
-        return view('kepalagudang.history');
+        $requests = Permintaan::with(['user', 'details'])
+            ->where('status_gudang', '!=', 'pending') // ✅ Hanya yang sudah di-approve/ditolak
+            ->orderBy('tanggal_permintaan', 'desc')
+            ->get();
+
+        return view('kepalagudang.history', compact('requests'));
     }
 
-    public function historyDetail($id)
+    public function historyDetailApi($tiket)
     {
-        // Akan kita isi nanti jika diperlukan
+        $permintaan = Permintaan::with(['user', 'details'])
+            ->where('tiket', $tiket)
+            ->firstOrFail();
+
+        $pengiriman = Pengiriman::with('details')
+            ->where('tiket_permintaan', $tiket)
+            ->first();
+
+        return response()->json([
+            'permintaan' => $permintaan,
+            'pengiriman' => $pengiriman,
+        ]);
     }
+
+    public function approveGudang($tiket)
+    {
+        $permintaan = Permintaan::where('tiket', $tiket)->firstOrFail();
+        $permintaan->update([
+            'status_gudang' => 'approved',
+            'status' => 'diterima', // opsional — untuk konsistensi global
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function rejectGudang($tiket)
+    {
+        $permintaan = Permintaan::where('tiket', $tiket)->firstOrFail();
+        $permintaan->update([
+            'status_gudang' => 'rejected',
+            'status' => 'ditolak', // opsional — untuk konsistensi global
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
+
 }

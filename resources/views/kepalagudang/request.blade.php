@@ -58,7 +58,11 @@
                                 <td>{{ $req->user->name ?? 'User' }}</td>
                                 <td>{{ \Illuminate\Support\Carbon::parse($req->tanggal_permintaan)->translatedFormat('d M Y') }}
                                 </td>
-                                <td><span class="badge bg-success">Disetujui</span></td>
+                                <td>
+                                    <span class="badge bg-{{ $req->status_gudang == 'approved' ? 'success' : 'warning' }}">
+                                        {{ $req->status_gudang == 'approved' ? 'Disetujui' : 'Pending' }}
+                                    </span>
+                                </td>
                                 <td class="action-buttons">
                                     <button class="btn btn-success btn-sm btn-terima" data-tiket="{{ $req->tiket }}"
                                         data-requester="{{ $req->user->name ?? 'User' }}"
@@ -272,26 +276,26 @@
             const nomorBaru = tbody.children.length + 1;
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                    <td>${nomorBaru}</td>
-                    <td><input type="text" class="form-control" placeholder="Nama Item" required></td>
-                    <td><input type="text" class="form-control" placeholder="Merk"></td>
-                    <td><input type="text" class="form-control" placeholder="Serial Number"></td>
-                    <td><input type="text" class="form-control" placeholder="Tipe"></td>
-                    <td><input type="number" class="form-control" value="1" min="1" required></td>
-                    <td>
-                        <select class="form-control">
-                            <option value="">Pilih Keterangan</option>
-                            <option value="Baru">Baru</option>
-                            <option value="Bekas">Bekas</option>
-                            <option value="Dipakai">Dipakai</option>
-                        </select>
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-danger btn-sm" onclick="hapusBaris(this)">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </td>
-                `;
+                        <td>${nomorBaru}</td>
+                        <td><input type="text" class="form-control" placeholder="Nama Item" required></td>
+                        <td><input type="text" class="form-control" placeholder="Merk"></td>
+                        <td><input type="text" class="form-control" placeholder="Serial Number"></td>
+                        <td><input type="text" class="form-control" placeholder="Tipe"></td>
+                        <td><input type="number" class="form-control" value="1" min="1" required></td>
+                        <td>
+                            <select class="form-control">
+                                <option value="">Pilih Keterangan</option>
+                                <option value="Baru">Baru</option>
+                                <option value="Bekas">Bekas</option>
+                                <option value="Dipakai">Dipakai</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="hapusBaris(this)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    `;
             tbody.appendChild(tr);
         }
 
@@ -342,12 +346,12 @@
                             data.details.forEach((item, index) => {
                                 const tr = document.createElement('tr');
                                 tr.innerHTML = `
-                                <td>${index + 1}</td>
-                                <td>${item.nama || '-'}</td>
-                                <td>${item.deskripsi || '-'}</td>
-                                <td>${item.jumlah}</td>
-                                <td>${item.keterangan || '-'}</td>
-                            `;
+                                    <td>${index + 1}</td>
+                                    <td>${item.nama || '-'}</td>
+                                    <td>${item.deskripsi || '-'}</td>
+                                    <td>${item.jumlah}</td>
+                                    <td>${item.keterangan || '-'}</td>
+                                `;
                                 detailBody.appendChild(tr);
                             });
                         } else {
