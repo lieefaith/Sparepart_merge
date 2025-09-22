@@ -85,7 +85,7 @@
                         @elseif($req->status_super_admin == 'rejected') bg-danger
                         @else bg-secondary
                         @endif">
-                                            {{ $req->status_super_admin == 'approved' ? 'Diterima' : ($req->status_super_admin == 'rejected' ? 'Ditolak' : 'Unknown') }}
+                                            {{ $req->status_super_admin == 'approved' ? 'Diterima' : ($req->status_super_admin == 'rejected' ? 'Ditolak' : 'pending') }}
                                         </span>
                                     </td>
                                     <td>{{ \Carbon\Carbon::parse($req->tanggal_permintaan)->format('Y-m-d') }}</td>

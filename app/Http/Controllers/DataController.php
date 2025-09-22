@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\JenisBarang;
 use App\Models\TipeBarang;
 use App\Models\Vendor;
+use App\Models\Region;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -16,6 +18,7 @@ class DataController extends Controller
             'jenis' => JenisBarang::all(),
             'tipe' => TipeBarang::all(),
             'vendor' => Vendor::all(),
+            'region' => Region::all(),
         ]);
     }
 
@@ -83,12 +86,48 @@ class DataController extends Controller
         return redirect()->back()->with('success', 'Tipe barang berhasil diupdate.');
     }
 
-
     public function destroyTipe($id)
     {
         TipeBarang::destroy($id);
         return redirect()->back()->with('success', 'Tipe barang berhasil dihapus.');
     }
+    // === Region ===
+    public function storeRegion(Request $request)
+    {
+        $request->validate([
+            'nama_region' => 'required|string|max:255',
+            'kode_region' => 'required|string|max:255|unique:region,kode_region',
+        ]);
+        
+        Region::create($request->only('nama_region', 'kode_region'));
+
+        return redirect()->back()->with('success', 'T\Region berhasil ditambahkan.');
+    }
+
+    public function updateRegion(Request $request, $id)
+    {
+         $request->validate([
+        'nama_region' => 'required|string|max:255',
+        'kode_region' => [
+            'required',
+            'string',
+            'max:255',
+            Rule::unique('region', 'kode_region')->ignore($id),
+        ],
+    ]);
+
+        $region = Region::findOrFail($id);
+        $region->update($request->only('nama_region', 'kode_region'));
+
+        return redirect()->back()->with('success', 'Region berhasil diupdate.');
+    }
+
+        public function destroyRegion($id)
+    {
+        Region::destroy($id);
+        return redirect()->back()->with('success', 'Region berhasil dihapus.');
+    }
+
 
     // === VENDOR ===
     public function storeVendor(Request $request)

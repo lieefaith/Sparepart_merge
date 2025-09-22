@@ -155,6 +155,12 @@ Route::middleware(['auth', 'role:3'])
         Route::put('/data/vendor/{id}', [DataController::class, 'updateVendor'])->name('vendor.update');
         Route::delete('/data/vendor/{id}', [DataController::class, 'destroyVendor'])->name('vendor.destroy');
 
+
+        // Region
+        Route::post('/data/region', [DataController::class, 'storeRegion'])->name('region.store');
+        Route::put('/data/region/{id}', [DataController::class, 'updateRegion'])->name('region.update');
+        Route::delete('/data/region/{id}', [DataController::class, 'destroyRegion'])->name('region.destroy');
+        
         // 🔥 Baru: Simpan data pengiriman
         Route::post('/pengiriman', [PengirimanController::class, 'store'])->name('pengiriman.store');
     });

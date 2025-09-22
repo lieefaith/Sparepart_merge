@@ -25,4 +25,9 @@ class Region extends Model
     {
         return $this->hasMany(ListBarang::class, 'kode_region', 'kode_region');
     }
+
+     public function users()
+    {
+        return $this->belongsTo(User::class, 'region');
+    }
 }

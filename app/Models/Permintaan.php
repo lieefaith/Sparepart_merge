@@ -26,6 +26,17 @@ class Permintaan extends Model
     'approved_by_admin',
     'approved_by_super_admin',
     ];
+     protected $casts = [
+        'status' => 'string',
+        'status_ro' => 'string',
+        'status_gudang' => 'string',
+        'status_admin' => 'string',
+        'status_super_admin' => 'string',
+        'approved_by_ro' => 'integer',
+        'approved_by_gudang' => 'integer',
+        'approved_by_admin' => 'integer',
+        'approved_by_super_admin' => 'integer',
+    ];
 
     public $timestamps = false;
 
@@ -73,4 +84,9 @@ class Permintaan extends Model
     {
         return $this->hasOne(HistoriPermintaan::class, 'tiket', 'tiket');
     }
+    public function pengiriman()
+{
+    return $this->hasOne(\App\Models\Pengiriman::class, 'tiket_permintaan', 'tiket');
+}
+
 }

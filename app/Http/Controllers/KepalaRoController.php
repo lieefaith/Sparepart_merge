@@ -15,6 +15,7 @@ class KepalaROController extends Controller
 
         $requests = Permintaan::with(['user', 'details'])
             ->where('status', 'pending')
+            ->where('status_ro', '!=', 'approved')
             ->whereHas('user', function($q) use ($user) {
                 $q->where('region', $user->region); // filter berdasarkan region
             })
@@ -34,7 +35,7 @@ class KepalaROController extends Controller
             $q->where('region', $user->region);
         });
 
-    // Filter status
+    // Filter 
     if ($request->filled('status') && $request->status !== 'all') {
         $query->where('status', $request->status);
     }
@@ -63,6 +64,7 @@ class KepalaROController extends Controller
         ->whereHas('user', function($q) use ($user) {
             $q->where('region', $user->region);
         })
+        ->where('status_ro', 'pending')
         ->firstOrFail();
 
     // ✅ Update status RO & status global
@@ -72,9 +74,10 @@ class KepalaROController extends Controller
         'status' => 'pending', // Tetap pending, karena belum sampai ke Super Admin
     ]);
 
-    return redirect()->back()->with('success', 'Permintaan disetujui!');
+    return redirect()->back()->with('success', 'Permintaan disetujui dan diteruskan!');
 }
 
+// Reject permintaan
 public function reject($id)
 {
     $user = Auth::user();
@@ -83,14 +86,14 @@ public function reject($id)
         ->whereHas('user', function($q) use ($user) {
             $q->where('region', $user->region);
         })
+        ->where('status_ro', 'pending')
         ->firstOrFail();
 
     // ✅ Update status RO & status global
     $request->update([
         'status_ro' => 'rejected',
         'catatan_ro' => $request->catatan ?? 'Ditolak oleh Kepala RO',
-        'status' => 'ditolak by: Kepala RO',
-    ]);
+        ]);
 
     return redirect()->back()->with('success', 'Permintaan ditolak!');
 }

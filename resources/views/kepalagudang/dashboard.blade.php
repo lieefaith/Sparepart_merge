@@ -5,7 +5,6 @@
 @endpush
 
 @section('content')
-    <!-- Header (judul + tanggal) -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="fw-bold">Dashboard Kepala Gudang</h3>
         <span class="badge badge-date"><i class="bi bi-calendar me-1"></i>
@@ -13,14 +12,13 @@
         </span>
     </div>
 
-    <!-- Stats Cards -->
     <div class="row g-4 mb-4">
         <div class="col-xl-3 col-md-6">
             <div class="dashboard-card p-4">
                 <div class="card-icon bg-primary bg-opacity-10 text-primary">
                     <i class="bi bi-box-arrow-in-down"></i>
                 </div>
-                <h4 class="stats-number">25</h4>
+                <h4 class="stats-number">{{ $totalMasuk ?? 0 }}</h4>
                 <p class="stats-title">Barang Masuk</p>
             </div>
         </div>
@@ -29,17 +27,17 @@
                 <div class="card-icon bg-danger bg-opacity-10 text-danger">
                     <i class="bi bi-box-arrow-up"></i>
                 </div>
-                <h4 class="stats-number">10</h4>
+                <h4 class="stats-number">15</h4>
                 <p class="stats-title">Barang Keluar</p>
             </div>
         </div>
         <div class="col-xl-3 col-md-6">
             <div class="dashboard-card p-4">
                 <div class="card-icon bg-success bg-opacity-10 text-success">
-                    <i class="bi bi-tools"></i>
+                    <i class="bi bi-hourglass-split"></i>
                 </div>
-                <h4 class="stats-number">156</h4>
-                <p class="stats-title">Total Sparepart</p>
+                <h4 class="stats-number">1</h4>
+                <p class="stats-title">Pending</p>
             </div>
         </div>
         <div class="col-xl-3 col-md-6">
@@ -47,13 +45,12 @@
                 <div class="card-icon bg-warning bg-opacity-10 text-warning">
                     <i class="bi bi-clock-history"></i>
                 </div>
-                <h4 class="stats-number">42</h4>
+                <h4 class="stats-number">{{ ($totalMasuk ?? 0) + 3 }}</h4>
                 <p class="stats-title">Transaksi Hari Ini</p>
             </div>
         </div>
     </div>
 
-    <!-- Recent Activity (Masuk & Keluar) -->
     <div class="row">
         <div class="col-md-6">
             <div class="table-container">
@@ -66,36 +63,31 @@
                                 <th>Barang</th>
                                 <th>Jumlah</th>
                                 <th>Tanggal</th>
-                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td><span class="badge bg-primary">IN001</span></td>
-                                <td>Filter Oli</td>
-                                <td>30</td>
-                                <td>2025-08-28</td>
-                                <td><span class="badge bg-success">Selesai</span></td>
-                            </tr>
-                            <tr>
-                                <td><span class="badge bg-primary">IN002</span></td>
-                                <td>Kampas Rem</td>
-                                <td>25</td>
-                                <td>2025-08-27</td>
-                                <td><span class="badge bg-success">Selesai</span></td>
-                            </tr>
-                            <tr>
-                                <td><span class="badge bg-primary">IN003</span></td>
-                                <td>Busi</td>
-                                <td>50</td>
-                                <td>2025-08-27</td>
-                                <td><span class="badge bg-warning">Proses</span></td>
-                            </tr>
+                            @forelse($detail as $index => $d)
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $d->jenis_nama ?? (optional($d->jenis)->nama ?? '-') }}
+                                        {{ $d->tipe_nama ?? (optional($d->tipe)->nama ?? '-') }}</td>
+                                    <td>{{ $d->total_qty }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($d->tanggal)->format('d M Y') }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted py-4">
+                                        <i class="bi bi-inbox display-4 d-block mb-2"></i>
+                                        Tidak ada data sparepart
+                                    </td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
                 <div class="d-flex justify-content-end mt-3">
-                    <a href="#" class="btn btn-sm btn-outline-primary">Lihat Semua <i class="bi bi-arrow-right"></i></a>
+                    <a href="{{ route('kepalagudang.sparepart.index') }}" class="btn btn-sm btn-outline-primary">Lihat Semua
+                        <i class="bi bi-arrow-right"></i></a>
                 </div>
             </div>
         </div>
@@ -111,36 +103,33 @@
                                 <th>Barang</th>
                                 <th>Jumlah</th>
                                 <th>Tanggal</th>
-                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td><span class="badge bg-danger">OUT001</span></td>
-                                <td>Kampas Rem</td>
-                                <td>15</td>
-                                <td>2025-08-30</td>
-                                <td><span class="badge bg-success">Terkirim</span></td>
+                                <td><span class="badge bg-danger">HIST003</span></td>
+                                <td>SFP+</td>
+                                <td>8</td>
+                                <td>2025-09-19</td>
                             </tr>
                             <tr>
-                                <td><span class="badge bg-danger">OUT002</span></td>
-                                <td>Filter Oli</td>
-                                <td>20</td>
-                                <td>2025-08-29</td>
-                                <td><span class="badge bg-warning">Pending</span></td>
+                                <td><span class="badge bg-danger">HIST002</span></td>
+                                <td>SFP</td>
+                                <td>7</td>
+                                <td>2025-09-19</td>
                             </tr>
                             <tr>
-                                <td><span class="badge bg-danger">OUT003</span></td>
-                                <td>Oli Mesin</td>
-                                <td>35</td>
-                                <td>2025-08-29</td>
-                                <td><span class="badge bg-success">Terkirim</span></td>
+                                <td><span class="badge bg-danger">HIST001</span></td>
+                                <td>DUMMY</td>
+                                <td>5</td>
+                                <td>2025-09-19</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
                 <div class="d-flex justify-content-end mt-3">
-                    <a href="#" class="btn btn-sm btn-outline-primary">Lihat Semua <i class="bi bi-arrow-right"></i></a>
+                    <a href="#" class="btn btn-sm btn-outline-primary">Lihat Semua <i
+                            class="bi bi-arrow-right"></i></a>
                 </div>
             </div>
         </div>
@@ -151,7 +140,11 @@
     <script>
         function updateDate() {
             const now = new Date();
-            const options = { day: 'numeric', month: 'long', year: 'numeric' };
+            const options = {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            };
             const formattedDate = now.toLocaleDateString('id-ID', options);
             const el = document.getElementById('current-date');
             if (el) el.textContent = formattedDate;
@@ -161,7 +154,7 @@
 
         const navToggler = document.querySelector('.navbar-toggler');
         if (navToggler) {
-            navToggler.addEventListener('click', function () {
+            navToggler.addEventListener('click', function() {
                 const sb = document.querySelector('.sidebar');
                 if (sb) sb.classList.toggle('show');
             });

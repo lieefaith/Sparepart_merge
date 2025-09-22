@@ -22,4 +22,8 @@ class PermintaanDetail extends Model
     {
         return $this->belongsTo(Permintaan::class, 'tiket', 'tiket');
     }
+       public function list_barang()
+    {
+        return $this->belongsTo(ListBarang::class, 'list_barang_id');
+    }
 }

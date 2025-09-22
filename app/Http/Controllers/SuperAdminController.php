@@ -1,83 +1,286 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Auth;
 
-use App\Models\Permintaan;
-use App\Models\Pengiriman;
 use Illuminate\Http\Request;
+use App\Models\Permintaan;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use App\Models\DetailBarang;
 
 class SuperAdminController extends Controller
 {
-    public function dashboard()
+    public function dashboard(Request $request)
     {
-        return view('superadmin.dashboard');
+        $date = $request->input('date', Carbon::today()->toDateString());
+
+        $groups = DB::table('detail_barang')
+            ->select('jenis_id', 'tipe_id', DB::raw('SUM(quantity) as total_qty'), DB::raw('MAX(id) as latest_id'))
+            ->whereDate('tanggal', $date)
+            ->groupBy('jenis_id', 'tipe_id')
+            ->get();
+
+        if ($groups->isEmpty()) {
+            $detail = collect();
+            $totalPerDay = 0;
+            return view('superadmin.dashboard', compact('detail', 'date', 'totalPerDay'));
+        }
+
+        $latestIds = $groups->pluck('latest_id')->filter()->all();
+
+        $latestRecords = DetailBarang::with(['jenis', 'tipe'])
+            ->whereIn('id', $latestIds)
+            ->get()
+            ->keyBy('id');
+
+        $rows = $groups->map(function ($g) use ($latestRecords, $date) {
+            $r = $latestRecords->get($g->latest_id);
+
+
+            $jenis_nama = $r && $r->jenis ? $r->jenis->nama : null;
+            $tipe_nama = $r && $r->tipe ? $r->tipe->nama : null;
+
+            return (object) [
+                'id' => $g->latest_id,
+                'tiket_sparepart' => $r ? $r->tiket_sparepart : null,
+                'nama_barang' => $r ? $r->nama_barang : null,
+                'qty_record' => $r ? $r->quantity : 0,
+                'jenis' => $r ? $r->jenis : (object) ['id' => $g->jenis_id, 'nama' => $jenis_nama],
+                'tipe' => $r ? $r->tipe : (object) ['id' => $g->tipe_id, 'nama' => $tipe_nama],
+                'jenis_nama' => $jenis_nama,
+                'tipe_nama' => $tipe_nama,
+                'total_qty' => (int) $g->total_qty,
+                'tanggal' => $r ? $r->tanggal : $date,
+            ];
+        })->sortByDesc('tiket_sparepart')->values();
+
+        $detail = $rows;
+        $totalPerDay = $groups->sum('total_qty');
+        $totalMasuk = DetailBarang::whereDate('tanggal', $date)->sum('quantity');
+
+
+        return view('superadmin.dashboard', compact('detail', 'date', 'totalPerDay', 'totalMasuk'));
     }
 
     public function requestIndex()
     {
-        $requests = Permintaan::with(['user'])
-            ->where('status_gudang', 'approved') // ✅ Hanya yang sudah di-approve Kepala Gudang
-            ->where('status_super_admin', 'pending') // ✅ Masih menunggu approval Superadmin
-            ->orderBy('tanggal_permintaan', 'desc')
-            ->get();
+        $user = Auth::user();
+
+        if ($user->id === 15) {
+            // Admin (Mbak Inong)
+            $requests = Permintaan::with(['user', 'details'])
+                ->where('status_ro', 'approved')
+                ->where('status_gudang', 'approved')
+                ->where('status_admin', 'pending')
+                ->orderBy('tanggal_permintaan', 'desc')
+                ->paginate(10);
+        } elseif ($user->id === 16) {
+            // Super Admin (Mas Septian)
+            $requests = Permintaan::with(['user', 'details'])
+                ->where('status_admin', 'approved')
+                ->where('status_super_admin', 'pending')
+                ->orderBy('tanggal_permintaan', 'desc')
+                ->paginate(10);
+        } else {
+            $requests = new LengthAwarePaginator([], 0, 10);
+        }
 
         return view('superadmin.request', compact('requests'));
     }
 
-    public function approveRequest($tiket)
+
+    public function historyIndex(Request $request)
     {
-        $permintaan = Permintaan::where('tiket', $tiket)->firstOrFail();
-        $permintaan->update([
-            'status_super_admin' => 'approved',
-            'status' => 'diterima', // atau sesuai logika bisnis kamu
-            'approved_by_super_admin' => auth()->id(),
-        ]);
+        // Ambil semua history yang **bukan pending**
+        $query = Permintaan::with(['user', 'details', 'pengiriman'])
+            ->where(function ($q) {
+                $q->where('status_super_admin', 'approved')
+                    ->orWhere('status_super_admin', 'rejected')
+                    ->orWhere('status_barang', 'diproses')
+                    ->orWhere('status_gudang', 'dikirim');
+            })
+            ->orderBy('tanggal_permintaan', 'desc');
 
-        return response()->json(['success' => true, 'message' => 'Request disetujui']);
-    }
+        // Optional: support filter tanggal / status dari query string
+        if ($request->filled('dateFrom')) {
+            $query->whereDate('tanggal_permintaan', '>=', $request->input('dateFrom'));
+        }
+        if ($request->filled('dateTo')) {
+            $query->whereDate('tanggal_permintaan', '<=', $request->input('dateTo'));
+        }
+        if ($request->filled('statusFilter')) {
+            $status = $request->input('statusFilter');
+            $query->where(function ($q) use ($status) {
+                if ($status === 'diterima') {
+                    $q->where('status_super_admin', 'approved');
+                } elseif ($status === 'ditolak') {
+                    $q->where('status_super_admin', 'rejected');
+                } elseif ($status === 'diproses') {
+                    $q->where('status_barang', 'diproses');
+                } elseif ($status === 'dikirim') {
+                    $q->where('status_gudang', 'dikirim');
+                }
+            });
+        }
 
-    public function rejectRequest($tiket, Request $request)
-    {
-        $permintaan = Permintaan::where('tiket', $tiket)->firstOrFail();
-        $permintaan->update([
-            'status_super_admin' => 'rejected',
-            'status' => 'ditolak',
-            'catatan_super_admin' => $request->catatan,
-            'approved_by_super_admin' => auth()->id(),
-        ]);
-
-        return response()->json(['success' => true, 'message' => 'Request ditolak']);
-    }
-
-    public function historyIndex()
-    {
-        $requests = Permintaan::with(['user', 'details'])
-            ->where('status_super_admin', '!=', 'pending') // ✅ Hanya yang sudah di-approve/ditolak
-            ->orderBy('tanggal_permintaan', 'desc')
-            ->get();
+        $requests = $query->paginate(10)->withQueryString();
 
         return view('superadmin.history', compact('requests'));
     }
-
-    public function historyDetailApi($tiket)
+    public function approveRequest(Request $request)
     {
-        $permintaan = Permintaan::with(['user', 'details'])
-            ->where('tiket', $tiket)
-            ->first();
+        $tiket = $request->tiket;
+        $user = Auth::user();
 
-        if (!$permintaan) {
+        // User ID 15 -> Admin
+        if ($user->id === 15) {
+            $permintaan = Permintaan::where('tiket', $tiket)->firstOrFail();
+
+            if ($permintaan->status_ro !== 'approved' || $permintaan->status_gudang !== 'approved') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Permintaan belum disetujui oleh RO/Gudang.'
+                ], 400);
+            }
+
+            $permintaan->update([
+                'status_admin' => 'approved',
+                'approved_by_admin' => $user->id,
+                'catatan_admin' => $request->catatan ?? null,
+            ]);
+
             return response()->json([
-                'error' => 'Data permintaan tidak ditemukan'
-            ], 404);
+                'success' => true,
+                'message' => 'Permintaan disetujui oleh Admin (Mbak Inong).'
+            ]);
         }
 
-        $pengiriman = \App\Models\Pengiriman::with('details')
-            ->where('tiket_permintaan', $tiket)
-            ->first();
+        // User ID 16 -> Super Admin
+        if ($user->id === 16) {
+            $permintaan = Permintaan::where('tiket', $tiket)->firstOrFail();
+
+            if ($permintaan->status_admin !== 'approved') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Permintaan belum disetujui oleh Admin.'
+                ], 400);
+            }
+
+            $permintaan->update([
+                'status_super_admin' => 'approved',
+                'approved_by_super_admin' => $user->id,
+                'catatan_super_admin' => $request->catatan ?? null,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Permintaan disetujui final oleh Super Admin (Mas Septian).'
+            ]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+    }
+
+    public function finalApprove(Request $request)
+    {
+        $tiket = $request->tiket;
+        $user = Auth::user();
+
+        if ($user->id !== 16) {
+            return response()->json(['success' => false, 'message' => 'Hanya Mas Septian yang dapat menyetujui final.'], 403);
+        }
+
+        $permintaan = Permintaan::where('tiket', $tiket)->firstOrFail();
+
+        if ($permintaan->status_super_admin !== 'approved' || $permintaan->approved_by_super_admin !== 15) {
+            return response()->json(['success' => false, 'message' => 'Permintaan belum disetujui Mbak Inong.'], 400);
+        }
+
+        $permintaan->update([
+            'status_super_admin' => 'approved',
+            'approved_by_super_admin' => 16,
+            'catatan_super_admin' => $request->catatan ?? null,
+            'status_barang' => 'on_delivery' // bisa juga update status barang sekalian
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Permintaan final disetujui oleh Mas Septian. Barang siap dikirim.']);
+    }
+
+
+
+
+    public function reject(Request $request)
+    {
+        $tiket = $request->tiket;
+        $user = Auth::user();
+
+        // User ID 15 -> Admin
+        if ($user->id === 15) {
+            $permintaan = Permintaan::where('tiket', $tiket)->firstOrFail();
+
+            if ($permintaan->status_ro !== 'approved' || $permintaan->status_gudang !== 'approved') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Permintaan belum disetujui oleh RO/Gudang.'
+                ], 400);
+            }
+
+            $permintaan->update([
+                'status_admin' => 'rejected',
+                'approved_by_admin' => $user->id,
+                'catatan_admin' => $request->catatan ?? 'Ditolak oleh Admin (Mbak Inong)',
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Permintaan ditolak oleh Admin.'
+            ]);
+        }
+
+        // User ID 16 -> Super Admin
+        if ($user->id === 16) {
+            $permintaan = Permintaan::where('tiket', $tiket)->firstOrFail();
+
+            if ($permintaan->status_admin !== 'approved') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Permintaan belum disetujui oleh Admin.'
+                ], 400);
+            }
+
+            $permintaan->update([
+                'status_super_admin' => 'rejected',
+                'approved_by_super_admin' => $user->id,
+                'catatan_super_admin' => $request->catatan ?? 'Ditolak oleh Super Admin (Mas Septian)',
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Permintaan ditolak oleh Super Admin.'
+            ]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+    }
+    public function historyDetailApi($tiket)
+    {
+        $permintaan = Permintaan::with(['user', 'details', 'pengiriman.details'])
+            ->where('tiket', $tiket)
+            ->firstOrFail();
 
         return response()->json([
-            'permintaan' => $permintaan,
-            'pengiriman' => $pengiriman,
+            'permintaan' => [
+                'tiket' => $permintaan->tiket,
+                'user' => $permintaan->user,
+                'tanggal_permintaan' => $permintaan->tanggal_permintaan,
+                'details' => $permintaan->details,
+            ],
+            'pengiriman' => $permintaan->pengiriman ? [
+                'tanggal_transaksi' => $permintaan->pengiriman->tanggal_transaksi,
+                'details' => $permintaan->pengiriman->details
+            ] : null
         ]);
     }
 }
