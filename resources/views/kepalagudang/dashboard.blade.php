@@ -36,7 +36,7 @@
                 <div class="card-icon bg-success bg-opacity-10 text-success">
                     <i class="bi bi-hourglass-split"></i>
                 </div>
-                <h4 class="stats-number">1</h4>
+                <h4 class="stats-number">{{$totalPending ?? 0 }}</h4>
                 <p class="stats-title">Pending</p>
             </div>
         </div>

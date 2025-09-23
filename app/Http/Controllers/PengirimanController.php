@@ -52,22 +52,26 @@ class PengirimanController extends Controller
         try {
             // Simpan pengiriman
             $pengiriman = Pengiriman::create([
-                'tiket_pengiriman'   => $tiket,
-                'tiket_permintaan'   => $tiket,
-                'user_id'            => Auth::id(),
-                'tanggal_transaksi'  => $request->tanggal_pengiriman,
-                'status'             => 'dikirim',
-                'tanggal_perubahan'  => now(),
+                'tiket_pengiriman' => $tiket,
+                'tiket_permintaan' => $tiket,
+                'user_id' => Auth::id(),
+                'tanggal_transaksi' => $request->tanggal_pengiriman,
+                'status' => 'dikirim',
+                'tanggal_perubahan' => now(),
             ]);
 
             // Simpan detail
             foreach ($request->items as $item) {
                 PengirimanDetail::create([
                     'tiket_pengiriman' => $tiket,
-                    'nama_item'        => $item['nama_item'],
-                    'deskripsi'        => $item['deskripsi'] ?? null,
-                    'jumlah'           => $item['jumlah'],
-                    'keterangan'       => $item['keterangan'] ?? null,
+                    'nama' => $item['nama_item'], // ✅ pakai kolom yang bener
+                    'kategori' => $item['kategori'] ?? null,
+                    'merk' => $item['merk'] ?? null,
+                    'sn' => $item['sn'] ?? null,
+                    'tipe' => $item['tipe'] ?? null,
+                    'deskripsi' => $item['deskripsi'] ?? null,
+                    'jumlah' => $item['jumlah'],
+                    'keterangan' => $item['keterangan'] ?? null,
                 ]);
             }
 

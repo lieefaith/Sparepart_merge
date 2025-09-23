@@ -27,7 +27,7 @@
 
     <!-- Stats Cards -->
     <div class="row g-4 mb-4">
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-4 col-md-6">
             <div class="dashboard-card p-4">
                 <div class="card-icon bg-primary bg-opacity-10 text-primary">
                     <i class="bi bi-tools"></i>
@@ -36,31 +36,22 @@
                 <p class="stats-title">Total Sparepart</p>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-4 col-md-6">
             <div class="dashboard-card p-4">
                 <div class="card-icon bg-success bg-opacity-10 text-success">
                     <i class="bi bi-check-circle"></i>
                 </div>
-                <h4 class="stats-number">{{ $totalTersedia }}</h4>
-                <p class="stats-title">Tersedia</p>
+                <h4 class="stats-number">{{ $totalBaru }}</h4>
+                <p class="stats-title">Sparepart Baru</p>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-4 col-md-6">
             <div class="dashboard-card p-4">
                 <div class="card-icon bg-warning bg-opacity-10 text-warning">
-                    <i class="bi bi-clock-history"></i>
+                    <i class="bi bi-arrow-repeat"></i>
                 </div>
-                <h4 class="stats-number">{{ $totalDikirim }}</h4>
-                <p class="stats-title">Dikirim</p>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="dashboard-card p-4">
-                <div class="card-icon bg-danger bg-opacity-10 text-danger">
-                    <i class="bi bi-exclamation-circle"></i>
-                </div>
-                <h4 class="stats-number">{{ $totalHabis }}</h4>
-                <p class="stats-title">Habis</p>
+                <h4 class="stats-number">{{ $totalLama }}</h4>
+                <p class="stats-title">Sparepart Lama</p>
             </div>
         </div>
     </div>
@@ -86,9 +77,8 @@
                     <label for="statusFilter" class="form-label">Status Sparepart</label>
                     <select class="form-select" name="status" id="statusFilter">
                         <option value="">Semua Status</option>
-                        <option value="tersedia" {{ request('status') == 'tersedia' ? 'selected' : '' }}>Tersedia</option>
-                        <option value="habis" {{ request('status') == 'habis' ? 'selected' : '' }}>Habis</option>
-                        <option value="dikirim" {{ request('status') == 'dikirim' ? 'selected' : '' }}>Dikirim</option>
+                        <option value="sparepart baru" {{ request('status') == 'sparepart baru' ? 'selected' : '' }}>Sparepart Baru</option>
+                        <option value="sparepart lama" {{ request('status') == 'sparepart lama' ? 'selected' : '' }}>Sparepart Lama</option>
                     </select>
                 </div>
                 <div class="col-md-4">
@@ -139,12 +129,10 @@
                         <th>ID Sparepart</th>
                         <th>Jenis & Type</th>
                         <th>Quantity</th>
-                        @if ($filterStatus === 'habis')
-                            <th>Habis</th>
-                        @elseif ($filterStatus === 'dikirim')
-                            <th>Dikirim</th>
+                        @if ($filterStatus === 'sparepart lama')
+                            <th>Sparepart Lama</th>
                         @else
-                            <th>Tersedia</th>
+                            <th>Sparepart Baru</th>
                         @endif
                         <th>Kategori</th>
                         <th>Detail</th>
@@ -159,12 +147,10 @@
     {{ $barang->tipeBarang?->nama ?? '-' }}
 </td>
                             <td>{{ $barang->quantity }}</td>
-                            @if ($filterStatus === 'habis')
-                                <td>{{ $totalsPerTiket[$barang->tiket_sparepart]['habis'] ?? 0 }}</td>
-                            @elseif ($filterStatus === 'dikirim')
-                                <td>{{ $totalsPerTiket[$barang->tiket_sparepart]['dikirim'] ?? 0 }}</td>
+                            @if ($filterStatus === 'sparepart lama')
+                                <td>{{ $totalsPerTiket[$barang->tiket_sparepart]['sparepart lama'] ?? 0 }}</td>
                             @else
-                                <td>{{ $totalsPerTiket[$barang->tiket_sparepart]['tersedia'] ?? 0 }}</td>
+                                <td>{{ $totalsPerTiket[$barang->tiket_sparepart]['sparepart baru'] ?? 0 }}</td>
                             @endif
                             <td>{{ ucwords(str_replace('-', ' ', $barang->kategori)) }}</td>
                             <td>
@@ -352,11 +338,9 @@
                                 <select class="form-select @error('status') is-invalid @enderror" id="status"
                                     name="status" required>
                                     <option value="" selected>Pilih Status</option>
-                                    <option value="tersedia" {{ old('status') == 'tersedia' ? 'selected' : '' }}>Tersedia
+                                    <option value="sparepart baru" {{ old('status') == 'sparepart baru' ? 'selected' : '' }}>Sparepart Baru
                                     </option>
-                                    <option value="dikirim" {{ old('status') == 'dikirim' ? 'selected' : '' }}>Dikirim
-                                    </option>
-                                    <option value="habis" {{ old('status') == 'dikirim' ? 'selected' : '' }}>Habis
+                                    <option value="sparepart lama" {{ old('status') == 'sparepart lama' ? 'selected' : '' }}>Sparepart Lama
                                     </option>
                                 </select>
 
@@ -526,20 +510,15 @@
                             <div class="col-md-6">
                                 <label for="edit-status" class="form-label">Status</label>
                                 <select class="form-select" id="edit-status" name="status" required>
-                                    <option value="tersedia"
-                                        {{ old('status', $detail->first()->status ?? '') == 'tersedia' ? 'selected' : '' }}>
-                                        Tersedia
+                                    <option value="sparepart baru"
+                                        {{ old('status', $detail->first()->status ?? '') == 'sparepart baru' ? 'selected' : '' }}>
+                                        Sparepart Baru
                                     </option>
 
-                                    <option value="dikirim"
-                                        {{ old('status', $detail->first()->status ?? '') == 'dikirim' ? 'selected' : '' }}>
-                                        Dikirim
+                                    <option value="sparepart lama"
+                                        {{ old('status', $detail->first()->status ?? '') == 'sparepart lama' ? 'selected' : '' }}>
+                                        Sparepart Lama                                  
                                     </option>
-                                    <option value="habis"
-                                        {{ old('status', $detail->first()->status ?? '') == 'habis' ? 'selected' : '' }}>
-                                        Habis
-                                    </option>
-
                                 </select>
 
 
@@ -744,9 +723,8 @@
 
             data.items.forEach((item, i) => {
                 let statusClass = 'bg-secondary';
-                if (item.status === 'tersedia') statusClass = 'bg-success';
-                else if (item.status === 'habis') statusClass = 'bg-danger';
-                else if (item.status === 'dipesan' || item.status === 'dikirim') statusClass = 'bg-warning';
+                if (item.status === 'sparepart baru') statusClass = 'bg-success';
+                else if (item.status === 'sparepart lama') statusClass = 'bg-warning';
 
                 const idForBtn = item.id || '';
                 const dataAttrs = [
@@ -804,17 +782,17 @@
         }
 
         function showDetail(tiket_sparepart) {
-            fetch(`/kepalagudang/sparepart/${tiket_sparepart}/detail`)
-                .then(res => {
-                    if (!res.ok) throw new Error('Network response was not ok');
-                    return res.json();
-                })
-                .then(data => showTransaksiDetail(data))
-                .catch(err => {
-                    console.error('Fetch error:', err);
-                    showToast('Gagal mengambil detail!', 'danger');
-                });
-        }
+    fetch(`/kepalagudang/sparepart/${tiket_sparepart}/detail`)
+      .then(res => res.json())
+      .then(data => {
+          const status = document.getElementById('statusFilter') ? document.getElementById('statusFilter').value : '';
+          if (status) {
+              data.items = data.items.filter(item => (item.status || '').toString() === status.toString());
+          }
+          showTransaksiDetail(data);
+      })
+      .catch(err => { console.error(err); alert('Gagal mengambil detail!'); });
+}
         document.addEventListener('click', (e) => {
             const editBtn = e.target.closest('.btn-edit');
             console.log(editBtn)

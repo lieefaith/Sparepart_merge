@@ -59,11 +59,6 @@
         </div>
     </div>
 
-    <div class="d-flex justify-content-end mb-3">
-        <button class="btn btn-export">
-            <i class="bi bi-download me-1"></i> Export Data
-        </button>
-    </div>
 
     <div class="table-container">
         <div class="table-responsive">

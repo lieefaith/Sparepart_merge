@@ -258,7 +258,7 @@
                 </div>
                 <h3>{{ $user->name }}</h3>
                 <p class="mb-0">Sistem Manajemen Sparepart</p>
-                <p>Field Technician</p>
+                <p>{{ $user->bagian  }}</p>
             </div>
 
             <div class="profile-body">

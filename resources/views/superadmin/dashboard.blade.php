@@ -34,7 +34,13 @@
                 <div class="card-icon bg-success bg-opacity-10 text-success">
                     <i class="bi bi-hourglass-split"></i>
                 </div>
-                <h4 class="stats-number">1</h4>
+                @if(Auth::id() === 15)
+                <h4 class="stats-number">{{ $totalAdminPending ?? 0 }}</h4>
+                    @elseif(Auth::id() === 16)
+                <h4 class="stats-number">{{ $totalSuperadminPending ?? 0 }}</h4>
+                    @else
+                        <h4 class="stats-number">0</h4>
+                    @endif
                 <p class="stats-title">Pending</p>
             </div>
         </div>

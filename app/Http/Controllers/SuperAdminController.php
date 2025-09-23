@@ -59,9 +59,15 @@ class SuperAdminController extends Controller
         $detail = $rows;
         $totalPerDay = $groups->sum('total_qty');
         $totalMasuk = DetailBarang::whereDate('tanggal', $date)->sum('quantity');
+        $totalAdminPending = Permintaan::whereDate('tanggal_permintaan', $date)
+                          ->where('status_admin', 'pending')
+                          ->count();
+        $totalSuperadminPending = Permintaan::whereDate('tanggal_permintaan', $date)
+                          ->where('status_super_admin', 'pending')
+                          ->count();
 
 
-        return view('superadmin.dashboard', compact('detail', 'date', 'totalPerDay', 'totalMasuk'));
+        return view('superadmin.dashboard', compact('detail', 'date', 'totalPerDay', 'totalMasuk','totalAdminPending', 'totalSuperadminPending'));
     }
 
     public function requestIndex()

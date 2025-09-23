@@ -69,9 +69,8 @@ class SparepartController extends Controller
             ->groupBy('d.status')
             ->pluck('total_quantity', 'status');
 
-        $totalTersedia = $totalPerStatus->get('tersedia', 0);
-        $totalDikirim  = $totalPerStatus->get('dikirim', 0);
-        $totalHabis    = $totalPerStatus->get('habis', 0);
+        $totalBaru = $totalPerStatus->get('sparepart baru', 0);
+        $totalLama  = $totalPerStatus->get('sparepart lama', 0);
 
         $totalsPerTiket = [];
 
@@ -83,9 +82,8 @@ class SparepartController extends Controller
                 ->map(fn($items) => $items->sum('quantity'));
 
             $totalsPerTiket[$tiket] = [
-                'tersedia' => $totalPerStatus->get('tersedia', 0),
-                'dikirim'  => $totalPerStatus->get('dikirim', 0),
-                'habis'    => $totalPerStatus->get('habis', 0),
+                'sparepart baru' => $totalPerStatus->get('sparepart baru', 0),
+                'sparepart lama'  => $totalPerStatus->get('sparepart lama', 0),
             ];
         }
 
@@ -105,9 +103,8 @@ class SparepartController extends Controller
             'detail'         => $detail,
             'jenisSparepart' => $jenisSparepart,
             'totalQty'      => $totalQty,
-            'totalTersedia' => $totalTersedia,
-            'totalDikirim'  => $totalDikirim,
-            'totalHabis'    => $totalHabis,
+            'totalBaru' => $totalBaru,
+            'totalLama'  => $totalLama,
             'totalsPerTiket' => $totalsPerTiket,
             'filterJenis'   => $request->jenis,
             'filterStatus'  => $request->status,
@@ -184,9 +181,8 @@ class SparepartController extends Controller
                 ->map(fn($items) => $items->sum('quantity'));
 
             $totalsPerTiket[$tiket] = [
-                'tersedia' => $totalPerStatus->get('tersedia', 0),
-                'dikirim'  => $totalPerStatus->get('dikirim', 0),
-                'habis'    => $totalPerStatus->get('habis', 0),
+                'sparepart baru' => $totalPerStatus->get('sparepart baru', 0),
+                'sparepart lama'  => $totalPerStatus->get('sparepart lama', 0),
             ];
         }
 

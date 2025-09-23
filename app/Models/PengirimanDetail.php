@@ -10,7 +10,11 @@ class PengirimanDetail extends Model
 
     protected $fillable = [
         'tiket_pengiriman',
-        'nama_item',
+        'nama',
+        'kategori',
+        'merk',
+        'sn',
+        'tipe',
         'deskripsi',
         'jumlah',
         'keterangan',

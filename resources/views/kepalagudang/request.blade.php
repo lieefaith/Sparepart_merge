@@ -187,7 +187,6 @@
                             <thead class="table-primary">
                                 <tr>
                                     <th>No</th>
-                                    <th>Kategori</th>
                                     <th>Nama Item</th>
                                     <th>Deskripsi</th>
                                     <th>Jumlah Diminta</th>
@@ -397,36 +396,36 @@
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                    <td class="no-col">${nomorBaru}</td>
-                    <td class="kategori-col">
-                        <select class="form-control kategori-select" name="kategori">
-                            <option value="">Kategori</option>
-                            <option value="aset">Aset</option>
-                            <option value="non-aset">Non-Aset</option>
-                        </select>
-                    </td>
-                    <td class="nama-col">
-                        <select class="form-control nama-item-select" name="nama_item">
-                            <option value="">Pilih Nama</option>
-                        </select>
-                    </td>
-                    <td class="tipe-col">
-                        <select class="form-control tipe-select" name="tipe">
-                            <option value="">Pilih Tipe</option>
-                        </select>
-                    </td>
-                    <td class="merk-col"><input type="text" class="form-control" placeholder="Merk"></td>
-                    <td class="sn-col"><input type="text" class="form-control" placeholder="Nomor Serial"></td>
-                    <td class="jumlah-col"><input type="number" class="form-control" value="1" min="1" required></td>
-                    <td class="keterangan-col">
-                        <input type="text" class="form-control" name="keterangan" placeholder="Keterangan">
-                    </td>
-                    <td class="aksi-col">
-                        <button type="button" class="btn btn-danger btn-sm" onclick="hapusBaris(this)">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </td>
-                `;
+                            <td class="no-col">${nomorBaru}</td>
+                            <td class="kategori-col">
+                                <select class="form-control kategori-select" name="kategori">
+                                    <option value="">Kategori</option>
+                                    <option value="aset">Aset</option>
+                                    <option value="non-aset">Non-Aset</option>
+                                </select>
+                            </td>
+                            <td class="nama-col">
+                                <select class="form-control nama-item-select" name="nama_item">
+                                    <option value="">Pilih Nama</option>
+                                </select>
+                            </td>
+                            <td class="tipe-col">
+                                <select class="form-control tipe-select" name="tipe">
+                                    <option value="">Pilih Tipe</option>
+                                </select>
+                            </td>
+                            <td class="merk-col"><input type="text" class="form-control" placeholder="Merk"></td>
+                            <td class="sn-col"><input type="text" class="form-control" placeholder="Nomor Serial"></td>
+                            <td class="jumlah-col"><input type="number" class="form-control" value="1" min="1" required></td>
+                            <td class="keterangan-col">
+                                <input type="text" class="form-control" name="keterangan" placeholder="Keterangan">
+                            </td>
+                            <td class="aksi-col">
+                                <button type="button" class="btn btn-danger btn-sm" onclick="hapusBaris(this)">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        `;
             tbody.appendChild(tr);
 
             const newKategori = tr.querySelector('.kategori-select');
@@ -481,13 +480,12 @@
                     req.details.forEach((item, index) => {
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
-                                <td>${index + 1}</td>
-                                <td>${item.list_barang?.kategori || item.kategori || '-'}</td>
-                                <td>${item.nama_item || '-'}</td>
-                                <td>${item.deskripsi || '-'}</td>
-                                <td>${item.jumlah}</td>
-                                <td>${item.keterangan || '-'}</td>
-                            `;
+                                        <td>${index + 1}</td>
+                                        <td>${item.nama_item || '-'}</td>
+                                        <td>${item.deskripsi || '-'}</td>
+                                        <td>${item.jumlah}</td>
+                                        <td>${item.keterangan || '-'}</td>
+                                    `;
                         detailBody.appendChild(tr);
                     });
                 } else {
@@ -634,16 +632,17 @@
                     return response.json();
                 })
                 .then(data => {
+                    const msg = data.message || 'Terjadi kesalahan. Cek log server.';
                     if (data.success) {
-                        alert(data.message);
+                        alert(msg);
                         location.reload();
                     } else {
-                        alert('Gagal: ' + data.message);
+                        alert('Gagal: ' + msg);
                     }
                 })
                 .catch(err => {
-                    alert('Error: ' + err.message);
                     console.error('Fetch error:', err);
+                    alert('Terjadi kesalahan teknis. Cek koneksi atau refresh halaman.');
                 });
         }
         function rejectRequest() {
@@ -685,92 +684,6 @@
                     alert('Terjadi kesalahan teknis.');
                 });
         }
-        // Submit form pengiriman
-        document.getElementById('formPengiriman').addEventListener('submit', async function (e) {
-            e.preventDefault();
-
-            const formData = new FormData(this);
-            const items = [];
-            const rows = document.querySelectorAll('#tabelBarang tbody tr');
-
-            let valid = true;
-
-            for (const row of rows) {
-                const cells = row.cells;
-                const kategori = cells[1].querySelector('select').value;
-                const nama = cells[2].querySelector('select').value;
-                const merk = cells[3].querySelector('input').value.trim();
-                const sn = cells[4].querySelector('input').value.trim();
-                const tipe = cells[5].querySelector('select').value;
-                const jumlah = cells[6].querySelector('input').value.trim();
-                const keterangan = cells[7].querySelector('input').value.trim();
-
-                if (!kategori || !nama || !jumlah) {
-                    valid = false;
-                    continue;
-                }
-
-                if (kategori === 'aset') {
-                    if (!sn) {
-                        alert('Serial Number wajib diisi untuk barang bertipe Aset.');
-                        return;
-                    }
-
-                    try {
-                        const response = await fetch(`/requestbarang/api/cek-sn?sn=${encodeURIComponent(sn)}`);
-                        const result = await response.json();
-
-                        if (!result.exists) {
-                            alert(`Serial Number "${sn}" tidak ditemukan atau tidak tersedia.`);
-                            return;
-                        }
-                    } catch (err) {
-                        console.error('Gagal memeriksa Serial Number:', err);
-                        alert('Terjadi kesalahan saat memeriksa Serial Number. Coba lagi.');
-                        return;
-                    }
-                }
-
-                items.push({
-                    kategori,
-                    nama_item: namaText,
-                    merk,
-                    sn,
-                    tipe,
-                    jumlah: parseInt(jumlah),
-                    keterangan
-                });
-            }
-
-            if (!valid) {
-                alert('Semua kolom wajib diisi.');
-                return;
-            }
-
-            formData.append('items', JSON.stringify(items));
-
-            fetch("{{ route('kepalagudang.pengiriman.store') }}", {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalTerima'));
-                        modal.hide();
-                        location.reload();
-                    } else {
-                        alert('Gagal: ' + data.message);
-                    }
-                })
-                .catch(err => {
-                    console.error('Error:', err);
-                    alert('Terjadi kesalahan teknis saat mengirim data.');
-                });
-        });
+        
     </script>
 @endpush

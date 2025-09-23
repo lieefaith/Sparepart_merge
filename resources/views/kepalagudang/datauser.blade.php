@@ -74,7 +74,8 @@
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
                     <i class="bi bi-plus-circle me-1"></i> Tambah User
                 </button>
-                <a href="{{ route('kepalagudang.dashboard') }}" class="btn btn-outline-secondary">
+                <a href="{{ route('kepalagudang.data') }}" class="btn btn-outline-secondary">
+
                     <i class="bi bi-arrow-left me-1"></i> Kembali
                 </a>
             </div>
