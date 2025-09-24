@@ -114,7 +114,7 @@ Route::middleware(['auth', 'role:3'])
         Route::get('/sparepart', [SparepartController::class, 'index'])->name('sparepart.index');
         Route::get('/sparepart/{tiket_sparepart}/detail', [SparepartController::class, 'showDetail'])->name('sparepart.detail');
 
-         Route::get('/datauser', [UserController::class, 'index'])->name('user.index');
+        Route::get('/datauser', [UserController::class, 'index'])->name('user.index');
         Route::post('/datauser/store', [UserController::class, 'store'])->name('user.store');
         Route::get('/datauser/{id}/edit', [UserController::class, 'edit'])->name('user.edit');
         Route::put('/datauser/{id}', [UserController::class, 'update'])->name('user.update');
@@ -160,7 +160,7 @@ Route::middleware(['auth', 'role:3'])
         Route::post('/data/region', [DataController::class, 'storeRegion'])->name('region.store');
         Route::put('/data/region/{id}', [DataController::class, 'updateRegion'])->name('region.update');
         Route::delete('/data/region/{id}', [DataController::class, 'destroyRegion'])->name('region.destroy');
-        
+
         // 🔥 Baru: Simpan data pengiriman
         Route::post('/pengiriman', [PengirimanController::class, 'store'])->name('pengiriman.store');
     });
@@ -177,6 +177,13 @@ Route::middleware(['auth', 'role:4'])
         Route::get('/sparepart', [HomeController::class, 'jenisBarang'])->name('jenis.barang');
         Route::get('/jenis-barang', [PermintaanController::class, 'getJenis']);
         Route::get('/tipe-barang', [PermintaanController::class, 'getTipe']);
+
+        Route::get('/validasi', [UserController::class, 'validasiIndex'])->name('validasi.index');
+        Route::post('/validasi/{tiket}/terima', [UserController::class, 'terimaBarang'])->name('validasi.terima');
+
+        Route::get('/history', [UserController::class, 'historyIndex'])->name('history.index');
+
+
     });
 
 

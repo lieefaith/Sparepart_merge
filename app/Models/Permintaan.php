@@ -25,6 +25,10 @@ class Permintaan extends Model
     'approved_by_gudang',
     'approved_by_admin',
     'approved_by_super_admin',
+     'status_penerimaan',
+    'nomor_resi',
+    'foto_bukti_penerimaan',
+    'tanggal_penerimaan',
     ];
      protected $casts = [
         'status' => 'string',

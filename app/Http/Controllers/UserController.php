@@ -4,64 +4,68 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Support\Str;
+use App\Models\Permintaan;
+use App\Models\Pengiriman;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+
 
 class UserController extends Controller
 {
-        public function index(Request $request)
-{
-    // Mapping role => label
-    $roleLabels = [
-        '1' => 'Superadmin',
-        '2' => 'Regional Office Head',
-        '3' => 'Warehouse Head',
-        '4' => 'Field Technician',
-    ];
+    public function index(Request $request)
+    {
+        // Mapping role => label
+        $roleLabels = [
+            '1' => 'Superadmin',
+            '2' => 'Regional Office Head',
+            '3' => 'Warehouse Head',
+            '4' => 'Field Technician',
+        ];
 
-    // Ambil role yang ada di DB
-    $rolesFromDb = User::select('role')->distinct()->pluck('role')->toArray();
+        // Ambil role yang ada di DB
+        $rolesFromDb = User::select('role')->distinct()->pluck('role')->toArray();
 
-    // Buat array roles berdasarkan data dari DB
-    $roles = collect($roleLabels)->only($rolesFromDb)->toArray();
+        // Buat array roles berdasarkan data dari DB
+        $roles = collect($roleLabels)->only($rolesFromDb)->toArray();
 
-    // Mulai query untuk ambil data user
-    $query = User::query();
+        // Mulai query untuk ambil data user
+        $query = User::query();
 
-    // Terapkan filter role jika ada
-    if ($request->filled('role')) {
-        $query->where('role', $request->role);
+        // Terapkan filter role jika ada
+        if ($request->filled('role')) {
+            $query->where('role', $request->role);
+        }
+
+        // Ambil daftar region yang valid dan tidak kosong
+        $regions = User::select('region')
+            ->distinct()
+            ->whereNotNull('region')  // Menghindari region kosong
+            ->pluck('region');
+
+        // Terapkan filter region jika ada
+        if ($request->filled('region')) {
+            $query->where('region', $request->region);
+        }
+
+        // Terapkan filter search jika ada
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        // Ambil data user dengan filter yang diterapkan
+        $users = $query
+            ->orderBy('role', 'asc')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->withQueryString();  // Menjaga query string di URL
+
+        // Kirim data ke view
+        return view('kepalagudang.datauser', compact('users', 'roles', 'regions', 'roleLabels'));
     }
-
-    // Ambil daftar region yang valid dan tidak kosong
-    $regions = User::select('region')
-                   ->distinct()
-                   ->whereNotNull('region')  // Menghindari region kosong
-                   ->pluck('region');
-
-    // Terapkan filter region jika ada
-    if ($request->filled('region')) {
-        $query->where('region', $request->region);
-    }
-
-    // Terapkan filter search jika ada
-    if ($request->filled('search')) {
-        $search = $request->search;
-        $query->where(function($q) use ($search) {
-            $q->where('name', 'like', "%{$search}%")
-              ->orWhere('email', 'like', "%{$search}%");
-        });
-    }
-
-    // Ambil data user dengan filter yang diterapkan
-    $users = $query
-        ->orderBy('role', 'asc')
-        ->orderBy('created_at', 'desc')
-        ->paginate(10)
-        ->withQueryString();  // Menjaga query string di URL
-
-    // Kirim data ke view
-    return view('kepalagudang.datauser', compact('users', 'roles', 'regions', 'roleLabels'));
-}
 
 
     public function store(Request $request)
@@ -97,38 +101,38 @@ class UserController extends Controller
     }
 
     public function update(Request $request, $id)
-{
-    // Validasi data
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users,email,' . $id,
-        'role' => 'required|numeric|in:1,2,3,4',
-        'region' => 'nullable|string|max:255',
-        'atasan' => 'nullable|string|max:255',
-        'password' => 'nullable|string|min:8|confirmed',
-    ]);
+    {
+        // Validasi data
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $id,
+            'role' => 'required|numeric|in:1,2,3,4',
+            'region' => 'nullable|string|max:255',
+            'atasan' => 'nullable|string|max:255',
+            'password' => 'nullable|string|min:8|confirmed',
+        ]);
 
-    // Temukan user berdasarkan ID
-    $user = User::findOrFail($id);
+        // Temukan user berdasarkan ID
+        $user = User::findOrFail($id);
 
-    // Data yang akan diupdate
-    $data = [
-        'name' => $request->name,
-        'email' => $request->email,
-        'role' => $request->role,
-        'region' => $request->region,
-        'atasan' => $request->atasan,
-    ];
+        // Data yang akan diupdate
+        $data = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'role' => $request->role,
+            'region' => $request->region,
+            'atasan' => $request->atasan,
+        ];
 
         if ($request->filled('password')) {
-        $data['password'] = bcrypt($request->password);
+            $data['password'] = bcrypt($request->password);
+        }
+
+        $user->update($data);
+
+        return response()->json(['success' => true]);
+
     }
-
-    $user->update($data);
-
-    return response()->json(['success' => true]);
-
-}
 
 
     public function destroy($id)
@@ -137,5 +141,74 @@ class UserController extends Controller
         $user->delete();
 
         return redirect()->route('kepalagudang.user.index')->with('success', 'User berhasil dihapus.');
+    }
+
+
+    public function validasiIndex()
+    {
+        $user = auth()->user();
+
+        $requests = Permintaan::with(['details', 'pengiriman.details'])
+            ->where('user_id', $user->id)
+            ->where('status_gudang', 'approved') // Sudah dikirim gudang
+            ->where('status_penerimaan', '!=', 'diterima') // Belum diterima
+            ->orderBy('tanggal_permintaan', 'desc')
+            ->get();
+
+        return view('user.validasi', compact('requests'));
+    }
+
+    public function terimaBarang(Request $request, $tiket)
+    {
+        $request->validate([
+            'nomor_resi' => 'required|string|max:255',
+            'foto_bukti' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $permintaan = Permintaan::where('tiket', $tiket)->firstOrFail();
+
+        // Simpan foto
+        $path = $request->file('foto_bukti')->store('bukti_penerimaan', 'public');
+
+        // Update status
+        $permintaan->update([
+            'status_penerimaan' => 'diterima',
+            'nomor_resi' => $request->nomor_resi,
+            'foto_bukti_penerimaan' => $path,
+            'tanggal_penerimaan' => now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Barang berhasil dikonfirmasi diterima!'
+        ]);
+    }
+
+    public function historyIndex(Request $request)
+    {
+        $user = auth()->user();
+
+        $query = Permintaan::with(['details', 'pengiriman.details'])
+            ->where('user_id', $user->id)
+            ->orderBy('tanggal_permintaan', 'desc');
+
+        // Filter berdasarkan status
+        if ($request->filled('statusFilter')) {
+            $status = $request->statusFilter;
+            if ($status === 'dikirim') {
+                $query->where('status_penerimaan', '!=', 'diterima');
+            } elseif ($status === 'diterima') {
+                $query->where('status_penerimaan', 'diterima');
+            }
+        }
+
+        // Filter berdasarkan tanggal
+        if ($request->filled('dateFilter')) {
+            $query->whereDate('tanggal_permintaan', $request->dateFilter);
+        }
+
+        $requests = $query->get();
+
+        return view('user.history', compact('requests'));
     }
 }

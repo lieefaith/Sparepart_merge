@@ -51,7 +51,7 @@
     <!-- Default: Tampilkan History -->
     <div id="history-section" class="bg-white shadow rounded-lg p-6 max-w-5xl mx-auto">
         <h4 class="text-xl font-bold mb-4 flex items-center text-gray-800">
-            <i class="fas fa-history me-2 text-blue-600"></i> History Request
+            <i class="fas fa-history me-2 text-blue-600"></i> On Progress
         </h4>
 
         <div class="overflow-x-auto">

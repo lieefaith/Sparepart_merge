@@ -12,29 +12,52 @@ class PermintaanController extends Controller
     /**
      * Tampilkan list permintaan user yang sedang login
      */
-    public function index(Request $request)
-    {
+   // app/Http/Controllers/PermintaanController.php
 
-        $query = Permintaan::with(['user', 'details'])
-            ->where('user_id', Auth::id());
+// Halaman utama: hanya pending
+public function index(Request $request)
+{
+    $query = Permintaan::with(['user', 'details'])
+        ->where('user_id', Auth::id())
+        ->where('status', 'pending'); // ✅ Hanya pending
 
-        // Filter berdasarkan status
-        if ($request->filled('status') && $request->status !== 'all') {
-            $query->where('status', $request->status);
-        }
-
-        // Filter berdasarkan tanggal
-        if ($request->filled('start_date') && $request->filled('end_date')) {
-            $query->whereBetween('tanggal_permintaan', [
-                $request->start_date,
-                $request->end_date
-            ]);
-        }
-
-        $permintaans = $query->orderBy('tanggal_permintaan', 'desc')->get();
-
-        return view('user.requestbarang', compact('permintaans'));
+    // Filter tanggal opsional
+    if ($request->filled('start_date') && $request->filled('end_date')) {
+        $query->whereBetween('tanggal_permintaan', [
+            $request->start_date,
+            $request->end_date
+        ]);
     }
+
+    $permintaans = $query->orderBy('tanggal_permintaan', 'desc')->get();
+
+    return view('user.requestbarang', compact('permintaans'));
+}
+
+// Halaman history: hanya diterima & ditolak
+public function history(Request $request)
+{
+    $query = Permintaan::with(['user', 'details'])
+        ->where('user_id', Auth::id())
+        ->whereIn('status', ['diterima', 'ditolak']); // ✅ Hanya selesai
+
+    // Filter tanggal opsional
+    if ($request->filled('start_date') && $request->filled('end_date')) {
+        $query->whereBetween('tanggal_permintaan', [
+            $request->start_date,
+            $request->end_date
+        ]);
+    }
+
+    // Filter status (opsional di history)
+    if ($request->filled('status') && in_array($request->status, ['diterima', 'ditolak'])) {
+        $query->where('status', $request->status);
+    }
+
+    $permintaans = $query->orderBy('tanggal_permintaan', 'desc')->get();
+
+    return view('user.history', compact('permintaans'));
+}
 
     /**
      * Simpan permintaan baru
