@@ -121,7 +121,6 @@
 
 
     <!-- Modal Terima & Kirim Barang -->
-    <!-- Modal Terima & Kirim Barang -->
     <div class="modal fade" id="modalTerima" tabindex="-1">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">

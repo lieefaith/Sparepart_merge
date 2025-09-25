@@ -188,26 +188,56 @@
 
                     <hr>
 
-                    <!-- Form Konfirmasi Penerimaan -->
-                    <h6 class="fw-bold text-info mb-3"><i class="bi bi-check-circle"></i> Form Konfirmasi Penerimaan</h6>
-                    <form id="formKonfirmasi">
-                        <input type="hidden" name="tiket" id="inputTiket">
-
-                        <div class="row mb-3">
+                    <!-- Layout Kanan-Kiri untuk Opsi Ekspedisi dan Upload File -->
+                        <div class="row mt-3">
+                            <!-- Kolom Kiri: Opsi Ekspedisi -->
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold">Nomor Resi <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" name="nomor_resi" placeholder="Masukkan nomor resi" required>
-                                <div class="form-text">Contoh: JNE1234567890</div>
+                                <div class="card h-100">
+                                    <div class="card-header bg-light">
+                                        <h6 class="card-title mb-0"><i class="bi bi-ticket-perforated"></i> Resi Pengiriman</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="col-12">
+                                                    <label class="form-label">Nomor Resi</label>
+                                                    <input type="text" class="form-control" name="no_resi"
+                                                        placeholder="Nomor tracking pengiriman">
+                                                </div>
+                                        <!-- Form tambahan jika memilih Ya -->
+                                        <div id="formEkspedisi" class="mt-3" style="display: none;">
+                                            <div class="row g-2">
+                                                <div class="col-12">
+                                                    <label class="form-label">Nama Ekspedisi</label>
+                                                    <input type="text" class="form-control" name="nama_ekspedisi"
+                                                        placeholder="JNE, TIKI, POS Indonesia">
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="form-label">Nomor Resi</label>
+                                                    <input type="text" class="form-control" name="no_resi"
+                                                        placeholder="Nomor tracking pengiriman">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Upload Foto Bukti <span class="text-danger">*</span></label>
-                                <input type="file" class="form-control" name="foto_bukti" accept="image/*" required>
-                                <div class="form-text">Format: JPG, PNG, GIF (max 2MB)</div>
-                            </div>
-                        </div>
 
-                        <div class="mb-3 text-center">
-                            <img id="previewFoto" src="" alt="Preview Foto" class="img-thumbnail" style="max-height: 200px; display: none;">
+                            <!-- Kolom Kanan: Upload File -->
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-header bg-light">
+                                        <h6 class="card-title mb-0"><i class="bi bi-paperclip"></i> Lampiran File</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">Upload File Pendukung</label>
+                                            <input type="file" class="form-control" name="file_upload" id="fileUpload">
+                                            <div class="form-text mt-2">
+                                                <small>Format: PDF, JPG, PNG, DOC, DOCX<br>Maksimal: 5MB</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>
