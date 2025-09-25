@@ -66,7 +66,7 @@ class KepalaGudangController extends Controller
             ->count();
 
 
-        return view('kepalagudang.dashboard', compact('detail', 'date', 'totalPerDay', 'totalMasuk','totalPending'));
+        return view('kepalagudang.dashboard', compact('detail', 'date', 'totalPerDay', 'totalMasuk', 'totalPending'));
     }
 
     /**
@@ -75,7 +75,7 @@ class KepalaGudangController extends Controller
     public function requestIndex()
     {
         $requests = Permintaan::where('status_ro', 'approved')
-           ->whereIn('status_gudang', ['pending', 'on progres'])
+            ->whereIn('status_gudang', ['pending', 'on progres'])
             ->with(['user', 'details']) // Load relasi jika diperlukan
             ->orderBy('tanggal_permintaan', 'desc')
             ->get();
@@ -169,14 +169,14 @@ class KepalaGudangController extends Controller
 
             $tiket = $request->tiket;
             $permintaan = Permintaan::where('tiket', $tiket)->firstOrFail();
-
-            // ✅ Validasi: Hanya proses jika status_gudang masih 'pending'
-            if ($permintaan->status_gudang !== 'pending') {
+            if ($permintaan->status_gudang !== 'on progres') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Permintaan ini sudah diproses sebelumnya. Tidak dapat diproses ulang.'
+                    'message' => 'Permintaan ini sudah diproses sebelumnya. Tidak dapat diproses ulang.',
                 ], 400);
             }
+
+            // ✅ Validasi: Hanya proses jika status_gudang masih 'pending'
 
             // ✅ Buat tiket pengiriman unik
             $tiketKirim = 'TKT-KRM-' . now()->format('YmdHis');
@@ -218,6 +218,7 @@ class KepalaGudangController extends Controller
                 'status_admin' => 'pending',
                 'approved_by_admin' => 13,
                 'catatan_admin' => null,
+                'status' => 'diterima',
             ]);
 
             \Log::info("✅ Status gudang dan admin berhasil diupdate");
@@ -249,12 +250,17 @@ class KepalaGudangController extends Controller
     public function rejectGudang($tiket)
     {
         $permintaan = Permintaan::where('tiket', $tiket)->firstOrFail();
+
+        // ✅ Broadcast rejected ke semua level + status_barang
         $permintaan->update([
             'status_gudang' => 'rejected',
-            'status' => 'ditolak', // opsional — untuk konsistensi global
+            'status_ro' => 'rejected',
+            'status_admin' => 'rejected',
+            'status_super_admin' => 'rejected',
+            'status_barang' => 'rejected', // 🔥 Penting!
+            'status' => 'ditolak',
+            'catatan_gudang' => $catatan ?? 'Ditolak oleh Kepala Gudang',
         ]);
-
-        return response()->json(['success' => true]);
     }
 
     public function approve(Request $request)
@@ -401,7 +407,12 @@ class KepalaGudangController extends Controller
 
             $permintaan->update([
                 'status_gudang' => 'rejected',
+                'status_ro' => 'rejected',
+                'status_admin' => 'rejected',
+                'status_super_admin' => 'rejected',
+                'status_barang' => 'rejected', // 🔥 Wajib!
                 'catatan_gudang' => $request->catatan ?? 'Ditolak oleh Kepala Gudang',
+                'status' => 'ditolak',
             ]);
 
             return response()->json([
@@ -417,45 +428,45 @@ class KepalaGudangController extends Controller
         }
     }
 
-   public function snInfo(Request $request)
-{
-    $sn = $request->query('sn');
+    public function snInfo(Request $request)
+    {
+        $sn = $request->query('sn');
 
-    if (empty($sn)) {
+        if (empty($sn)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Parameter SN kosong.',
+                'item' => null,
+            ], 200);
+        }
+
+        // Cari detail_barang yang punya serial_number tersebut
+        $detail = DetailBarang::with(['listBarang', 'vendor']) // load relasi terkait
+            ->where('serial_number', $sn)
+            ->first();
+
+        if (!$detail || !$detail->listBarang) {
+            return response()->json([
+                'success' => false,
+                'message' => 'SN tidak ditemukan.',
+                'item' => null,
+            ], 200);
+        }
+
+        $item = $detail->listBarang;
+
         return response()->json([
-            'success' => false,
-            'message' => 'Parameter SN kosong.',
-            'item' => null,
+            'success' => true,
+            'item' => [
+                'id' => $item->id,
+                'tipe_id' => $detail->tipe_id ?? null,
+                'vendor_id' => $detail->vendor_id ?? null,
+                'keterangan' => $detail->keterangan ?? null,
+                'jenis_id' => $detail->jenis_id ?? null,
+                'serial_number' => $detail->serial_number ?? null,
+            ],
         ], 200);
     }
-
-    // Cari detail_barang yang punya serial_number tersebut
-    $detail = DetailBarang::with(['listBarang', 'vendor']) // load relasi terkait
-        ->where('serial_number', $sn)
-        ->first();
-
-    if (! $detail || ! $detail->listBarang) {
-        return response()->json([
-            'success' => false,
-            'message' => 'SN tidak ditemukan.',
-            'item' => null,
-        ], 200);
-    }
-
-    $item = $detail->listBarang;
-
-    return response()->json([
-        'success' => true,
-        'item' => [
-            'id' => $item->id,
-            'tipe_id' => $detail->tipe_id  ?? null,
-            'vendor_id' => $detail->vendor_id  ?? null,
-            'keterangan' => $detail->keterangan ?? null,
-            'jenis_id' => $detail->jenis_id ?? null,
-            'serial_number' => $detail->serial_number ?? null,
-        ],
-    ], 200);
-}
 
 
 

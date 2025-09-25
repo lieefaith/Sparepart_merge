@@ -16,11 +16,12 @@ class ApprovalStatusController extends Controller
         }
 
         return response()->json([
-            'ro'           => $permintaan->status_ro,
-            'gudang'       => $permintaan->status_gudang,
-            'admin'        => $permintaan->status_admin,
-            'super_admin'  => $permintaan->status_super_admin,
-            'catatan'      => $this->getLastCatatan($permintaan),
+            'ro' => $permintaan->status_ro,
+            'gudang' => $permintaan->status_gudang,
+            'admin' => $permintaan->status_admin,
+            'super_admin' => $permintaan->status_super_admin,
+            'status_barang' => $permintaan->status_barang, //
+            'catatan' => $this->getLastCatatan($permintaan),
         ]);
     }
 
@@ -34,7 +35,8 @@ class ApprovalStatusController extends Controller
         ];
 
         foreach ($catatans as $catatan) {
-            if ($catatan) return $catatan;
+            if ($catatan)
+                return $catatan;
         }
 
         return null;
