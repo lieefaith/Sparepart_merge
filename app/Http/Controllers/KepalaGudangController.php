@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\DetailBarang;
+use App\Models\ListBarang;
 
 class KepalaGudangController extends Controller
 {
@@ -74,7 +75,7 @@ class KepalaGudangController extends Controller
     public function requestIndex()
     {
         $requests = Permintaan::where('status_ro', 'approved')
-            ->where('status_gudang', 'pending')
+           ->whereIn('status_gudang', ['pending', 'on progres'])
             ->with(['user', 'details']) // Load relasi jika diperlukan
             ->orderBy('tanggal_permintaan', 'desc')
             ->get();
@@ -87,10 +88,6 @@ class KepalaGudangController extends Controller
         return view('kepalagudang.sparepart');
     }
 
-    public function sparepartStore(Request $request)
-    {
-        // Akan kita isi nanti jika diperlukan
-    }
     public function kirim($id)
     {
         $permintaan = Permintaan::findOrFail($id);
@@ -419,5 +416,47 @@ class KepalaGudangController extends Controller
             ], 500);
         }
     }
+
+   public function snInfo(Request $request)
+{
+    $sn = $request->query('sn');
+
+    if (empty($sn)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Parameter SN kosong.',
+            'item' => null,
+        ], 200);
+    }
+
+    // Cari detail_barang yang punya serial_number tersebut
+    $detail = DetailBarang::with(['listBarang', 'vendor']) // load relasi terkait
+        ->where('serial_number', $sn)
+        ->first();
+
+    if (! $detail || ! $detail->listBarang) {
+        return response()->json([
+            'success' => false,
+            'message' => 'SN tidak ditemukan.',
+            'item' => null,
+        ], 200);
+    }
+
+    $item = $detail->listBarang;
+
+    return response()->json([
+        'success' => true,
+        'item' => [
+            'id' => $item->id,
+            'tipe_id' => $detail->tipe_id  ?? null,
+            'vendor_id' => $detail->vendor_id  ?? null,
+            'keterangan' => $detail->keterangan ?? null,
+            'jenis_id' => $detail->jenis_id ?? null,
+            'serial_number' => $detail->serial_number ?? null,
+        ],
+    ], 200);
+}
+
+
 
 }

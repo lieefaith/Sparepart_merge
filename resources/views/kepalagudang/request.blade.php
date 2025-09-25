@@ -95,7 +95,8 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center">Tidak ada permintaan yang menunggu proses pengiriman.</td>
+                                <td colspan="5" class="text-center">Tidak ada permintaan yang menunggu proses pengiriman.
+                                </td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -118,52 +119,8 @@
         </div>
     </div>
 
-    <!-- Modal Request (dummy) -->
-    <div class="modal fade" id="modalRequest" tabindex="-1">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title"><i class="bi bi-cart-check"></i> Form Request Barang</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="table-responsive">
-                            <table class="table table-bordered">
-                                <thead class="table-primary">
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Nama Item</th>
-                                        <th>Deskripsi</th>
-                                        <th>Jumlah</th>
-                                        <th>Keterangan</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td><input type="text" class="form-control" placeholder="Nama Item"></td>
-                                        <td><input type="text" class="form-control" placeholder="Deskripsi"></td>
-                                        <td><input type="number" class="form-control" value="1"></td>
-                                        <td><input type="text" class="form-control" placeholder="Keterangan"></td>
-                                        <td><button class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <button type="button" class="btn btn-outline-primary"><i class="bi bi-plus"></i> Tambah
-                            Baris</button>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button class="btn btn-success">Kirim Request</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
+    <!-- Modal Terima & Kirim Barang -->
     <!-- Modal Terima & Kirim Barang -->
     <div class="modal fade" id="modalTerima" tabindex="-1">
         <div class="modal-dialog modal-xl">
@@ -198,8 +155,6 @@
                             </tbody>
                         </table>
                     </div>
-
-
 
                     <hr>
 
@@ -241,7 +196,6 @@
                                                 <option value="non-aset">Non-Aset</option>
                                             </select>
                                         </td>
-                                        <!-- Sesudah: tambah class untuk akses JS -->
                                         <td class="nama-col">
                                             <select class="form-control nama-item-select" name="nama_item">
                                                 <option value="">Pilih Nama</option>
@@ -252,7 +206,10 @@
                                                 <option value="">Pilih Tipe</option>
                                             </select>
                                         </td>
-                                        <td class="merk-col"><input type="text" class="form-control" placeholder="Merk">
+                                        <td class="merk-col">
+                                            <select class="form-control merk-select" name="merk">
+                                                <option value="">Pilih Merk</option>
+                                            </select>
                                         </td>
                                         <td class="sn-col"><input type="text" class="form-control"
                                                 placeholder="Nomor Serial"></td>
@@ -275,10 +232,82 @@
                             <i class="bi bi-plus"></i> Tambah Baris
                         </button>
 
-                        <div class="mt-3">
-                            <label class="form-label">Catatan</label>
-                            <textarea class="form-control" name="catatan" rows="3"
-                                placeholder="Tambahkan catatan jika ada..."></textarea>
+                        <!-- Card untuk Catatan -->
+                        <div class="card mt-3">
+                            <div class="card-header bg-light">
+                                <h6 class="card-title mb-0"><i class="bi bi-chat-text"></i> Catatan</h6>
+                            </div>
+                            <div class="card-body">
+                                <textarea class="form-control" name="catatan" rows="3"
+                                    placeholder="Tambahkan catatan jika ada..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Layout Kanan-Kiri untuk Opsi Ekspedisi dan Upload File -->
+                        <div class="row mt-3">
+                            <!-- Kolom Kiri: Opsi Ekspedisi -->
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-header bg-light">
+                                        <h6 class="card-title mb-0"><i class="bi bi-truck"></i> Opsi Pengiriman</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">Menggunakan ekspedisi?</label>
+                                            <div class="d-flex gap-4">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="ekspedisi"
+                                                        id="ekspedisiYa" value="ya">
+                                                    <label class="form-check-label" for="ekspedisiYa">
+                                                        <i class="bi bi-check-circle"></i> Ya
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="ekspedisi"
+                                                        id="ekspedisiTidak" value="tidak" checked>
+                                                    <label class="form-check-label" for="ekspedisiTidak">
+                                                        <i class="bi bi-x-circle"></i> Tidak
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Form tambahan jika memilih Ya -->
+                                        <div id="formEkspedisi" class="mt-3" style="display: none;">
+                                            <div class="row g-2">
+                                                <div class="col-12">
+                                                    <label class="form-label">Nama Ekspedisi</label>
+                                                    <input type="text" class="form-control" name="nama_ekspedisi"
+                                                        placeholder="JNE, TIKI, POS Indonesia">
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="form-label">Nomor Resi</label>
+                                                    <input type="text" class="form-control" name="no_resi"
+                                                        placeholder="Nomor tracking pengiriman">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Kolom Kanan: Upload File -->
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-header bg-light">
+                                        <h6 class="card-title mb-0"><i class="bi bi-paperclip"></i> Lampiran File</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">Upload File Pendukung</label>
+                                            <input type="file" class="form-control" name="file_upload" id="fileUpload">
+                                            <div class="form-text mt-2">
+                                                <small>Format: PDF, JPG, PNG, DOC, DOCX<br>Maksimal: 5MB</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -300,338 +329,601 @@
             </div>
         </div>
     </div>
+
+    <!-- Script untuk toggle form ekspedisi -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const ekspedisiYa = document.getElementById('ekspedisiYa');
+            const ekspedisiTidak = document.getElementById('ekspedisiTidak');
+            const formEkspedisi = document.getElementById('formEkspedisi');
+
+            ekspedisiYa.addEventListener('change', function () {
+                if (this.checked) {
+                    formEkspedisi.style.display = 'block';
+                }
+            });
+
+            ekspedisiTidak.addEventListener('change', function () {
+                if (this.checked) {
+                    formEkspedisi.style.display = 'none';
+                }
+            });
+        });
+    </script>
 @endsection
 
 @push('scripts')
     <script>
-        // Toggle sidebar
-        document.querySelector('.navbar-toggler')?.addEventListener('click', function () {
-            document.querySelector('.sidebar')?.classList.toggle('show');
-        });
-
-        // Filter pencarian
-        document.getElementById('searchFilter')?.addEventListener('keyup', function () {
-            const filter = this.value.toLowerCase();
-            document.querySelectorAll('tbody tr').forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(filter) ? '' : 'none';
-            });
-        });
-
-        // Fungsi: Muat daftar jenis barang berdasarkan kategori
-        async function loadItemsByKategori(selectKategori, targetSelect) {
-            const kategori = selectKategori.value;
-            if (!kategori || !targetSelect) return;
-
-            try {
-                const response = await fetch(`/requestbarang/api/jenis-barang?kategori=${encodeURIComponent(kategori)}`);
-                const items = await response.json();
-
-                targetSelect.innerHTML = '<option value="">Pilih Nama</option>';
-                items.forEach(item => {
-                    const option = document.createElement('option');
-                    option.value = item.id;           // ✅ Untuk filter tipe
-                    option.textContent = item.nama;   // ✅ Yang ditampilkan
-                    option.dataset.nama = item.nama;  // ✅ Simpan nama untuk pakai nanti
-                    targetSelect.appendChild(option);
-                });
-
-                // Reset tipe setelah isi nama
-                const row = targetSelect.closest('tr');
-                const tipeSelect = row.querySelector('.tipe-select');
-                if (tipeSelect) {
-                    tipeSelect.innerHTML = '<option value="">Pilih Tipe</option>';
-                }
-            } catch (err) {
-                console.error('Gagal muat jenis barang:', err);
-                targetSelect.innerHTML = '<option value="">Gagal muat</option>';
-            }
-        }
-
-        // Fungsi: Muat daftar tipe berdasarkan kategori + jenis_id
-        async function loadTipeByKategoriAndJenis(selectKategori, selectJenis, targetSelect) {
-            const kategori = selectKategori.value;
-            const jenisId = selectJenis.value;
-
-            if (!kategori || !jenisId || !targetSelect) {
-                if (targetSelect) targetSelect.innerHTML = '<option value="">Pilih Tipe</option>';
-                return;
+        (function () {
+            // -----------------------
+            // Utility / Setup
+            // -----------------------
+            function getCsrfToken() {
+                return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || null;
             }
 
-            try {
-                const response = await fetch(
-                    `/requestbarang/api/tipe-barang?kategori=${encodeURIComponent(kategori)}&jenis_id=${encodeURIComponent(jenisId)}`
+            function getSelectedId(selectEl) {
+                if (!selectEl) return null;
+                const opt = selectEl.options[selectEl.selectedIndex];
+                return (opt && opt.dataset && opt.dataset.id) ? opt.dataset.id : null;
+            }
+
+            // Helper: pastikan option ada (value = label, dataset.id = id) lalu kembalikan option
+            function ensureOption(selectEl, id, label) {
+                if (!selectEl) return null;
+                const idStr = (id === undefined || id === null) ? null : String(id);
+                let opt = Array.from(selectEl.options).find(o =>
+                    (idStr !== null && o.dataset && String(o.dataset.id) === idStr) ||
+                    (idStr === null && o.value === label)
                 );
-                const tipes = await response.json();
-
-                targetSelect.innerHTML = '<option value="">Pilih Tipe</option>';
-                tipes.forEach(tipe => {
-                    const option = document.createElement('option');
-                    option.value = tipe.nama;
-                    option.textContent = tipe.nama;
-                    targetSelect.appendChild(option);
-                });
-            } catch (err) {
-                console.error('Gagal muat tipe:', err);
-                targetSelect.innerHTML = '<option value="">Gagal muat</option>';
+                if (!opt) {
+                    opt = document.createElement('option');
+                    opt.value = label ?? (idStr ?? '');
+                    if (idStr !== null) opt.dataset.id = idStr;
+                    opt.textContent = label ?? (idStr ?? opt.value);
+                    selectEl.appendChild(opt);
+                }
+                return opt;
             }
-        }
-
-        // Cek Serial Number
-        async function cekSerialNumber(sn) {
-            try {
-                const response = await fetch(`/requestbarang/api/cek-sn?sn=${encodeURIComponent(sn)}`);
-                const data = await response.json();
-                return data.exists;
-            } catch (err) {
-                console.error('Gagal cek serial number:', err);
-                return false;
+            // -----------------------
+            // API loaders (value = label, dataset.id = id)
+            // -----------------------
+            async function loadItemsByKategori(selectKategori, targetSelect) {
+                const kategori = selectKategori?.value;
+                if (!kategori || !targetSelect) return;
+                const url = `/requestbarang/api/jenis-barang?kategori=${encodeURIComponent(kategori)}`;
+                targetSelect.innerHTML = '<option value="">Memuat nama...</option>';
+                try {
+                    const res = await fetch(url);
+                    if (!res.ok) throw res;
+                    const items = await res.json();
+                    targetSelect.innerHTML = '<option value="">Pilih Nama</option>';
+                    (items || []).forEach(i => {
+                        const opt = document.createElement('option');
+                        opt.value = i.nama ?? i.name ?? '';
+                        if (i.id !== undefined && i.id !== null) opt.dataset.id = i.id;
+                        opt.textContent = i.nama ?? i.name ?? opt.value;
+                        targetSelect.appendChild(opt);
+                    });
+                } catch (e) {
+                    targetSelect.innerHTML = '<option value="">Gagal muat</option>';
+                }
             }
-        }
 
-        // Tambah baris baru
-        function tambahBaris() {
-            const tbody = document.querySelector('#tabelBarang tbody');
-            const nomorBaru = tbody.children.length + 1;
-
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                            <td class="no-col">${nomorBaru}</td>
-                            <td class="kategori-col">
-                                <select class="form-control kategori-select" name="kategori">
-                                    <option value="">Kategori</option>
-                                    <option value="aset">Aset</option>
-                                    <option value="non-aset">Non-Aset</option>
-                                </select>
-                            </td>
-                            <td class="nama-col">
-                                <select class="form-control nama-item-select" name="nama_item">
-                                    <option value="">Pilih Nama</option>
-                                </select>
-                            </td>
-                            <td class="tipe-col">
-                                <select class="form-control tipe-select" name="tipe">
-                                    <option value="">Pilih Tipe</option>
-                                </select>
-                            </td>
-                            <td class="merk-col"><input type="text" class="form-control" placeholder="Merk"></td>
-                            <td class="sn-col"><input type="text" class="form-control" placeholder="Nomor Serial"></td>
-                            <td class="jumlah-col"><input type="number" class="form-control" value="1" min="1" required></td>
-                            <td class="keterangan-col">
-                                <input type="text" class="form-control" name="keterangan" placeholder="Keterangan">
-                            </td>
-                            <td class="aksi-col">
-                                <button type="button" class="btn btn-danger btn-sm" onclick="hapusBaris(this)">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </td>
-                        `;
-            tbody.appendChild(tr);
-
-            const newKategori = tr.querySelector('.kategori-select');
-            const newNama = tr.querySelector('.nama-item-select');
-            const newTipe = tr.querySelector('.tipe-select');
-
-            newKategori.addEventListener('change', () => {
-                loadItemsByKategori(newKategori, newNama);
-            });
-
-            newNama.addEventListener('change', () => {
-                loadTipeByKategoriAndJenis(newKategori, newNama, newTipe);
-            });
-        }
-
-        // Hapus baris
-        function hapusBaris(button) {
-            const tr = button.closest('tr');
-            const tbody = tr.parentElement;
-            if (tbody.children.length > 1) {
-                tr.remove();
-                Array.from(tbody.children).forEach((row, i) => {
-                    row.cells[0].textContent = i + 1;
-                });
-            } else {
-                alert('Minimal satu baris harus ada.');
+            async function loadTipeByKategoriAndJenis(selectKategori, selectJenis, targetSelect) {
+                const kategori = selectKategori?.value;
+                const jenisId = getSelectedId(selectJenis);
+                if (!kategori || !jenisId || !targetSelect) {
+                    if (targetSelect) targetSelect.innerHTML = '<option value="">Pilih Tipe</option>';
+                    return;
+                }
+                const url =
+                    `/requestbarang/api/tipe-barang?kategori=${encodeURIComponent(kategori)}&jenis_id=${encodeURIComponent(jenisId)}`;
+                targetSelect.innerHTML = '<option value="">Memuat tipe...</option>';
+                try {
+                    const res = await fetch(url);
+                    if (!res.ok) throw res;
+                    const tipes = await res.json();
+                    targetSelect.innerHTML = '<option value="">Pilih Tipe</option>';
+                    (tipes || []).forEach(t => {
+                        const opt = document.createElement('option');
+                        opt.value = t.nama ?? t.name ?? '';
+                        if (t.id !== undefined && t.id !== null) opt.dataset.id = t.id;
+                        opt.textContent = t.nama ?? t.name ?? opt.value;
+                        targetSelect.appendChild(opt);
+                    });
+                } catch (e) {
+                    targetSelect.innerHTML = '<option value="">Gagal muat</option>';
+                }
             }
-        }
 
-        // Simpan daftar requests
-        const allRequests = @json($requests);
+            async function loadVendors(selectJenis, selectTipe, targetSelect) {
+                const jenisId = getSelectedId(selectJenis);
+                const tipeId = getSelectedId(selectTipe);
+                if (!jenisId || !tipeId || !targetSelect) {
+                    if (targetSelect) targetSelect.innerHTML = '<option value="">Pilih Merk</option>';
+                    return;
+                }
+                const url =
+                    `/requestbarang/api/vendor?jenis_id=${encodeURIComponent(jenisId)}&tipe_id=${encodeURIComponent(tipeId)}`;
+                targetSelect.innerHTML = '<option value="">Memuat merk...</option>';
+                try {
+                    const res = await fetch(url);
+                    if (!res.ok) throw res;
+                    const vendors = await res.json();
+                    targetSelect.innerHTML = '<option value="">Pilih Merk</option>';
+                    (vendors || []).forEach(v => {
+                        const opt = document.createElement('option');
+                        opt.value = v.nama ?? v.name ?? '';
+                        if (v.id !== undefined && v.id !== null) opt.dataset.id = v.id;
+                        opt.textContent = v.nama ?? v.name ?? opt.value;
+                        targetSelect.appendChild(opt);
+                    });
+                } catch (e) {
+                    targetSelect.innerHTML = '<option value="">Gagal muat</option>';
+                }
+            }
 
-        // Isi modal saat tombol "Terima" diklik
-        document.querySelectorAll('.btn-terima').forEach(button => {
-            button.addEventListener('click', function () {
-                const tiket = this.dataset.tiket;
-                const requester = this.dataset.requester;
-                const tanggal = this.dataset.tanggal;
+            // -----------------------
+            // SN lookup
+            // -----------------------
+            async function fetchItemBySN(sn) {
+                if (!sn) return null;
+                try {
+                    const res = await fetch(`/kepalagudang/sn-info?sn=${encodeURIComponent(sn)}`);
+                    if (!res.ok) return null;
+                    const data = await res.json();
+                    return data.item ?? data;
+                } catch (e) {
+                    return null;
+                }
+            }
 
-                // Isi header modal
-                document.getElementById('tiketInput').value = tiket;
-                document.getElementById('modal-tiket-display').textContent = tiket;
-                document.getElementById('modal-requester').textContent = requester;
-                document.getElementById('modal-tanggal').textContent = tanggal;
+            // -----------------------
+            // Row build & populate
+            // -----------------------
+            function buildRow(idx, item = {}) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+    <td class="no-col">${idx + 1}</td>
+    <td class="kategori-col">
+      <select class="form-control kategori-select" name="items[${idx}][kategori]">
+        <option value="">Kategori</option>
+        <option value="aset">Aset</option>
+        <option value="non-aset">Non-Aset</option>
+      </select>
+    </td>
+    <td class="nama-col">
+      <select class="form-control nama-item-select" name="items[${idx}][nama_item]">
+        <option value="">Pilih Nama</option>
+      </select>
+      <input type="hidden" class="jenis-id" name="items[${idx}][jenis_id]" value="">
+    </td>
+    <td class="tipe-col">
+      <select class="form-control tipe-select" name="items[${idx}][tipe]">
+        <option value="">Pilih Tipe</option>
+      </select>
+      <input type="hidden" class="tipe-id" name="items[${idx}][tipe_id]" value="">
+    </td>
+    <td class="merk-col">
+      <select class="form-control merk-select" name="items[${idx}][merk]">
+        <option value="">Pilih Merk</option>
+      </select>
+      <input type="hidden" class="vendor-id" name="items[${idx}][vendor_id]" value="">
+    </td>
+    <td class="sn-col"><input type="text" class="form-control sn-input" name="items[${idx}][sn]" placeholder="Nomor Serial" disabled></td>
+    <td class="jumlah-col"><input type="number" class="form-control" name="items[${idx}][jumlah]" value="${item.jumlah || 1}" min="1" required></td>
+    <td class="keterangan-col">
+      <input type="text" class="form-control" name="items[${idx}][keterangan]" value="${item.keterangan || ''}" placeholder="Keterangan">
+    </td>
+    <td class="aksi-col">
+      <button type="button" class="btn btn-danger btn-sm" onclick="hapusBaris(this)">
+        <i class="bi bi-trash"></i>
+      </button>
+    </td>
+    `;
+                return tr;
+            }
 
-                // Isi detail request
-                const req = allRequests.find(r => r.tiket === tiket);
-                const detailBody = document.getElementById('detail-request-body');
-                detailBody.innerHTML = '';
+            async function populateRowWithItem(tr, item = {}, snInfo = null) {
+                try {
+                    const kategoriSelect = tr.querySelector('.kategori-select');
+                    const namaSelect = tr.querySelector('.nama-item-select');
+                    const tipeSelect = tr.querySelector('.tipe-select');
+                    const merkSelect = tr.querySelector('.merk-select');
+                    const snInput = tr.querySelector('.sn-input');
+                    const jumlahInput = tr.querySelector('input[name*="[jumlah]"]');
+                    const keteranganInput = tr.querySelector('input[name*="[keterangan]"]');
 
-                if (req && req.details.length > 0) {
-                    req.details.forEach((item, index) => {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                                        <td>${index + 1}</td>
-                                        <td>${item.nama_item || '-'}</td>
-                                        <td>${item.deskripsi || '-'}</td>
-                                        <td>${item.jumlah}</td>
-                                        <td>${item.keterangan || '-'}</td>
-                                    `;
-                        detailBody.appendChild(tr);
+                    // 1) set kategori
+                    if (item.kategori) {
+                        kategoriSelect.value = item.kategori;
+                        kategoriSelect.dispatchEvent(new Event('change'));
+                    } else {
+                        if (namaSelect) namaSelect.innerHTML = '<option value="">Pilih Nama</option>';
+                        if (tipeSelect) tipeSelect.innerHTML = '<option value="">Pilih Tipe</option>';
+                        if (merkSelect) merkSelect.innerHTML = '<option value="">Pilih Merk</option>';
+                    }
+
+                    // 2) load nama (jenis) jika kategori tersedia
+                    if (kategoriSelect.value) {
+                        await loadItemsByKategori(kategoriSelect, namaSelect);
+
+                        const jenisId = item.jenis_id ?? item.nama_item_id ?? null;
+                        const jenisLabel = item.nama_item ?? item.nama_item_label ?? null;
+
+                        if (jenisId) {
+                            // cari option berdasarkan data-id; jika tidak ada, buat option dengan value=label dan data-id=id
+                            let opt = Array.from(namaSelect.options).find(o => o.dataset && String(o.dataset.id) === String(jenisId));
+                            if (!opt) {
+                                opt = document.createElement('option');
+                                opt.value = jenisLabel ?? String(jenisId);
+                                opt.dataset.id = String(jenisId);
+                                opt.textContent = jenisLabel ?? String(jenisId);
+                                namaSelect.appendChild(opt);
+                            }
+                            // set select ke option.value (label) — jangan set ke id langsung
+                            namaSelect.value = opt.value;
+                            namaSelect.dispatchEvent(new Event('change'));
+                        } else if (jenisLabel) {
+                            // fallback by label
+                            let opt = Array.from(namaSelect.options).find(o => o.value === jenisLabel);
+                            if (!opt) {
+                                opt = document.createElement('option');
+                                opt.value = jenisLabel;
+                                opt.textContent = jenisLabel;
+                                namaSelect.appendChild(opt);
+                            }
+                            namaSelect.value = opt.value;
+                            namaSelect.dispatchEvent(new Event('change'));
+                        }
+                    }
+
+                    // 3) load tipe jika nama terpilih
+                    if (namaSelect.value) {
+                        await loadTipeByKategoriAndJenis(kategoriSelect, namaSelect, tipeSelect);
+
+                        const tipeId = item.tipe_id ?? null;
+                        const tipeLabel = item.tipe ?? item.tipe_label ?? null;
+                        if (tipeId) {
+                            let tipeOpt = Array.from(tipeSelect.options).find(o => o.dataset && String(o.dataset.id) === String(tipeId));
+                            if (!tipeOpt) {
+                                tipeOpt = document.createElement('option');
+                                tipeOpt.value = tipeLabel ?? String(tipeId);
+                                tipeOpt.dataset.id = String(tipeId);
+                                tipeOpt.textContent = tipeLabel ?? String(tipeId);
+                                tipeSelect.appendChild(tipeOpt);
+                            }
+                            tipeSelect.value = tipeOpt.value;
+                            tipeSelect.dispatchEvent(new Event('change'));
+                        } else if (tipeLabel) {
+                            let tipeOpt = Array.from(tipeSelect.options).find(o => o.value === tipeLabel);
+                            if (!tipeOpt) {
+                                tipeOpt = document.createElement('option');
+                                tipeOpt.value = tipeLabel;
+                                tipeOpt.textContent = tipeLabel;
+                                tipeSelect.appendChild(tipeOpt);
+                            }
+                            tipeSelect.value = tipeOpt.value;
+                            tipeSelect.dispatchEvent(new Event('change'));
+                        }
+                    } else {
+                        if (tipeSelect) tipeSelect.innerHTML = '<option value="">Pilih Tipe</option>';
+                    }
+
+                    // 4) load merk/vendor jika nama & tipe terpilih
+                    if (namaSelect.value && tipeSelect.value) {
+                        await loadVendors(namaSelect, tipeSelect, merkSelect);
+
+                        const vendorId = item.vendor_id ?? item.merk_id ?? null;
+                        const vendorLabel = item.merk ?? item.merk_label ?? null;
+                        if (vendorId) {
+                            let findOpt = Array.from(merkSelect.options).find(o => o.dataset && String(o.dataset.id) === String(vendorId));
+                            if (!findOpt) {
+                                const newOpt = document.createElement('option');
+                                newOpt.value = vendorLabel ?? String(vendorId);
+                                newOpt.dataset.id = String(vendorId);
+                                newOpt.textContent = vendorLabel ?? String(vendorId);
+                                merkSelect.appendChild(newOpt);
+                                findOpt = newOpt;
+                            }
+                            merkSelect.value = findOpt.value;
+                        } else if (vendorLabel) {
+                            let findOpt = Array.from(merkSelect.options).find(o => o.value === vendorLabel);
+                            if (!findOpt) {
+                                const newOpt = document.createElement('option');
+                                newOpt.value = vendorLabel;
+                                newOpt.textContent = vendorLabel;
+                                merkSelect.appendChild(newOpt);
+                                findOpt = newOpt;
+                            }
+                            merkSelect.value = findOpt.value;
+                        }
+                    } else {
+                        if (merkSelect) merkSelect.innerHTML = '<option value="">Pilih Merk</option>';
+                    }
+
+                    // 5) jumlah
+                    if (jumlahInput) jumlahInput.value = item.jumlah || 1;
+
+                    // 6) SN handling
+                    const snFromRequest = item.sn || item.serial_number || null;
+                    if (!snInfo && snFromRequest) snInfo = await fetchItemBySN(snFromRequest);
+
+                    if (snInput) {
+                        if (kategoriSelect && kategoriSelect.value === 'aset') {
+                            snInput.disabled = false;
+                            snInput.required = true;
+                        } else {
+                            snInput.disabled = true;
+                            snInput.required = false;
+                            snInput.value = '';
+                        }
+                        if (snFromRequest) snInput.value = snFromRequest;
+                    }
+
+                    // 7) keterangan
+                    if (keteranganInput) {
+                        keteranganInput.value = (snInfo && (snInfo.keterangan ?? snInfo.note ?? null))
+                            ? (snInfo.keterangan ?? snInfo.note)
+                            : '';
+                    }
+
+                    // 8) jika SN punya data, apply (gunakan ensureOption sehingga option dibuat dengan value=label dan data-id)
+                    if (snInfo && kategoriSelect.value) {
+                        if (snInfo.nama_id || snInfo.id) {
+                            const nid = snInfo.nama_id ?? snInfo.id;
+                            const label = snInfo.nama ?? snInfo.name ?? String(nid);
+                            const opt = ensureOption(namaSelect, nid, label);
+                            if (opt) {
+                                namaSelect.value = opt.value;
+                                namaSelect.dispatchEvent(new Event('change'));
+                                await loadTipeByKategoriAndJenis(kategoriSelect, namaSelect, tipeSelect);
+                                await loadVendors(namaSelect, tipeSelect, merkSelect);
+                            }
+                        }
+                        if (snInfo.tipe_id) {
+                            const tid = snInfo.tipe_id;
+                            const label = snInfo.tipe_nama ?? snInfo.tipe ?? String(tid);
+                            const optT = ensureOption(tipeSelect, tid, label);
+                            if (optT) {
+                                tipeSelect.value = optT.value;
+                                tipeSelect.dispatchEvent(new Event('change'));
+                            }
+                        }
+                        if (snInfo.vendor_id) {
+                            const vid = snInfo.vendor_id;
+                            const label = snInfo.vendor_nama ?? snInfo.vendor ?? String(vid);
+                            const optV = ensureOption(merkSelect, vid, label);
+                            if (optV) merkSelect.value = optV.value;
+                        }
+                    }
+
+                    // 9) update hidden id inputs (jenis_id, tipe_id, vendor_id)
+                    const jenisIdInput = tr.querySelector('.jenis-id');
+                    const tipeIdInput = tr.querySelector('.tipe-id');
+                    const vendorIdInput = tr.querySelector('.vendor-id');
+
+                    if (jenisIdInput && namaSelect) jenisIdInput.value = getSelectedId(namaSelect) || '';
+                    if (tipeIdInput && tipeSelect) tipeIdInput.value = getSelectedId(tipeSelect) || '';
+                    if (vendorIdInput && merkSelect) vendorIdInput.value = getSelectedId(merkSelect) || '';
+
+                } catch (err) {
+                    console.error('populateRowWithItem error:', err);
+                }
+            }
+
+            // -----------------------
+            // Buttons / Modal handling
+            // -----------------------
+            window.hapusBaris = function (button) {
+                const tr = button.closest('tr');
+                const tbody = tr.parentElement;
+                if (tbody.children.length > 1) {
+                    tr.remove();
+                    Array.from(tbody.children).forEach((row, i) => {
+                        const noCell = row.querySelector('.no-col');
+                        if (noCell) noCell.textContent = i + 1;
+                        row.querySelectorAll('[name]').forEach(el => {
+                            const name = el.getAttribute('name');
+                            if (!name) return;
+                            const newName = name.replace(/items$$\d+$$/, `items[${i}]`);
+                            el.setAttribute('name', newName);
+                        });
                     });
                 } else {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = '<td colspan="6" class="text-center">Tidak ada item.</td>';
-                    detailBody.appendChild(tr);
+                    alert('Minimal satu baris harus ada.');
                 }
+            };
 
-                // Buka modal
-                const modal = new bootstrap.Modal(document.getElementById('modalTerima'));
-                modal.show();
+            window.tambahBaris = function () {
+                const tbody = document.querySelector('#tabelBarang tbody');
+                const nomorBaru = tbody.children.length + 1;
+                const tr = buildRow(nomorBaru - 1, {});
+                tbody.appendChild(tr);
 
-                // 🔥 DEBUG: Cek apakah fetch jalan
-                console.log('🔧 Memulai /terima untuk tiket:', tiket);
-                // Setelah modal muncul, pasang event listener
-                setTimeout(() => {
-                    const firstRow = document.querySelector('#tabelBarang tbody tr');
-                    if (!firstRow) return;
-
-                    const selectKategori = firstRow.querySelector('.kategori-select');
-                    const selectNama = firstRow.querySelector('.nama-item-select');
-                    const selectTipe = firstRow.querySelector('.tipe-select');
-
-                    selectKategori.replaceWith(selectKategori.cloneNode(true));
-                    selectNama.replaceWith(selectNama.cloneNode(true));
-                    selectTipe.replaceWith(selectTipe.cloneNode(true));
-
-                    const newKategori = firstRow.querySelector('.kategori-select');
-                    const newNama = firstRow.querySelector('.nama-item-select');
-                    const newTipe = firstRow.querySelector('.tipe-select');
-
-                    newKategori.addEventListener('change', () => {
-                        loadItemsByKategori(newKategori, newNama);
-                    });
-
-                    newNama.addEventListener('change', () => {
-                        loadTipeByKategoriAndJenis(newKategori, newNama, newTipe);
-                    });
-
-                    if (newKategori.value) {
-                        loadItemsByKategori(newKategori, newNama);
+                // initial SN state for the new row
+                const kategori = tr.querySelector('.kategori-select')?.value;
+                const snInput = tr.querySelector('.sn-input');
+                if (snInput) {
+                    if (!kategori) {
+                        snInput.disabled = true;
+                        snInput.placeholder = 'Pilih kategori terlebih dahulu';
+                        snInput.removeAttribute('required');
+                    } else if (kategori === 'aset') {
+                        snInput.disabled = false;
+                        snInput.required = true;
+                        snInput.placeholder = 'Nomor Serial (wajib untuk aset)';
+                    } else {
+                        snInput.disabled = true;
+                        snInput.placeholder = 'Tidak diperlukan untuk Non-Aset';
+                        snInput.removeAttribute('required');
                     }
-                }, 500);
-            });
-        });
-
-        function getCsrfToken() {
-            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-            if (!token) {
-                console.error('CSRF token tidak ditemukan!');
-                alert('Sistem bermasalah: token keamanan hilang. Silakan refresh halaman.');
-            }
-            return token;
-        }
-
-        // Approve Request
-        function approveRequest() {
-            const tiket = document.getElementById('tiketInput').value;
-            if (!tiket) return;
-
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-            if (!csrfToken) {
-                alert('CSRF token tidak ditemukan.');
-                return;
-            }
-            // ✅ Ambil dengan getElementById (lebih spesifik)
-            const tanggalInput = document.getElementById('tanggal_pengiriman');
-            if (!tanggalInput || !tanggalInput.value) {
-                alert('Tanggal Pengiriman wajib diisi.');
-                return;
-            }
-            const tanggalPengiriman = tanggalInput.value;
-
-            // Ambil catatan
-            const catatan = document.querySelector('[name="catatan"]')?.value || '';
-
-            // Ambil items
-            const rows = document.querySelectorAll('#tabelBarang tbody tr');
-            const items = [];
-            let valid = true;
-
-            for (const row of rows) {
-                const cells = row.cells;
-                const kategori = cells[1].querySelector('select')?.value;
-                const nama = cells[2].querySelector('select')?.value;
-                const tipe = cells[3].querySelector('select')?.value;
-                const merk = cells[4].querySelector('input')?.value.trim();
-                const sn = cells[5].querySelector('input')?.value.trim();
-                const jumlah = cells[6].querySelector('input')?.value.trim();
-                const keterangan = cells[7].querySelector('input')?.value.trim();
-
-                if (!kategori || !nama || !jumlah) {
-                    valid = false;
-                    continue;
                 }
+            };
 
-                if (kategori === 'aset' && !sn) {
-                    alert(`Serial Number wajib diisi untuk barang Aset di baris ${row.rowIndex}.`);
+            // allRequests must be provided by Blade: const allRequests = @json($requests);
+            const allRequests = @json($requests);
+
+            document.querySelectorAll('.btn-terima').forEach(button => {
+                button.addEventListener('click', function () {
+                    const tiket = this.dataset.tiket;
+                    const requester = this.dataset.requester;
+                    const tanggal = this.dataset.tanggal;
+
+                    document.getElementById('tiketInput').value = tiket;
+                    document.getElementById('modal-tiket-display').textContent = tiket;
+                    document.getElementById('modal-requester').textContent = requester;
+                    document.getElementById('modal-tanggal').textContent = tanggal;
+
+                    const req = allRequests.find(r => r.tiket === tiket) || {
+                        details: []
+                    };
+                    const detailBody = document.getElementById('detail-request-body');
+                    detailBody.innerHTML = '';
+
+                    if (req.details && req.details.length) {
+                        req.details.forEach((item, index) => {
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+    <td>${index + 1}</td>
+    <td>${item.nama_item ?? item.nama ?? '-'}</td>
+    <td>${item.deskripsi ?? '-'}</td>
+    <td>${item.jumlah ?? '-'}</td>
+    <td>${item.keterangan ?? '-'}</td>
+    `;
+                            detailBody.appendChild(tr);
+                        });
+                    } else {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = '<td colspan="6" class="text-center">Tidak ada item.</td>';
+                        detailBody.appendChild(tr);
+                    }
+
+                    // build form rows
+                    const tbody = document.querySelector('#tabelBarang tbody');
+                    tbody.innerHTML = '';
+                    if (!req.details || req.details.length === 0) {
+                        tbody.appendChild(buildRow(0, {}));
+                    } else {
+                        req.details.forEach((item, idx) => tbody.appendChild(buildRow(idx, item)));
+                    }
+
+                    // show modal and populate rows (fetch SNs in parallel)
+                    const modalEl = document.getElementById('modalTerima');
+                    const modal = new bootstrap.Modal(modalEl);
+
+                    async function onShown() {
+                        const rows = Array.from(document.querySelectorAll('#tabelBarang tbody tr'));
+                        const snList = (req.details || []).map(d => d.sn || d.serial_number ||
+                            null);
+                        const fetchPromises = snList.map(sn => sn ? fetchItemBySN(sn) : Promise
+                            .resolve(null));
+                        const snInfos = await Promise.all(fetchPromises);
+                        for (let i = 0; i < rows.length; i++) {
+                            const tr = rows[i];
+                            const item = (req.details && req.details[i]) ? req.details[i] : {};
+                            const snInfoForThis = snInfos[i] || null;
+                            await populateRowWithItem(tr, item, snInfoForThis);
+                        }
+                        modalEl.removeEventListener('shown.bs.modal', onShown);
+                    }
+
+                    modalEl.addEventListener('shown.bs.modal', onShown);
+                    modal.show();
+                });
+            });
+
+            // -----------------------
+            // Approve / Reject
+            // -----------------------
+            async function approveRequest() {
+                const tiket = document.getElementById('tiketInput').value;
+                if (!tiket) return;
+
+                const csrfToken = getCsrfToken();
+                if (!csrfToken) {
+                    alert('CSRF token tidak ditemukan.');
                     return;
                 }
 
+                const tanggalInput = document.getElementById('tanggal_pengiriman');
+                if (!tanggalInput || !tanggalInput.value) {
+                    alert('Tanggal Pengiriman wajib diisi.');
+                    return;
+                }
+                const tanggalPengiriman = tanggalInput.value;
+                const catatan = document.querySelector('[name="catatan"]')?.value || '';
 
-                items.push({
-                    kategori,
-                    nama_item: nama,
-                    tipe,
-                    merk,
-                    sn,
-                    jumlah: parseInt(jumlah),
-                    keterangan
-                });
-            }
+                const rows = document.querySelectorAll('#tabelBarang tbody tr');
+                const items = [];
+                let valid = true;
 
-            if (!valid || items.length === 0) {
-                alert('Isi minimal satu barang dengan lengkap.');
-                return;
-            }
+                for (const row of rows) {
+                    const cells = row.cells;
+                    const kategori = cells[1].querySelector('select')?.value;
 
-            // 🔥 DEBUG: Cek data sebelum kirim
-            console.log("📦 Mengirim data ke server:", {
-                tiket,
-                tanggal_pengiriman: tanggalPengiriman,
-                catatan,
-                items
-            });
+                    const namaSelect = cells[2].querySelector('select.nama-item-select');
+                    const tipeSelect = cells[3].querySelector('select.tipe-select');
+                    const merkSelect = cells[4].querySelector('select.merk-select');
 
-            // Kirim semua data
-            fetch(`/kepalagudang/request/${tiket}/approve`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    tiket: tiket,
-                    tanggal_pengiriman: tanggalPengiriman,
-                    catatan: catatan,
-                    items: items
-                })
-            })
+                    const namaLabel = namaSelect ? namaSelect.value.trim() : '';
+                    const tipeLabel = tipeSelect ? tipeSelect.value.trim() : '';
+                    const merkLabel = merkSelect ? merkSelect.value.trim() : '';
 
-                .then(response => {
-                    if (!response.ok) throw new Error('Server error');
-                    return response.json();
-                })
-                .then(data => {
+                    const jenisId = cells[2].querySelector('.jenis-id')?.value || getSelectedId(namaSelect) || null;
+                    const tipeId = cells[3].querySelector('.tipe-id')?.value || getSelectedId(tipeSelect) || null;
+                    const vendorId = cells[4].querySelector('.vendor-id')?.value || getSelectedId(merkSelect) ||
+                        null;
+
+                    const sn = cells[5].querySelector('input')?.value.trim();
+                    const jumlah = cells[6].querySelector('input')?.value.trim();
+                    const keterangan = cells[7].querySelector('input')?.value.trim();
+
+                    if (!kategori || !namaLabel || !jumlah) {
+                        valid = false;
+                        continue;
+                    }
+                    if (kategori === 'aset' && !sn) {
+                        alert(`Serial Number wajib diisi untuk barang Aset di baris ${row.rowIndex}.`);
+                        return;
+                    }
+
+                    items.push({
+                        kategori,
+                        nama_item: namaLabel,
+                        tipe: tipeLabel,
+                        merk: merkLabel,
+                        jenis_id: jenisId,
+                        tipe_id: tipeId,
+                        vendor_id: vendorId,
+                        sn: sn || null,
+                        jumlah: parseInt(jumlah),
+                        keterangan: keterangan || null
+                    });
+                }
+
+                if (!valid || items.length === 0) {
+                    alert('Isi minimal satu barang dengan lengkap.');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/kepalagudang/request/${tiket}/approve`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            tiket,
+                            tanggal_pengiriman: tanggalPengiriman,
+                            catatan,
+                            items
+                        })
+                    });
+                    if (!response.ok) throw new Error('Server error ' + response.status);
+                    const data = await response.json();
                     const msg = data.message || 'Terjadi kesalahan. Cek log server.';
                     if (data.success) {
                         alert(msg);
@@ -639,51 +931,244 @@
                     } else {
                         alert('Gagal: ' + msg);
                     }
-                })
-                .catch(err => {
+                } catch (err) {
                     console.error('Fetch error:', err);
                     alert('Terjadi kesalahan teknis. Cek koneksi atau refresh halaman.');
-                });
-        }
-        function rejectRequest() {
-            const tiket = document.getElementById('tiketInput').value;
-            if (!tiket) return;
+                }
+            }
+            window.approveRequest = approveRequest;
 
-            const catatan = prompt('Masukkan alasan penolakan (opsional):', '');
+            function rejectRequest() {
+                const tiket = document.getElementById('tiketInput').value;
+                if (!tiket) return;
 
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-            if (!csrfToken) {
-                alert('CSRF token tidak ditemukan. Silakan refresh halaman.');
-                return;
+                const catatan = prompt('Masukkan alasan penolakan (opsional):', '');
+                const csrfToken = getCsrfToken();
+                if (!csrfToken) {
+                    alert('CSRF token tidak ditemukan. Silakan refresh halaman.');
+                    return;
+                }
+
+                fetch(`/kepalagudang/request/${tiket}/reject`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        tiket,
+                        catatan
+                    })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('modalTerima'));
+                            modal.hide();
+                            location.reload();
+                        } else {
+                            alert('Gagal: ' + data.message);
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error:', err);
+                        alert('Terjadi kesalahan teknis.');
+                    });
+            }
+            window.rejectRequest = rejectRequest;
+
+            // -----------------------
+            // Event delegation: selects, SN inputs
+            // -----------------------
+            document.addEventListener('change', function (e) {
+                const el = e.target;
+
+                if (el.matches('.kategori-select')) {
+                    const tr = el.closest('tr');
+                    const namaSelect = tr.querySelector('.nama-item-select');
+                    const snInput = tr.querySelector('.sn-input');
+
+                    if (snInput) {
+                        if (el.value === 'aset') {
+                            snInput.disabled = false;
+                            snInput.required = true;
+                            snInput.placeholder = 'Nomor Serial (wajib untuk aset)';
+                        } else if (el.value === 'non-aset') {
+                            snInput.disabled = true;
+                            snInput.required = false;
+                            snInput.value = '';
+                            snInput.placeholder = 'Tidak diperlukan untuk Non-Aset';
+                        } else {
+                            snInput.disabled = true;
+                            snInput.required = false;
+                            snInput.value = '';
+                            snInput.placeholder = 'Pilih kategori terlebih dahulu';
+                        }
+                    }
+
+                    if (typeof loadItemsByKategori === 'function') loadItemsByKategori(el, namaSelect);
+                }
+
+                if (el.matches('.nama-item-select')) {
+                    const tr = el.closest('tr');
+                    const hid = tr.querySelector('.jenis-id');
+                    const selId = getSelectedId(el);
+                    if (hid) hid.value = selId || '';
+                    const kategori = tr.querySelector('.kategori-select');
+                    const tipe = tr.querySelector('.tipe-select');
+                    if (kategori && tipe) loadTipeByKategoriAndJenis(kategori, el, tipe);
+                }
+
+                if (el.matches('.tipe-select')) {
+                    const tr = el.closest('tr');
+                    const hid = tr.querySelector('.tipe-id');
+                    const selId = getSelectedId(el);
+                    if (hid) hid.value = selId || '';
+                    const nama = tr.querySelector('.nama-item-select');
+                    const merk = tr.querySelector('.merk-select');
+                    if (nama && merk) loadVendors(nama, el, merk);
+                }
+
+                if (el.matches('.merk-select')) {
+                    const tr = el.closest('tr');
+                    const hid = tr.querySelector('.vendor-id');
+                    const selId = getSelectedId(el);
+                    if (hid) hid.value = selId || '';
+                }
+            });
+
+            // SN input handlers (focusout & Enter)
+            document.addEventListener('focusout', function (e) {
+                const el = e.target;
+                if (el.matches('#tabelBarang .sn-col input')) {
+                    if (el.disabled) return;
+                    handleSnInputEvent(el);
+                }
+            }, true);
+
+            document.addEventListener('keydown', function (e) {
+                const el = e.target;
+                if (e.key === 'Enter' && el.matches('#tabelBarang .sn-col input')) {
+                    e.preventDefault();
+                    if (el.disabled) return;
+                    handleSnInputEvent(el);
+                }
+            });
+
+            async function handleSnInputEvent(inputEl) {
+                if (!inputEl || inputEl.disabled) return;
+                const sn = inputEl.value.trim();
+                const tr = inputEl.closest('tr');
+                if (!tr) return;
+                const kategoriSelect = tr.querySelector('.kategori-select');
+                if (kategoriSelect && kategoriSelect.value !== 'aset') return;
+
+                const keteranganInput = tr.querySelector('.keterangan-col input, .keterangan-col textarea');
+                if (keteranganInput) keteranganInput.value = '';
+
+                if (!sn) return;
+
+                const snInfo = await fetchItemBySN(sn);
+                if (!snInfo) {
+                    alert(`SN "${sn}" tidak ditemukan di database.`);
+                    if (keteranganInput) keteranganInput.value = '';
+                    return;
+                }
+
+                const namaSelect = tr.querySelector('.nama-item-select');
+                const tipeSelect = tr.querySelector('.tipe-select');
+                const merkSelect = tr.querySelector('.merk-select');
+
+                // set nama/jenis
+                const namaId = snInfo.nama_id ?? snInfo.jenis_id ?? null;
+                if (namaId) {
+                    const optNama = ensureOption(namaSelect, namaId, snInfo.nama ?? snInfo.name ?? String(namaId));
+                    if (optNama) {
+                        namaSelect.value = optNama.value;
+                        namaSelect.dispatchEvent(new Event('change'));
+                    }
+                } else if (snInfo.nama || snInfo.name) {
+                    const optNama = ensureOption(namaSelect, null, snInfo.nama ?? snInfo.name);
+                    if (optNama) {
+                        namaSelect.value = optNama.value;
+                        namaSelect.dispatchEvent(new Event('change'));
+                    }
+                }
+
+                // load tipe and set
+                await loadTipeByKategoriAndJenis(kategoriSelect, namaSelect, tipeSelect);
+                const tipeId = snInfo.tipe_id ?? null;
+                if (tipeId) {
+                    const optT = ensureOption(tipeSelect, tipeId, snInfo.tipe_nama ?? snInfo.tipe ?? String(
+                        tipeId));
+                    if (optT) {
+                        tipeSelect.value = optT.value;
+                        tipeSelect.dispatchEvent(new Event('change'));
+                    }
+                } else if (snInfo.tipe_nama || snInfo.tipe) {
+                    const optT = ensureOption(tipeSelect, null, snInfo.tipe_nama ?? snInfo.tipe);
+                    if (optT) {
+                        tipeSelect.value = optT.value;
+                        tipeSelect.dispatchEvent(new Event('change'));
+                    }
+                }
+
+                // load vendors and set merk
+                await loadVendors(namaSelect, tipeSelect, merkSelect);
+                const vendorId = snInfo.vendor_id ?? null;
+                if (vendorId) {
+                    const optV = ensureOption(merkSelect, vendorId, snInfo.vendor_nama ?? snInfo.vendor ?? String(
+                        vendorId));
+                    if (optV) merkSelect.value = optV.value;
+                } else if (snInfo.vendor_nama || snInfo.vendor) {
+                    const optV = ensureOption(merkSelect, null, snInfo.vendor_nama ?? snInfo.vendor);
+                    if (optV) merkSelect.value = optV.value;
+                }
+
+                // keterangan
+                if (keteranganInput) keteranganInput.value = snInfo.keterangan ?? snInfo.note ?? '';
+
+                // update hidden id inputs
+                const jenisIdInput = tr.querySelector('.jenis-id');
+                const tipeIdInput = tr.querySelector('.tipe-id');
+                const vendorIdInput = tr.querySelector('.vendor-id');
+                if (jenisIdInput && namaSelect) jenisIdInput.value = getSelectedId(namaSelect) || '';
+                if (tipeIdInput && tipeSelect) tipeIdInput.value = getSelectedId(tipeSelect) || '';
+                if (vendorIdInput && merkSelect) vendorIdInput.value = getSelectedId(merkSelect) || '';
             }
 
-            fetch(`/kepalagudang/request/${tiket}/reject`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    tiket: tiket,
-                    catatan: catatan
-                })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalTerima'));
-                        modal.hide();
-                        location.reload();
+            // Initial state for static rows (on page load)
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelectorAll('#tabelBarang tbody tr').forEach((tr, idx) => {
+                    const kategori = tr.querySelector('.kategori-select')?.value;
+                    const snInput = tr.querySelector('.sn-col input');
+                    if (!snInput) return;
+                    if (!kategori) {
+                        snInput.disabled = true;
+                        snInput.placeholder = 'Pilih kategori terlebih dahulu';
+                        snInput.removeAttribute('required');
+                    } else if (kategori === 'aset') {
+                        snInput.disabled = false;
+                        snInput.required = true;
+                        snInput.placeholder = 'Nomor Serial (wajib untuk aset)';
                     } else {
-                        alert('Gagal: ' + data.message);
+                        snInput.disabled = true;
+                        snInput.value = '';
+                        snInput.placeholder = 'Tidak diperlukan untuk Non-Aset';
+                        snInput.removeAttribute('required');
                     }
-                })
-                .catch(err => {
-                    console.error('Error:', err);
-                    alert('Terjadi kesalahan teknis.');
+
+                    // reindex names for compatibility
+                    tr.querySelectorAll('[name]').forEach(el => {
+                        const name = el.getAttribute('name');
+                        if (!name) return;
+                        const newName = name.replace(/items$$\d+$$/, `items[${idx}]`);
+                        el.setAttribute('name', newName);
+                    });
                 });
-        }
-        
+            });
+
+        })();
     </script>
 @endpush

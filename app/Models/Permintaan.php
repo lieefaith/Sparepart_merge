@@ -10,27 +10,23 @@ class Permintaan extends Model
     protected $table = 'permintaan';
 
     protected $fillable = [
-    'user_id',
-    'tanggal_permintaan',
-    'status',
-    'status_ro',          
-    'status_gudang',
-    'status_admin',
-    'status_super_admin',
-    'catatan_ro',
-    'catatan_gudang',
-    'catatan_admin',
-    'catatan_super_admin',
-    'approved_by_ro',
-    'approved_by_gudang',
-    'approved_by_admin',
-    'approved_by_super_admin',
-     'status_penerimaan',
-    'nomor_resi',
-    'foto_bukti_penerimaan',
-    'tanggal_penerimaan',
+        'user_id',
+        'tanggal_permintaan',
+        'status',
+        'status_ro',
+        'status_gudang',
+        'status_admin',
+        'status_super_admin',
+        'catatan_ro',
+        'catatan_gudang',
+        'catatan_admin',
+        'catatan_super_admin',
+        'approved_by_ro',
+        'approved_by_gudang',
+        'approved_by_admin',
+        'approved_by_super_admin',
     ];
-     protected $casts = [
+    protected $casts = [
         'status' => 'string',
         'status_ro' => 'string',
         'status_gudang' => 'string',
@@ -89,8 +85,7 @@ class Permintaan extends Model
         return $this->hasOne(HistoriPermintaan::class, 'tiket', 'tiket');
     }
     public function pengiriman()
-{
-    return $this->hasOne(\App\Models\Pengiriman::class, 'tiket_permintaan', 'tiket');
-}
-
+    {
+        return $this->hasOne(Pengiriman::class, 'tiket_permintaan', 'tiket');
+    }
 }
