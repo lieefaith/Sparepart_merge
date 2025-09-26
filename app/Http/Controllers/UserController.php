@@ -144,19 +144,21 @@ class UserController extends Controller
     }
 
 
-    public function validasiIndex()
-    {
-        $user = auth()->user();
+public function validasiIndex()
+{
+    $user = auth()->user();
 
-        $requests = Permintaan::with(['details', 'pengiriman.details'])
-            ->where('user_id', $user->id)
-            ->where('status_gudang', 'approved') // Sudah dikirim gudang
-            ->where('status_penerimaan', '!=', 'diterima') // Belum diterima
-            ->orderBy('tanggal_permintaan', 'desc')
-            ->get();
+    $requests = Permintaan::with(['details', 'pengiriman.details'])
+        ->where('user_id', $user->id)
+        ->where('status_gudang', 'approved')
+        ->where('status_penerimaan', '!=', 'diterima')
+        ->orderBy('tanggal_permintaan', 'desc')
+        ->get();
 
-        return view('user.validasi', compact('requests'));
-    }
+    $data = $requests; // tambahkan ini
+    return view('user.validasi', compact('requests', 'data'));
+}
+
 
     public function terimaBarang(Request $request, $tiket)
     {
@@ -210,5 +212,21 @@ class UserController extends Controller
         $requests = $query->get();
 
         return view('user.history', compact('requests'));
+    }
+
+        public function historyDetailApi($tiket)
+    {
+        $permintaan = Permintaan::with(['user', 'details'])
+            ->where('tiket', $tiket)
+            ->firstOrFail();
+
+        $pengiriman = Pengiriman::with('details')
+            ->where('tiket_permintaan', $tiket)
+            ->first();
+
+        return response()->json([
+            'permintaan' => $permintaan,
+            'pengiriman' => $pengiriman,
+        ]);
     }
 }

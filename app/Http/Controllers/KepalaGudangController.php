@@ -254,38 +254,38 @@ class KepalaGudangController extends Controller
     }
 
     public function rejectGudang(Request $request, $tiket)
-{
-    try {
-        $permintaan = Permintaan::where('tiket', $tiket)->firstOrFail();
+    {
+        try {
+            $permintaan = Permintaan::where('tiket', $tiket)->firstOrFail();
 
-        // Ambil catatan dari request (opsional)
-        $catatan = $request->input('catatan', 'Ditolak oleh Kepala Gudang');
+            // Ambil catatan dari request (opsional)
+            $catatan = $request->input('catatan', 'Ditolak oleh Kepala Gudang');
 
-        // Update semua status jadi rejected
-        $permintaan->update([
-            'status_gudang' => 'rejected',
-            'status_ro' => 'rejected',
-            'status_admin' => 'rejected',
-            'status_super_admin' => 'rejected',
-            'status_barang' => 'rejected', // ✅ 'closed', bukan 'rejected' (sesuai enum)
-            'status' => 'ditolak',
-            'catatan_gudang' => $catatan,
-        ]);
+            // Update semua status jadi rejected
+            $permintaan->update([
+                'status_gudang' => 'rejected',
+                'status_ro' => 'rejected',
+                'status_admin' => 'rejected',
+                'status_super_admin' => 'rejected',
+                'status_barang' => 'rejected', // ✅ 'closed', bukan 'rejected' (sesuai enum)
+                'status' => 'ditolak',
+                'catatan_gudang' => $catatan,
+            ]);
 
-        // ✅ Kembalikan JSON sukses
-        return response()->json([
-            'success' => true,
-            'message' => 'Permintaan berhasil ditolak.'
-        ]);
+            // ✅ Kembalikan JSON sukses
+            return response()->json([
+                'success' => true,
+                'message' => 'Permintaan berhasil ditolak.'
+            ]);
 
-    } catch (\Exception $e) {
-        // ✅ Tangani error & kembalikan JSON error
-        return response()->json([
-            'success' => false,
-            'message' => 'Gagal menolak permintaan: ' . $e->getMessage()
-        ], 500);
+        } catch (\Exception $e) {
+            // ✅ Tangani error & kembalikan JSON error
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menolak permintaan: ' . $e->getMessage()
+            ], 500);
+        }
     }
-}
 
     public function approve(Request $request)
     {
@@ -333,7 +333,7 @@ class KepalaGudangController extends Controller
             $permintaan = Permintaan::where('tiket', $tiket)->firstOrFail();
 
             // ✅ Validasi: Hanya proses jika status_gudang masih 'pending'
-            if ($permintaan->status_gudang !== 'pending') {
+            if ($permintaan->status_gudang !== 'on progres') {
                 return response()->json([
                     'success' => false,
                     'message' => 'Permintaan ini sudah diproses sebelumnya. Tidak dapat diproses ulang.'
@@ -495,31 +495,47 @@ class KepalaGudangController extends Controller
 
     public function closedFormIndex()
     {
-        // 🔸 Dummy data sementara (nanti diganti dengan query ke database)
-        $permintaans = collect([
-            (object) [
-                'tiket' => 'REQ-JKT-04-2025-001',
-                'user_name' => 'Ahmad Fauzi',
-                'tanggal_penerimaan' => '2025-04-05 14:30',
-                'foto_bukti_penerimaan' => 'validasi/bukti_001.jpg',
-                'status_barang' => 'diterima',
-            ],
-            (object) [
-                'tiket' => 'REQ-SBY-04-2025-003',
-                'user_name' => 'Siti Rahayu',
-                'tanggal_penerimaan' => '2025-04-06 09:15',
-                'foto_bukti_penerimaan' => 'validasi/bukti_003.pdf',
-                'status_barang' => 'diterima',
-            ],
-        ]);
+        // Data dummy: REQ-CLG-09-2025-010 sampai 021
+        $permintaans = collect();
+        for ($i = 10; $i <= 21; $i++) {
+            $permintaans->push((object) [
+                'tiket' => "REQ-CLG-09-2025-" . str_pad($i, 3, '0', STR_PAD_LEFT),
+                'user' => (object) ['region' => 'CLG', 'id' => rand(1, 50)],
+                'tanggal_penerimaan' => now()->subDays(rand(1, 30)),
+                'foto_bukti_penerimaan' => 'validasi/bukti_' . $i . '.jpg',
+                'no_resi' => 'RESI-' . rand(100000, 999999),
+            ]);
+        }
 
         return view('kepalagudang.closed-form', compact('permintaans'));
     }
 
     public function verifyClosedForm(Request $request, $tiket)
-{
-    // Nanti isi logika verifikasi
-    return redirect()->back()->with('success', 'Berhasil diverifikasi!');
-}
+    {
+        // Nanti isi logika verifikasi
+        return redirect()->back()->with('success', 'Berhasil diverifikasi!');
+    }
+
+    public function getValidasiDetail($tiket)
+    {
+        // Untuk dummy, kita kembalikan data simulasi
+        return response()->json([
+            'tiket' => $tiket,
+            'name' => 'User CLG ' . rand(1, 50),
+            'tanggal_permintaan' => now()->subDays(10)->toISOString(),
+            'no_resi' => 'RESI-' . rand(100000, 999999),
+            'nama_ekspedisi' => 'JNE',
+            'foto_bukti_penerimaan' => 'validasi/bukti_' . rand(10, 21) . '.jpg',
+            'details' => [
+                ['nama' => 'Laptop Dell', 'deskripsi' => 'Core i5, 8GB RAM', 'jumlah' => 2, 'keterangan' => 'Baru'],
+            ],
+            'pengiriman' => [
+                'tanggal_transaksi' => now()->subDays(5)->toISOString(),
+                'details' => [
+                    ['nama' => 'Laptop Dell', 'merk' => 'Dell', 'sn' => 'SN123456', 'tipe' => 'Latitude', 'jumlah' => 2, 'keterangan' => 'Dikirim sesuai'],
+                ],
+            ],
+        ]);
+    }
 
 }

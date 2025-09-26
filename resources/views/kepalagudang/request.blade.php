@@ -270,22 +270,6 @@
                                                 </div>
                                             </div>
                                         </div>
-
-                                        <!-- Form tambahan jika memilih Ya -->
-                                        <div id="formEkspedisi" class="mt-3" style="display: none;">
-                                            <div class="row g-2">
-                                                <div class="col-12">
-                                                    <label class="form-label">Nama Ekspedisi</label>
-                                                    <input type="text" class="form-control" name="nama_ekspedisi"
-                                                        placeholder="JNE, TIKI, POS Indonesia">
-                                                </div>
-                                                <div class="col-12">
-                                                    <label class="form-label">Nomor Resi</label>
-                                                    <input type="text" class="form-control" name="no_resi"
-                                                        placeholder="Nomor tracking pengiriman">
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>

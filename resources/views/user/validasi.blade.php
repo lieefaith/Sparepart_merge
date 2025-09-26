@@ -65,27 +65,19 @@
                                 </td>
                                 <td class="px-4 py-3 text-sm">
                                     <div class="flex items-center space-x-2">
-                                        @if($req->status_penerimaan == 'diterima')
-                                            <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Diterima</span>
+                                        @if ($req->status_penerimaan == 'diterima')
+                                            <span
+                                                class="inline-flex items-center px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Diterima</span>
                                         @else
-                                            <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">Dikirim</span>
+                                            <span
+                                                class="inline-flex items-center px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">Dikirim</span>
                                         @endif
-
-                                        <button 
-                                            type="button"
-                                            onclick="showStatusDetailModal('{{ $req->tiket }}', 'user')"
-                                            class="text-blue-600 hover:text-blue-800 focus:outline-none"
-                                            title="Lihat detail progres approval">
-                                            <i class="fas fa-eye text-sm"></i>
-                                        </button>
                                     </div>
                                 </td>
                                 <td class="px-4 py-3 text-sm">
-                                    @if($req->status_penerimaan != 'diterima')
-                                        <button class="btn btn-success btn-sm btn-terima" 
-                                            data-tiket="{{ $req->tiket }}"
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#modalTerima">
+                                    @if ($req->status_penerimaan != 'diterima')
+                                        <button class="btn btn-success btn-sm btn-terima" data-tiket="{{ $req->tiket }}"
+                                            data-bs-toggle="modal" data-bs-target="#modalTerima">
                                             <i class="bi bi-check-circle me-1"></i> Terima
                                         </button>
                                     @else
@@ -154,7 +146,9 @@
                                 </tr>
                             </thead>
                             <tbody id="request-table-body">
-                                <tr><td colspan="5" class="text-center">Memuat data...</td></tr>
+                                <tr>
+                                    <td colspan="5" class="text-center">Memuat data...</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -181,64 +175,84 @@
                                 </tr>
                             </thead>
                             <tbody id="pengiriman-table-body">
-                                <tr><td colspan="7" class="text-center">Memuat data...</td></tr>
+                                <tr>
+                                    <td colspan="7" class="text-center">Memuat data...</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
 
                     <hr>
-
-                    <!-- Layout Kanan-Kiri untuk Opsi Ekspedisi dan Upload File -->
-                        <div class="row mt-3">
-                            <!-- Kolom Kiri: Opsi Ekspedisi -->
-                            <div class="col-md-6">
-                                <div class="card h-100">
-                                    <div class="card-header bg-light">
-                                        <h6 class="card-title mb-0"><i class="bi bi-ticket-perforated"></i> Resi Pengiriman</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="col-12">
-                                                    <label class="form-label">Nomor Resi</label>
-                                                    <input type="text" class="form-control" name="no_resi"
-                                                        placeholder="Nomor tracking pengiriman">
-                                                </div>
-                                        <!-- Form tambahan jika memilih Ya -->
-                                        <div id="formEkspedisi" class="mt-3" style="display: none;">
-                                            <div class="row g-2">
-                                                <div class="col-12">
-                                                    <label class="form-label">Nama Ekspedisi</label>
-                                                    <input type="text" class="form-control" name="nama_ekspedisi"
-                                                        placeholder="JNE, TIKI, POS Indonesia">
-                                                </div>
-                                                <div class="col-12">
-                                                    <label class="form-label">Nomor Resi</label>
-                                                    <input type="text" class="form-control" name="no_resi"
-                                                        placeholder="Nomor tracking pengiriman">
-                                                </div>
-                                            </div>
-                                        </div>
+                    <div class="row mt-3">
+                        <div class="card h-100">
+                            <div class="card-header bg-light">
+                                <h6 class="card-title mb-0"><i class="bi bi-paperclip"></i> Lampiran File</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Upload File Pendukung</label>
+                                    <input type="file" class="form-control" name="file_upload" id="fileUpload">
+                                    <div class="form-text mt-2">
+                                        <small>Format: PDF, JPG, PNG, DOC, DOCX<br>Maksimal: 5MB</small>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Kolom Kanan: Upload File -->
-                            <div class="col-md-6">
-                                <div class="card h-100">
-                                    <div class="card-header bg-light">
-                                        <h6 class="card-title mb-0"><i class="bi bi-paperclip"></i> Lampiran File</h6>
+                    </div>
+
+                    <!-- Layout Kanan-Kiri untuk Opsi Ekspedisi dan Upload File -->
+                    <div class="row mt-3">
+                        <!-- Kolom Kiri: Opsi Ekspedisi -->
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-header bg-light">
+                                    <h6 class="card-title mb-0"><i class="bi bi-ticket-perforated"></i> Resi Pengiriman
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="col-12">
+                                        <label class="form-label">Nomor Resi</label>
+                                        <input type="text" class="form-control" name="no_resi"
+                                            placeholder="Nomor tracking pengiriman">
                                     </div>
-                                    <div class="card-body">
-                                        <div class="mb-3">
-                                            <label class="form-label fw-semibold">Upload File Pendukung</label>
-                                            <input type="file" class="form-control" name="file_upload" id="fileUpload">
-                                            <div class="form-text mt-2">
-                                                <small>Format: PDF, JPG, PNG, DOC, DOCX<br>Maksimal: 5MB</small>
+                                    <!-- Form tambahan jika memilih Ya -->
+                                    <div id="formEkspedisi" class="mt-3" style="display: none;">
+                                        <div class="row g-2">
+                                            <div class="col-12">
+                                                <label class="form-label">Nama Ekspedisi</label>
+                                                <input type="text" class="form-control" name="nama_ekspedisi"
+                                                    placeholder="JNE, TIKI, POS Indonesia">
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label">Nomor Resi</label>
+                                                <input type="text" class="form-control" name="no_resi"
+                                                    placeholder="Nomor tracking pengiriman">
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Kolom Kanan: Upload File -->
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-header bg-light">
+                                    <h6 class="card-title mb-0"><i class="bi bi-paperclip"></i> Lampiran File</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Upload File Pendukung</label>
+                                        <input type="file" class="form-control" name="file_upload" id="fileUpload">
+                                        <div class="form-text mt-2">
+                                            <small>Format: PDF, JPG, PNG, DOC, DOCX<br>Maksimal: 5MB</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     </form>
                 </div>
 
@@ -251,250 +265,437 @@
             </div>
         </div>
     </div>
+    <script>
+        (function() {
+            document.addEventListener('DOMContentLoaded', function() {
+                // ----- Helper -----
+                const safeQuery = (sel, root = document) => root.querySelector(sel);
+                const safeQueryAll = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+                const getCsrfToken = () => document.querySelector('meta[name="csrf-token"]')?.getAttribute(
+                    'content') || '';
 
-    <!-- Modal Detail Approval Berjenjang -->
-    <div x-data="{ showStatusDetail: false, status: {}, role: 'user' }"
-         x-show="showStatusDetail"
-         x-cloak
-         class="fixed inset-0 z-50 overflow-y-auto"
-         style="display: none;"
-         id="status-detail-modal">
-        <div class="flex items-center justify-center min-h-screen">
-            <div class="bg-black bg-opacity-50 absolute inset-0" @click="showStatusDetail = false"></div>
-            <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 z-10">
-                <div class="modal-header bg-blue-600 text-white p-4 rounded-t-lg flex justify-between items-center">
-                    <h5 class="text-lg font-semibold">Detail Progres Approval</h5>
-                    <button @click="showStatusDetail = false" class="text-white hover:text-gray-200">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="p-6">
-                    <div class="space-y-4 text-sm">
-                        <!-- Kepala RO -->
-                        <template x-if="['user'].includes(role)">
-                            <div class="flex justify-between items-center p-3 border border-gray-200 rounded">
-                                <span class="font-medium">Kepala RO</span>
-                                <span :class="{
-                                    'bg-yellow-100 text-yellow-800': status.ro === 'pending',
-                                    'bg-green-100 text-green-800': status.ro === 'approved',
-                                    'bg-red-100 text-red-800': status.ro === 'rejected'
-                                }" class="px-3 py-1 rounded-full text-xs font-medium">
-                                    <template x-if="status.ro === 'pending'">Pending</template>
-                                    <template x-if="status.ro === 'approved'">Disetujui</template>
-                                    <template x-if="status.ro === 'rejected'">Ditolak</template>
-                                </span>
-                            </div>
-                        </template>
+                const formatDateId = (iso) => {
+                    try {
+                        return new Date(iso).toLocaleDateString('id-ID', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                    } catch (e) {
+                        return iso ?? '-';
+                    }
+                };
 
-                        <!-- Kepala Gudang -->
-                        <template x-if="['user', 'kepala_ro'].includes(role)">
-                            <div class="flex justify-between items-center p-3 border border-gray-200 rounded">
-                                <span class="font-medium">Kepala Gudang</span>
-                                <span :class="{
-                                    'bg-yellow-100 text-yellow-800': status.gudang === 'pending',
-                                    'bg-green-100 text-green-800': status.gudang === 'approved',
-                                    'bg-red-100 text-red-800': status.gudang === 'rejected'
-                                }" class="px-3 py-1 rounded-full text-xs font-medium">
-                                    <template x-if="status.gudang === 'pending'">Pending</template>
-                                    <template x-if="status.gudang === 'approved'">Disetujui</template>
-                                    <template x-if="status.gudang === 'rejected'">Ditolak</template>
-                                </span>
-                            </div>
-                        </template>
+                // ----- Ensure preview image exists (create if missing) -----
+                const fileInput = safeQuery('#fileUpload') || safeQuery(
+                    'input[type="file"][name="file_upload"]') || null;
+                let previewImg = safeQuery('#previewFoto');
+                if (!previewImg) {
+                    if (fileInput && fileInput.parentElement) {
+                        previewImg = document.createElement('img');
+                        previewImg.id = 'previewFoto';
+                        previewImg.alt = 'Preview';
+                        previewImg.style.display = 'none';
+                        previewImg.style.maxWidth = '200px';
+                        previewImg.style.marginTop = '10px';
+                        fileInput.parentElement.appendChild(previewImg);
+                    }
+                }
 
-                        <!-- Admin -->
-                        <template x-if="['user', 'kepala_ro', 'kepala_gudang'].includes(role)">
-                            <div class="flex justify-between items-center p-3 border border-gray-200 rounded">
-                                <span class="font-medium">Admin</span>
-                                <span :class="{
-                                    'bg-yellow-100 text-yellow-800': status.admin === 'pending',
-                                    'bg-green-100 text-green-800': status.admin === 'approved',
-                                    'bg-red-100 text-red-800': status.admin === 'rejected'
-                                }" class="px-3 py-1 rounded-full text-xs font-medium">
-                                    <template x-if="status.admin === 'pending'">Pending</template>
-                                    <template x-if="status.admin === 'approved'">Disetujui</template>
-                                    <template x-if="status.admin === 'rejected'">Ditolak</template>
-                                </span>
-                            </div>
-                        </template>
+                if (fileInput) {
+                    fileInput.addEventListener('change', function(e) {
+                        const file = e.target.files && e.target.files[0];
+                        if (!file) {
+                            if (previewImg) {
+                                previewImg.style.display = 'none';
+                                previewImg.src = '';
+                            }
+                            return;
+                        }
+                        const reader = new FileReader();
+                        reader.onload = function(ev) {
+                            if (previewImg) {
+                                previewImg.src = ev.target.result;
+                                previewImg.style.display = 'block';
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                }
 
-                        <!-- Super Admin -->
-                        <template x-if="['user', 'kepala_ro', 'kepala_gudang', 'admin'].includes(role)">
-                            <div class="flex justify-between items-center p-3 border border-gray-200 rounded">
-                                <span class="font-medium">Super Admin</span>
-                                <span :class="{
-                                    'bg-yellow-100 text-yellow-800': status.super_admin === 'pending',
-                                    'bg-green-100 text-green-800': status.super_admin === 'approved',
-                                    'bg-red-100 text-red-800': status.super_admin === 'rejected'
-                                }" class="px-3 py-1 rounded-full text-xs font-medium">
-                                    <template x-if="status.super_admin === 'pending'">Pending</template>
-                                    <template x-if="status.super_admin === 'approved'">Disetujui</template>
-                                    <template x-if="status.super_admin === 'rejected'">Ditolak</template>
-                                </span>
-                            </div>
-                        </template>
+                // ----- Ensure hidden input for tiket exists (create if missing) -----
+                let inputTiket = safeQuery('#inputTiket');
+                const modalTerima = safeQuery('#modalTerima');
+                if (!inputTiket) {
+                    inputTiket = document.createElement('input');
+                    inputTiket.type = 'hidden';
+                    inputTiket.id = 'inputTiket';
+                    inputTiket.name = 'tiket';
+                    if (modalTerima) {
+                        // append to modal body if exists
+                        const body = safeQuery('.modal-body', modalTerima) || modalTerima;
+                        body.appendChild(inputTiket);
+                    } else {
+                        document.body.appendChild(inputTiket);
+                    }
+                }
 
-                        <!-- Catatan Jika Ditolak -->
-                        <div class="mt-4 text-sm" x-show="status.catatan">
-                            <strong>Catatan:</strong>
-                            <p x-text="status.catatan" class="text-gray-600 mt-1"></p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-gray-50 px-6 py-4 rounded-b-lg flex justify-end">
-                    <button @click="showStatusDetail = false" class="btn btn-secondary bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-md text-sm">
-                        Tutup
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-@endsection
+                // Bootstrap modal instance helper (Bootstrap 5)
+                const getBootstrapModal = (element) => {
+                    if (!element) return null;
+                    if (typeof bootstrap === 'undefined' || !bootstrap.Modal) return null;
+                    return bootstrap.Modal.getOrCreateInstance(element);
+                };
 
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    // Preview foto
-    document.querySelector('input[name="foto_bukti"]')?.addEventListener('change', function(e) {
-        const preview = document.getElementById('previewFoto');
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.src = e.target.result;
-                preview.style.display = 'block';
-            }
-            reader.readAsDataURL(file);
-        } else {
-            preview.style.display = 'none';
-        }
-    });
+                const modalInstanceTerima = getBootstrapModal(modalTerima);
 
-    // Buka modal & load data
-    document.querySelectorAll('.btn-terima').forEach(button => {
-        button.addEventListener('click', function() {
-            const tiket = this.dataset.tiket;
+                // ----- Table body placeholders -----
+                const requestTableBody = safeQuery('#request-table-body');
+                const pengirimanTableBody = safeQuery('#pengiriman-table-body');
 
-            // Reset modal
-            document.getElementById('modal-tiket-display').textContent = '-';
-            document.getElementById('modal-requester-display').textContent = '-';
-            document.getElementById('modal-tanggal-request-display').textContent = '-';
-            document.getElementById('modal-tanggal-pengiriman-display').textContent = '-';
-            document.getElementById('inputTiket').value = tiket;
-            document.getElementById('previewFoto').style.display = 'none';
+                // Ganti fungsi loadRequestDetailToModal Anda dengan ini
+                async function loadRequestDetailToModal(tiket) {
+                    if (!tiket) return;
+                    // Reset UI
+                    safeQuery('#modal-tiket-display') && (safeQuery('#modal-tiket-display').textContent =
+                        '-');
+                    safeQuery('#modal-requester-display') && (safeQuery('#modal-requester-display')
+                        .textContent = '-');
+                    safeQuery('#modal-tanggal-request-display') && (safeQuery(
+                        '#modal-tanggal-request-display').textContent = '-');
+                    safeQuery('#modal-tanggal-pengiriman-display') && (safeQuery(
+                        '#modal-tanggal-pengiriman-display').textContent = '-');
+                    if (inputTiket) inputTiket.value = tiket;
+                    if (previewImg) {
+                        previewImg.style.display = 'none';
+                        previewImg.src = '';
+                    }
 
-            // Reset tabel
-            document.getElementById('request-table-body').innerHTML = '<tr><td colspan="5" class="text-center">Memuat data...</td></tr>';
-            document.getElementById('pengiriman-table-body').innerHTML = '<tr><td colspan="7" class="text-center">Memuat data...</td></tr>';
+                    if (requestTableBody) requestTableBody.innerHTML =
+                        '<tr><td colspan="5" class="text-center">Memuat data...</td></tr>';
+                    if (pengirimanTableBody) pengirimanTableBody.innerHTML =
+                        '<tr><td colspan="7" class="text-center">Memuat data...</td></tr>';
 
-            // Fetch data request + pengiriman
-            fetch(`/requestbarang/${tiket}`)
-                .then(response => response.json())
-                .then(data => {
-                    // Isi data request
-                    document.getElementById('modal-tiket-display').textContent = data.tiket;
-                    document.getElementById('modal-requester-display').textContent = data.name || 'User';
-                    document.getElementById('modal-tanggal-request-display').textContent = new Date(data.tanggal_permintaan)
-                        .toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+                    try {
+                        const url = `/user/validasi/${encodeURIComponent(tiket)}/api?_=${Date.now()}`;
+                        const resp = await fetch(url, {
+                            method: 'GET',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json'
+                            },
+                            credentials: 'same-origin',
+                            cache: 'no-store'
+                        });
 
-                    // Isi tabel request
-                    const requestTable = document.getElementById('request-table-body');
-                    requestTable.innerHTML = '';
-                    data.details.forEach((item, index) => {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td>${index + 1}</td>
-                            <td>${item.nama}</td>
-                            <td>${item.deskripsi || '-'}</td>
-                            <td>${item.jumlah}</td>
-                            <td>${item.keterangan || '-'}</td>
-                        `;
-                        requestTable.appendChild(tr);
+                        const rawText = await resp.clone().text();
+                        // Jika bukan OK, tampilkan response untuk debugging
+                        if (!resp.ok) {
+                            console.error('Fetch error:', resp.status, rawText);
+                            throw new Error(`Fetch gagal: ${resp.status}`);
+                        }
+
+                        let data;
+                        try {
+                            data = rawText ? JSON.parse(rawText) : {};
+                        } catch (e) {
+                            console.error('JSON parse error. Response text:', rawText);
+                            throw e;
+                        }
+
+                        // Struktur: data.permintaan, data.pengiriman
+                        const permintaan = data.permintaan || null;
+                        const pengiriman = data.pengiriman || null;
+
+                        // Isi dasar permintaan
+                        if (permintaan) {
+                            safeQuery('#modal-tiket-display') && (safeQuery('#modal-tiket-display')
+                                .textContent = permintaan.tiket ?? tiket);
+                            safeQuery('#modal-requester-display') && (safeQuery('#modal-requester-display')
+                                .textContent = permintaan.user?.name ?? '-');
+                            if (permintaan.tanggal_permintaan) {
+                                safeQuery('#modal-tanggal-request-display') && (safeQuery(
+                                    '#modal-tanggal-request-display').textContent = formatDateId(
+                                    permintaan.tanggal_permintaan));
+                            }
+
+                            // Preview foto jika ada (contoh: path atau URL)
+                            if (previewImg && permintaan.foto_bukti_penerimaan) {
+                                let src = permintaan.foto_bukti_penerimaan;
+                                // Jika stored path (mis. 'uploads/..'), coba prefix /storage/
+                                if (!/^https?:\/\//i.test(src) && !src.startsWith('/')) {
+                                    // sesuaikan prefix sesuai cara Anda menyajikan file (Storage::url, dsb.)
+                                    // Jika Anda menggunakan public storage -> /storage/{path}
+                                    src = '/storage/' + src;
+                                }
+                                previewImg.src = src;
+                                previewImg.style.display = 'block';
+                            }
+                        } else {
+                            safeQuery('#modal-tiket-display') && (safeQuery('#modal-tiket-display')
+                                .textContent = tiket);
+                        }
+
+                        // Populate request details table (permintaan.details)
+                        if (requestTableBody) {
+                            requestTableBody.innerHTML = '';
+                            const details = Array.isArray(permintaan?.details) ? permintaan.details : [];
+                            if (details.length === 0) {
+                                requestTableBody.innerHTML =
+                                    '<tr><td colspan="5" class="text-center">Tidak ada item.</td></tr>';
+                            } else {
+                                details.forEach((item, idx) => {
+                                    const tr = document.createElement('tr');
+                                    // field names sesuai contoh JSON: nama_item, deskripsi, jumlah, keterangan
+                                    tr.innerHTML = `
+            <td>${idx + 1}</td>
+            <td>${item.nama_item ?? item.nama ?? '-'}</td>
+            <td>${item.deskripsi ?? '-'}</td>
+            <td>${item.jumlah ?? '-'}</td>
+            <td>${item.keterangan ?? '-'}</td>
+          `;
+                                    requestTableBody.appendChild(tr);
+                                });
+                            }
+                        }
+
+                        // Populate pengiriman
+                        if (pengiriman) {
+                            if (pengiriman.tanggal_transaksi) {
+                                safeQuery('#modal-tanggal-pengiriman-display') && (safeQuery(
+                                    '#modal-tanggal-pengiriman-display').textContent = formatDateId(
+                                    pengiriman.tanggal_transaksi));
+                            }
+                            if (pengirimanTableBody) {
+                                pengirimanTableBody.innerHTML = '';
+                                const pDetails = Array.isArray(pengiriman.details) ? pengiriman.details :
+                            [];
+                                if (pDetails.length === 0) {
+                                    pengirimanTableBody.innerHTML =
+                                        '<tr><td colspan="7" class="text-center">Tidak ada item pengiriman.</td></tr>';
+                                } else {
+                                    pDetails.forEach((item, idx) => {
+                                        const tr = document.createElement('tr');
+                                        // field names sesuai contoh JSON: nama, merk, sn, tipe, jumlah, keterangan
+                                        tr.innerHTML = `
+              <td>${idx + 1}</td>
+              <td>${item.nama ?? item.nama_item ?? '-'}</td>
+              <td>${item.merk ?? '-'}</td>
+              <td>${item.sn ?? '-'}</td>
+              <td>${item.tipe ?? '-'}</td>
+              <td>${item.jumlah ?? '-'}</td>
+              <td>${item.keterangan ?? '-'}</td>
+            `;
+                                        pengirimanTableBody.appendChild(tr);
+                                    });
+                                }
+                            }
+                        } else {
+                            if (pengirimanTableBody) pengirimanTableBody.innerHTML =
+                                '<tr><td colspan="7" class="text-center">Belum ada data pengiriman.</td></tr>';
+                        }
+
+                    } catch (err) {
+                        console.error('Error loadRequestDetailToModal:', err);
+                        if (requestTableBody) requestTableBody.innerHTML =
+                            '<tr><td colspan="5" class="text-center">Gagal memuat data.</td></tr>';
+                        if (pengirimanTableBody) pengirimanTableBody.innerHTML =
+                            '<tr><td colspan="7" class="text-center">Gagal memuat data.</td></tr>';
+                        alert('Gagal memuat detail request. Lihat console untuk detail.');
+                    }
+                }
+                // ----- Bind click on .btn-terima -----
+                safeQueryAll('.btn-terima').forEach(button => {
+                    button.addEventListener('click', function(ev) {
+                        const tiket = this.dataset.tiket || this.getAttribute('data-tiket');
+                        if (!tiket) return;
+                        // load data then show modal
+                        loadRequestDetailToModal(tiket).finally(() => {
+                            // Show modal via Bootstrap if available, otherwise rely on data-bs-toggle
+                            if (modalInstanceTerima) modalInstanceTerima.show();
+                        });
+                    });
+                });
+
+                // ----- Build and send confirmation (manual FormData) -----
+                const btnKonfirmasi = safeQuery('#btnKonfirmasi');
+                btnKonfirmasi && btnKonfirmasi.addEventListener('click', async function() {
+                    // get tiket from hidden input OR modal display
+                    const tiketVal = (inputTiket && inputTiket.value) || (safeQuery(
+                            '#modal-tiket-display') && safeQuery('#modal-tiket-display')
+                        .textContent) || '';
+                    if (!tiketVal) {
+                        alert('Tiket tidak ditemukan. Coba tutup dan buka kembali modal.');
+                        return;
+                    }
+
+                    // Build FormData manually to avoid requiring a <form> in HTML
+                    const fd = new FormData();
+                    fd.append('tiket', tiketVal);
+
+                    // Collect ekspedisi fields (if present)
+                    const namaEkspedisiEl = safeQuery('input[name="nama_ekspedisi"]');
+                    const noResiEls = safeQueryAll(
+                    'input[name="no_resi"]'); // there may be duplicates -> prefer visible non-empty
+                    const noResiEl = noResiEls.find(i => i.offsetParent !== null && i.value
+                    .trim() !== '') || noResiEls[0] || null;
+
+                    if (namaEkspedisiEl && namaEkspedisiEl.value.trim() !== '') fd.append(
+                        'nama_ekspedisi', namaEkspedisiEl.value.trim());
+                    if (noResiEl && noResiEl.value.trim() !== '') fd.append('no_resi', noResiEl
+                        .value.trim());
+
+                    // Attach file if present
+                    const fileEls = safeQueryAll('input[type="file"]');
+                    if (fileEls.length > 0) {
+                        // take first file from first file input that has files
+                        let attached = false;
+                        for (const fEl of fileEls) {
+                            if (fEl.files && fEl.files.length > 0) {
+                                fd.append(fEl.name || 'file_upload', fEl.files[0]);
+                                attached = true;
+                                break;
+                            }
+                        }
+                        if (!attached) {
+                            // no files chosen -> fine (server may accept)
+                        }
+                    }
+
+                    // Optionally include other inputs inside modal, e.g. textarea[name="keterangan"]
+                    const otherInputs = safeQueryAll('#modalTerima [name]');
+                    otherInputs.forEach(el => {
+                        const name = el.name;
+                        if (!name) return;
+                        // skip file inputs (already handled) and tiket (already appended)
+                        if (el.type === 'file') return;
+                        if (name === 'tiket') return;
+                        const val = (el.value !== undefined) ? el.value : '';
+                        // avoid duplicating nama_ekspedisi/no_resi already appended
+                        if (name === 'nama_ekspedisi' || name === 'no_resi') return;
+                        fd.append(name, val);
                     });
 
-                    // Isi data pengiriman
-                    if (data.pengiriman) {
-                        document.getElementById('modal-tanggal-pengiriman-display').textContent = new Date(data.pengiriman.tanggal_transaksi)
-                            .toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
-
-                        const pengirimanTable = document.getElementById('pengiriman-table-body');
-                        pengirimanTable.innerHTML = '';
-                        data.pengiriman.details.forEach((item, index) => {
-                            const tr = document.createElement('tr');
-                            tr.innerHTML = `
-                                <td>${index + 1}</td>
-                                <td>${item.nama}</td>
-                                <td>${item.merk || '-'}</td>
-                                <td>${item.sn || '-'}</td>
-                                <td>${item.tipe || '-'}</td>
-                                <td>${item.jumlah}</td>
-                                <td>${item.keterangan || '-'}</td>
-                            `;
-                            pengirimanTable.appendChild(tr);
+                    // Send POST
+                    const endpoint = `/user/validasi/${encodeURIComponent(tiketVal)}/terima`;
+                    try {
+                        const resp = await fetch(endpoint, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': getCsrfToken(),
+                                // 'Accept': 'application/json' // optional
+                            },
+                            body: fd,
                         });
-                    } else {
-                        document.getElementById('pengiriman-table-body').innerHTML = '<tr><td colspan="7" class="text-center">Belum ada data pengiriman.</td></tr>';
+
+                        // Try parse JSON safely
+                        const text = await resp.text();
+                        let data;
+                        try {
+                            data = text ? JSON.parse(text) : {};
+                        } catch (e) {
+                            throw new Error('Response JSON invalid: ' + text);
+                        }
+
+                        if (resp.ok && data && data.success) {
+                            alert(data.message || 'Penerimaan berhasil dikonfirmasi.');
+                            // close modal if bootstrap present
+                            if (modalInstanceTerima) modalInstanceTerima.hide();
+                            // reload to update listing
+                            window.location.reload();
+                        } else {
+                            const msg = data?.message || `Gagal: status ${resp.status}`;
+                            alert(msg);
+                        }
+                    } catch (err) {
+                        console.error('Error saat submit konfirmasi:', err);
+                        alert(
+                            'Terjadi kesalahan saat mengirim konfirmasi. Cek console untuk detail.');
                     }
-                })
-                .catch(err => {
-                    console.error('Error:', err);
-                    alert('Gagal memuat detail request.');
                 });
-        });
-    });
 
-    // Submit form
-    document.getElementById('btnKonfirmasi')?.addEventListener('click', function() {
-        const form = document.getElementById('formKonfirmasi');
-        const formData = new FormData(form);
-        const tiket = document.getElementById('inputTiket').value;
-
-        fetch(`/user/validasi/${tiket}/terima`, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert(data.message);
-                location.reload();
-            } else {
-                alert('Gagal: ' + data.message);
-            }
-        })
-        .catch(err => {
-            alert('Terjadi kesalahan: ' + err.message);
-        });
-    });
-
-    // Filter pencarian
-    document.getElementById('searchFilter')?.addEventListener('keyup', function () {
-        const filter = this.value.toLowerCase();
-        document.querySelectorAll('tbody tr').forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(filter) ? '' : 'none';
-        });
-    });
-
-    // Detail status approval
-    window.showStatusDetailModal = function(tiket, userRole) {
-        fetch(`/requestbarang/api/permintaan/${tiket}/status`)
-            .then(response => response.json())
-            .then(data => {
-                const modal = document.getElementById('status-detail-modal');
-                if (modal && modal.__x) {
-                    modal.__x.$data.status = data;
-                    modal.__x.$data.role = userRole;
-                    modal.__x.$data.showStatusDetail = true;
+                // ----- Search filter (only on main listing table with class .table-hover) -----
+                const searchInput = safeQuery('#searchFilter');
+                if (searchInput) {
+                    searchInput.addEventListener('input', function() {
+                        const filter = this.value.trim().toLowerCase();
+                        // choose the main listing table (table-hover)
+                        const rows = document.querySelectorAll('.table.table-hover tbody tr');
+                        rows.forEach(row => {
+                            // don't hide rows inside modal tables (modals are not using .table-hover)
+                            const text = row.textContent.toLowerCase();
+                            row.style.display = filter === '' || text.includes(filter) ? '' :
+                                'none';
+                        });
+                    });
                 }
-            })
-            .catch(err => {
-                alert('Gagal muat detail status approval.');
+
+                // ----- Status detail modal (Alpine.js-aware, fallback if not present) -----
+                window.showStatusDetailModal = async function(tiket, userRole = 'user') {
+                    if (!tiket) return;
+                    try {
+                        const resp = await fetch(`/user/validasi/${encodeURIComponent(tiket)}/api`, {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+                        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                        const data = await resp.json();
+
+                        const modal = safeQuery('#status-detail-modal');
+                        if (!modal) return;
+
+                        const alpine = modal.__x;
+                        if (alpine && alpine.$data) {
+                            alpine.$data.status = data ?? {};
+                            alpine.$data.role = userRole;
+                            alpine.$data.showStatusDetail = true;
+                        } else {
+                            // Fallback: show modal container (basic)
+                            // If using Bootstrap to show overlay modal, you might want to toggle a class here.
+                            modal.style.display = 'block';
+                            // try to populate a fallback textual area if present
+                            const statusTextEl = safeQuery('#status-detail-fallback');
+                            if (statusTextEl) statusTextEl.textContent = JSON.stringify(data, null, 2);
+                            console.warn('Alpine.js tidak tersedia. Fallback simpel sudah diaktifkan.');
+                        }
+                    } catch (err) {
+                        console.error('Gagal muat detail status approval:', err);
+                        alert('Gagal memuat detail status approval. Cek console untuk detail.');
+                    }
+                };
+
+                // ----- Optional: toggle formEkspedisi visibility if there is a control -----
+                (function handleFormEkspedisiToggle() {
+                    const formEkspedisi = safeQuery('#formEkspedisi');
+                    if (!formEkspedisi) return;
+                    // check for a checkbox/radio named show_ekspedisi OR element with id 'toggleEkspedisi'
+                    const toggle = safeQuery('[name="show_ekspedisi"]') || safeQuery('#toggleEkspedisi');
+                    if (!toggle) {
+                        // If there is no toggle, but fields inside formEkspedisi have values, show it; otherwise hide.
+                        const anyValue = safeQueryAll(
+                                '#formEkspedisi input, #formEkspedisi select, #formEkspedisi textarea')
+                            .some(i => i.value && i.value.trim() !== '');
+                        formEkspedisi.style.display = anyValue ? 'block' : 'none';
+                        return;
+                    }
+
+                    const apply = () => {
+                        if (toggle.type === 'checkbox') {
+                            formEkspedisi.style.display = toggle.checked ? 'block' : 'none';
+                        } else {
+                            // for select/radio where value 'yes' or '1' indicates show
+                            const val = toggle.value;
+                            formEkspedisi.style.display = (val === '1' || val.toLowerCase() === 'ya' ||
+                                val.toLowerCase() === 'yes') ? 'block' : 'none';
+                        }
+                    };
+                    toggle.addEventListener('change', apply);
+                    apply();
+                })();
+
+                // End DOMContentLoaded
             });
-    };
-});
-</script>
-@endpush
+        })();
+    </script>
+@endsection

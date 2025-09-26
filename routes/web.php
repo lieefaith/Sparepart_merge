@@ -170,6 +170,7 @@ Route::middleware(['auth', 'role:3'])
 
         Route::get('/closed-form', 'closedFormIndex')->name('closed.form.index');
         Route::post('/closed-form/{tiket}/verify', 'verifyClosedForm')->name('closed.form.verify');
+        Route::get('/closed-form/{tiket}/detail', 'getValidasiDetail')->name('closed.form.detail');
     });
 
 
@@ -187,6 +188,9 @@ Route::middleware(['auth', 'role:4'])
 
         Route::get('/validasi', [UserController::class, 'validasiIndex'])->name('validasi.index');
         Route::post('/validasi/{tiket}/terima', [UserController::class, 'terimaBarang'])->name('validasi.terima');
+        Route::get('/validasi/{tiket}/detail', [UserController::class, 'historyDetail'])->name('history.detail');
+        Route::get('/validasi/{tiket}/api', [KepalaGudangController::class, 'historyDetailApi'])
+            ->name('history.api');
 
         Route::get('/history', [UserController::class, 'historyIndex'])->name('history.index');
 
