@@ -177,6 +177,12 @@ class KepalaGudangController extends Controller
             }
 
             // ✅ Validasi: Hanya proses jika status_gudang masih 'pending'
+            if ($permintaan->status_gudang !== 'on progres') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Permintaan ini sudah diproses sebelumnya. Tidak dapat diproses ulang.'
+                ], 400);
+            }
 
             // ✅ Buat tiket pengiriman unik
             $tiketKirim = 'TKT-KRM-' . now()->format('YmdHis');
@@ -215,7 +221,7 @@ class KepalaGudangController extends Controller
             // ✅ Update status permintaan
             $permintaan->update([
                 'status_gudang' => 'approved',
-                'status_admin' => 'pending',
+                'status_admin' => 'on progres',
                 'approved_by_admin' => 13,
                 'catatan_admin' => null,
                 'status' => 'diterima',
@@ -247,21 +253,39 @@ class KepalaGudangController extends Controller
         }
     }
 
-    public function rejectGudang($tiket)
-    {
+    public function rejectGudang(Request $request, $tiket)
+{
+    try {
         $permintaan = Permintaan::where('tiket', $tiket)->firstOrFail();
 
-        // ✅ Broadcast rejected ke semua level + status_barang
+        // Ambil catatan dari request (opsional)
+        $catatan = $request->input('catatan', 'Ditolak oleh Kepala Gudang');
+
+        // Update semua status jadi rejected
         $permintaan->update([
             'status_gudang' => 'rejected',
             'status_ro' => 'rejected',
             'status_admin' => 'rejected',
             'status_super_admin' => 'rejected',
-            'status_barang' => 'rejected', // 🔥 Penting!
+            'status_barang' => 'rejected', // ✅ 'closed', bukan 'rejected' (sesuai enum)
             'status' => 'ditolak',
-            'catatan_gudang' => $catatan ?? 'Ditolak oleh Kepala Gudang',
+            'catatan_gudang' => $catatan,
         ]);
+
+        // ✅ Kembalikan JSON sukses
+        return response()->json([
+            'success' => true,
+            'message' => 'Permintaan berhasil ditolak.'
+        ]);
+
+    } catch (\Exception $e) {
+        // ✅ Tangani error & kembalikan JSON error
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal menolak permintaan: ' . $e->getMessage()
+        ], 500);
     }
+}
 
     public function approve(Request $request)
     {
@@ -353,8 +377,8 @@ class KepalaGudangController extends Controller
             // ✅ Update status permintaan
             $permintaan->update([
                 'status_gudang' => 'approved',
-                'status_admin' => 'pending',
-                'approved_by_admin' => 13,
+                'status_admin' => 'on_progres',
+                'approved_by_admin' => 15,
                 'catatan_admin' => null,
             ]);
 
@@ -469,5 +493,33 @@ class KepalaGudangController extends Controller
     }
 
 
+    public function closedFormIndex()
+    {
+        // 🔸 Dummy data sementara (nanti diganti dengan query ke database)
+        $permintaans = collect([
+            (object) [
+                'tiket' => 'REQ-JKT-04-2025-001',
+                'user_name' => 'Ahmad Fauzi',
+                'tanggal_penerimaan' => '2025-04-05 14:30',
+                'foto_bukti_penerimaan' => 'validasi/bukti_001.jpg',
+                'status_barang' => 'diterima',
+            ],
+            (object) [
+                'tiket' => 'REQ-SBY-04-2025-003',
+                'user_name' => 'Siti Rahayu',
+                'tanggal_penerimaan' => '2025-04-06 09:15',
+                'foto_bukti_penerimaan' => 'validasi/bukti_003.pdf',
+                'status_barang' => 'diterima',
+            ],
+        ]);
+
+        return view('kepalagudang.closed-form', compact('permintaans'));
+    }
+
+    public function verifyClosedForm(Request $request, $tiket)
+{
+    // Nanti isi logika verifikasi
+    return redirect()->back()->with('success', 'Berhasil diverifikasi!');
+}
 
 }

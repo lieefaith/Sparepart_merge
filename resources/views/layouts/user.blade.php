@@ -546,7 +546,7 @@
 
             <!-- Logo -->
             <div class="flex items-center justify-between h-16 border-b border-blue-900 bg-[#002060] px-4">
-                <span class="text-lg font-bold">SMS</span>
+                <span class="text-lg font-bold">SiSpare</span>
                 <button @click="sidebarOpen = false" class="md:hidden text-white">
                     <i class="bi bi-x-lg"></i>
                 </button>
@@ -563,7 +563,7 @@
                 <a href="{{ route('request.barang.index') }}" class="flex items-center px-3 py-2 mt-2 rounded transition duration-200 hover:bg-blue-900 text-gray-300 hover:text-white
                     {{ request()->routeIs('request.barang.index') ? 'bg-blue-900 text-white' : '' }}">
                     <i class="bi bi-cart-check me-2"></i>
-                    <span>Request Barang</span>
+                    <span>Request </span>
                 </a>
 
                 <a href="{{ route('validasi.index') }}" class="flex items-center px-3 py-2 mt-2 rounded transition duration-200 hover:bg-blue-900 text-gray-300 hover:text-white
@@ -585,7 +585,7 @@
                 <div class="bg-white text-gray-800 rounded-lg p-2 flex items-center space-x-2 text-sm cursor-pointer">
                     <img src="{{ asset('images/avatar.png') }}" alt="Profile" class="w-8 h-8 rounded-full">
                     <div class="truncate ml-2">
-                        <div class="font-medium">{{ Auth::user()->name }}</div>
+                        <div class="font-medium">{{ Auth::user()->name ?? '-' }}</div>
                         <div class="text-xs text-gray-600">User</div>
                     </div>
                 </div>

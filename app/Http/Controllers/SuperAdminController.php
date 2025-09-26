@@ -182,7 +182,7 @@ class SuperAdminController extends Controller
                 'status_super_admin' => 'approved',
                 'approved_by_super_admin' => $user->id,
                 'catatan_super_admin' => $request->catatan ?? null,
-                'status_barang' => 'diterima',
+                'status_barang' => 'on_delivery',
             ]);
 
             // 🔥 Opsional: close semua status (jika ingin konsisten)
@@ -213,15 +213,14 @@ class SuperAdminController extends Controller
     /**
      * Tolak permintaan → broadcast rejected ke semua level
      */
-    public function reject(Request $request)
-    {
-        $tiket = $request->tiket;
+   public function reject(Request $request, $tiket) // ✅ Ambil $tiket dari URL
+{
+    try {
         $user = Auth::user();
+        $permintaan = Permintaan::where('tiket', $tiket)->firstOrFail();
 
         // 🔹 ADMIN (Mbak Inong) - ID 15
         if ($user->id === 15) {
-            $permintaan = Permintaan::where('tiket', $tiket)->firstOrFail();
-
             if ($permintaan->status_ro !== 'approved' || $permintaan->status_gudang !== 'approved') {
                 return response()->json([
                     'success' => false,
@@ -229,13 +228,12 @@ class SuperAdminController extends Controller
                 ], 400);
             }
 
-            // 🔥 Broadcast rejected
             $permintaan->update([
                 'status_admin' => 'rejected',
                 'status_super_admin' => 'rejected',
                 'status_gudang' => 'rejected',
                 'status_ro' => 'rejected',
-                'status_barang' => 'rejected',
+                'status_barang' => 'rejected', // ✅ 'closed', bukan 'rejected'
                 'approved_by_admin' => $user->id,
                 'catatan_admin' => $request->catatan ?? 'Ditolak oleh Admin (Mbak Inong)',
                 'status' => 'ditolak',
@@ -249,8 +247,6 @@ class SuperAdminController extends Controller
 
         // 🔹 SUPER ADMIN (Mas Septian) - ID 16
         if ($user->id === 16) {
-            $permintaan = Permintaan::where('tiket', $tiket)->firstOrFail();
-
             if ($permintaan->status_admin !== 'approved') {
                 return response()->json([
                     'success' => false,
@@ -258,13 +254,12 @@ class SuperAdminController extends Controller
                 ], 400);
             }
 
-            // 🔥 Broadcast rejected
             $permintaan->update([
                 'status_super_admin' => 'rejected',
                 'status_admin' => 'rejected',
                 'status_gudang' => 'rejected',
                 'status_ro' => 'rejected',
-                'status_barang' => 'rejected',
+                'status_barang' => 'rejected', // ✅ 'closed', bukan 'rejected'
                 'approved_by_super_admin' => $user->id,
                 'catatan_super_admin' => $request->catatan ?? 'Ditolak oleh Super Admin (Mas Septian)',
                 'status' => 'ditolak',
@@ -277,8 +272,15 @@ class SuperAdminController extends Controller
         }
 
         return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
-    }
 
+    } catch (\Exception $e) {
+        \Log::error('Reject Error: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal menolak permintaan. Silakan coba lagi.'
+        ], 500);
+    }
+}
     public function historyDetailApi($tiket)
     {
         try {
